@@ -1,5 +1,51 @@
+* Setting :noexport:
+Remember to exceture (C-c C-c) the following line:
+#+PROPERTY: header-args:R :async :results output verbatim  :exports both  :session *R* :cache yes
+Other setting can also be useful:
+# #+PROPERTY: header-args:R  :async :results output raw drawer  :exports both  :session *R* :cache yes
+
 #+Title: The state learner
 
 This repository provides code that implements the state learner. We provide
 examples of how to use it as a stand-alone tool and in combination with targeted
 learning.
+
+To run the examples below, run the following code to load the needed functions.
+
+#+BEGIN_SRC R
+  library(here)
+  library(targets)
+  tar_source(here("R-code/functions"))
+#+END_SRC
+
+#+RESULTS[(2023-11-06 13:14:03) ab04ea159ccfb3e6fe0ef94b7eb9203da121ecbc]:
+
+** Stand alone use of the state learner
+We illustrate how to use the state learner by fitting it to the =Melanoma= data
+set as provided by the =riskRegression= package.
+
+#+BEGIN_SRC R
+  library(riskRegression)
+  data(Melanoma,package="riskRegression")
+  setDT(Melanoma)
+  head(Melanoma)
+#+END_SRC
+
+#+RESULTS[(2023-11-06 13:14:07) 9cfa88c2f8cb145980438e1195cf3ea5a731a262]:
+:    time status                    event invasion ici      epicel       ulcer thick    sex age   logthick
+: 1:   10      2       death.other.causes  level.1   2     present     present  6.76   Male  76  1.9110229
+: 2:   30      2       death.other.causes  level.0   0 not present not present  0.65   Male  56 -0.4307829
+: 3:   35      0                 censored  level.1   2 not present not present  1.34   Male  41  0.2926696
+: 4:   99      2       death.other.causes  level.0   2 not present not present  2.90 Female  71  1.0647107
+: 5:  185      1 death.malignant.melanoma  level.2   2     present     present 12.08   Male  52  2.4915512
+: 6:  204      1 death.malignant.melanoma  level.2   2 not present     present  4.84   Male  28  1.5769147
+
+
+The state learner
+
+#+BEGIN_SRC R
+
+#+END_SRC
+
+** Testing
+
