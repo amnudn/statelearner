@@ -1,0 +1,15 @@
+*.bbl
+*.blg
+*.aux
+*.log
+*.out
+*.synctex.gz
+*.lof
+*.lot
+*.fff
+*.ttt
+auto/
+meta/
+_targets/
+data/
+documents/

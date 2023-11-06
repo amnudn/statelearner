@@ -1,0 +1,429 @@
+\documentclass[a4,danish]{article}
+\usepackage[a4paper, margin=3.5cm]{geometry}
+\input{./latex-settings/standard-settings.tex}
+\input{./latex-settings/standard-commands.tex}
+\input{./latex-settings/theorem-env.tex}
+\input{./latex-settings/title-compact.tex}
+\definecolor{linkcolor}{rgb}{0, 0, 0.54}
+\usepackage[colorlinks=true,allcolors=linkcolor,linktocpage=true]{hyperref} % Doesn't work for org, so included here
+
+\title{Implementation details for cause-specific ATE}
+\author{Anders Munch}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+We assume given the functions,
+\begin{align*}
+  & \pi(w)
+  \\
+  & \Lambda_j(t \mid a, w), \quad j \in \{1,2\},
+  \\
+  & \Gamma(t \mid a, w),
+\end{align*}
+as defined in the main paper.
+
+Define
+\begin{align*}
+  \omega_a(A,W; \pi)
+  &=  \frac{(-1)^{a+1}\1{\{A=a\}}}{\pi(W)^{a}(1-\pi(W))^{1-a}},
+  \\
+  g(t, A, W; \Lambda_1, \Lambda_2)
+  & = \int_0^{t}
+    e^{-\Lambda_1(s- \mid W, A)-\Lambda_2(s- \mid W, A)}  \Lambda_1(\diff s \mid
+    W, A),
+  \\  
+  M_j(\diff t \mid A, W;  \Lambda_j  )
+  & = N_j(\diff t) -
+    \1{\{\tilde{T} \geq t\}} \Lambda_j(\diff t \mid W, A),
+    \quad j \in \{1,2\},
+  \\
+  M(\diff t \mid A, W;  \Lambda_1, \Lambda_2  )
+  & = M_1(\diff t \mid A, W;  \Lambda_1  ) +
+    M_2(\diff t \mid A, W;  \Lambda_2  ).
+\end{align*}
+
+The efficient influence function is
+\begin{equation*}
+  \begin{split}
+    & \psi_{\tau}(O; \Lambda_1, \Lambda_2, \Gamma, \pi)
+    \\
+    & =
+      \sum_{a=0}^{1}
+      \omega_a(A,W; \pi)
+      % \Bigg\{
+      \int_0^{\tau} e^{\Gamma(t- \mid A, W)}   
+      M_1(\diff t \mid A, W; \Lambda_1)
+      % \Bigg\}
+    \\
+    & \quad
+      - \sum_{a=0}^{1}
+      \omega_a(A,W; \pi)
+      g(\tau, A, W; \Lambda_1, \Lambda_2)
+      \int_0^{\tau} e^{[\Gamma+\Lambda_1 + \Lambda_2](t- \mid A, W)}
+      M(\diff t \mid A, W; \Lambda_1, \Lambda_2)
+    \\
+    & \quad
+      + \sum_{a=0}^{1}
+      \omega_a(A,W; \pi)      
+      \int_0^{\tau}
+      g(t, A, W; \Lambda_1, \Lambda_2)
+      e^{[\Gamma+\Lambda_1 + \Lambda_2](t- \mid A, W)}
+      M(\diff t \mid A, W; \Lambda_1, \Lambda_2)
+    \\
+    & \quad + g(\tau, 1, W; \Lambda_1, \Lambda_2)
+      - g(\tau, 0, W; \Lambda_1, \Lambda_2)
+    \\
+    & \quad
+      -\tilde{\Psi}_{t}^0(\Lambda_1, \Lambda_2, \mu).
+  \end{split}
+\end{equation*}
+
+The one-step estimator is
+\begin{equation*}
+  \Psi_{\text{OS}}(\Lambda_1, \Lambda_2, \Gamma, \pi, \mu) =  
+  \tilde{\Psi}_{t}^0(\Lambda_1, \Lambda_2, \mu)
+  + \empmeas{[\psi_{\tau}(\blank; \Lambda_1, \Lambda_2, \Gamma, \pi)]}
+\end{equation*}
+
+Define
+\begin{align*}
+  \mathtt{termW}_i(\pi)
+  & =
+    \frac{(-1)^{A_i+1}}{\pi(W_i)^{A_i}(1-\pi(W_i))^{1-A_i}},
+  \\
+  \mathtt{termA\_N}_i(\Gamma)
+  & =\int_0^{\tau} e^{\Gamma(t- \mid A_i, W_i)}   
+    N_{1,i}(\diff t)
+  \\
+  & =
+    \1{\{\tilde{D}_i = 1\}} \1{\{\tilde{T}_i \leq \tau \}}
+    e^{\Gamma(\tilde{T}_i- \mid A_i, W_i)}   
+  \\
+  \mathtt{termA\_L}_i(\Gamma, \Lambda_1)
+  & =\int_0^{\tau} e^{\Gamma(t- \mid A_i, W_i)}
+    \1{\{\tilde{T}_i \geq t\}}
+    \Lambda_1(\diff t \mid A_i, W_i)
+  \\
+  \mathtt{termB\_N}_i(\Gamma, \Lambda_1, \Lambda_2)
+  & =
+    g(\tau, A_i, W_i; \Lambda_1, \Lambda_2)
+    \int_0^{\tau} e^{[\Gamma+\Lambda_1 + \Lambda_2](t- \mid A_i, W_i)}
+    [N_{1,i}+N_{2,i}](\diff t)
+  \\
+  & =
+    g(\tau, A_i, W_i; \Lambda_1, \Lambda_2)
+    \1{\{\tilde{D}_i \not = 0\}} \1{\{\tilde{T}_i \leq \tau \}}
+    e^{[\Gamma+\Lambda_1 + \Lambda_2](\tilde{T}_i- \mid A_i, W_i)},
+  \\
+  \mathtt{termB\_L}_i(\Gamma, \Lambda_1, \Lambda_2)
+  & =
+    g(\tau, A_i, W_i; \Lambda_1, \Lambda_2)
+    \int_0^{\tau} e^{[\Gamma+\Lambda_1 + \Lambda_2](t- \mid A_i, W_i)}
+    \1{\{\tilde{T}_i \geq t\}}
+    [\Lambda_1+\Lambda_2](\diff t \mid A_i, W_i),
+  \\
+  \mathtt{termC\_N}_i(\Gamma, \Lambda_1, \Lambda_2)
+  & =    
+    \int_0^{\tau}
+    g(t, A_i, W_i; \Lambda_1, \Lambda_2)e^{[\Gamma+\Lambda_1 + \Lambda_2](t- \mid A_i, W_i)}
+    [N_{1,i}+N_{2,i}](\diff t)
+  \\
+  & =
+    g(\tilde{T}_i \wedge \tau, A_i, W_i; \Lambda_1, \Lambda_2)
+    \1{\{\tilde{D}_i \not = 0\}} \1{\{\tilde{T}_i \leq \tau \}}
+    e^{[\Gamma+\Lambda_1 + \Lambda_2](\tilde{T}_i- \mid A_i, W_i)},
+  \\
+  & =
+    \int_0^{\tau}
+    e^{-\Lambda_1(s- \mid W_i, A_i)-\Lambda_2(s- \mid W_i, A_i)}
+    \1{\{\tilde{T}_i \geq t\}}
+    \Lambda_1(\diff s \mid W_i, A_i)
+  \\
+  & \quad \times
+    \1{\{\tilde{D}_i \not = 0\}} \1{\{\tilde{T}_i \leq \tau \}}
+    e^{[\Gamma+\Lambda_1 + \Lambda_2](\tilde{T}_i- \mid A_i, W_i)},
+  \\
+  \mathtt{termC\_L}_i(\Gamma, \Lambda_1, \Lambda_2)
+  & =    
+    \int_0^{\tau}
+    \int_0^{t}
+    e^{-\Lambda_1(s- \mid W_i, A_i)-\Lambda_2(s- \mid W_i, A_i)}
+    \Lambda_1(\diff s \mid W_i, A_i)
+  \\
+  & \quad \times
+    e^{[\Gamma+\Lambda_1 + \Lambda_2](t- \mid A_i,
+    W_i)}
+    \1{\{\tilde{T}_i \geq t\}}
+    [\Lambda_1+\Lambda_2](\diff t \mid A_i, W_i),
+  \\
+  \mathtt{naiv}_i(\Lambda_1,\Lambda_2)
+  & =
+    g(\tau, 1, W_i; \Lambda_1, \Lambda_2)
+    - g(\tau, 0, W_i; \Lambda_1, \Lambda_2)
+\end{align*}
+
+Then we can write the one-step estimator as
+\begin{align*}
+  \Psi_{\text{OS}}(\Lambda_1, \Lambda_2, \Gamma, \pi, \mu)
+  = \frac{1}{n}\sum_{i=1}^{n}
+  \Bigg\{
+  & 
+    \mathtt{term}_i(\pi)
+    \Big(
+    \left[
+    \mathtt{termA\_N}_i(\Gamma) - \mathtt{termA\_L}_i(\Gamma, \Lambda_1)
+    \right]
+  \\
+  & \quad\qquad\qquad - 
+          \left[
+          \mathtt{termB\_N}_i(\Gamma, \Lambda_1, \Lambda_2)
+          - \mathtt{termB\_L}_i(\Gamma, \Lambda_1, \Lambda_2)
+          \right]
+  \\
+  & \quad\qquad\qquad+ 
+    \left[
+    \mathtt{termC\_N}_i(\Gamma, \Lambda_1, \Lambda_2)
+    - \mathtt{termC\_L}_i(\Gamma, \Lambda_1, \Lambda_2)
+    \right] \Big)
+  \\
+  & + \mathtt{naiv}_i(\Lambda_1,\Lambda_2)
+    \Bigg\}
+\end{align*}
+
+
+% Define
+% \begin{equation*}
+%   \omega_a(A,W; \pi) =
+%   \frac{\1{\{A=a\}}}{\pi(W)^{a}(1-\pi(W))^{1-a}},
+% \end{equation*}
+% \begin{equation*}
+%   g(t, A, W; \Lambda_1, \Lambda_2)
+%   = \int_0^{t}
+%   e^{-\Lambda_1(s- \mid W, A)-\Lambda_2(s- \mid W, A)}  \Lambda_1(\diff s \mid
+%   W, A),
+% \end{equation*}
+% and
+% \begin{equation*}
+%   M_j(\diff t \mid A, W;  \Lambda_j  ) =
+%   N_j(\diff t) -
+%   \1{\{\tilde{T} \geq t\}} \Lambda_j(\diff t \mid W, A),
+% \end{equation*}
+% for \( j \in \{1,2\} \) and
+% \begin{equation*}
+%   M(\diff t \mid A, W;  \Lambda_1, \Lambda_2  ) =
+%   M_1(\diff t \mid A, W;  \Lambda_1  ) +
+%   M_2(\diff t \mid A, W;  \Lambda_2  ).
+% \end{equation*}
+% Then
+% \begin{equation}
+%   \label{eq:8}
+%   \begin{split}
+%     & \psi_{\tau}(O; \Lambda_1, \Lambda_2, \Gamma, \pi)
+%     \\
+%     & =
+%       \sum_{a=0}^{1}
+%       \omega_a(A,W; \pi)
+%       % \Bigg\{
+%       \int_0^{\tau} e^{\Gamma(t- \mid A, W)}   
+%       M_1(\diff t \mid A, W; \Lambda_1)
+%       % \Bigg\}
+%     \\
+%     & \quad
+%       - \sum_{a=0}^{1}
+%       \omega_a(A,W; \pi)
+%       g(\tau, A, W; \Lambda_1, \Lambda_2)
+%       \int_0^{\tau} e^{[\Gamma+\Lambda_1 + \Lambda_2](t- \mid A, W)}
+%       M(\diff t \mid A, W; \Lambda_1, \Lambda_2)
+%     \\
+%     & \quad
+%       + \sum_{a=0}^{1}
+%       \omega_a(A,W; \pi)      
+%       \int_0^{\tau}
+%       g(t, A, W; \Lambda_1, \Lambda_2)
+%       e^{[\Gamma+\Lambda_1 + \Lambda_2](t- \mid A, W)}
+%       M(\diff t \mid A, W; \Lambda_1, \Lambda_2)
+%     \\
+%     & \quad + g(\tau, 1, W; \Lambda_1, \Lambda_2)
+%       - g(\tau, 0, W; \Lambda_1, \Lambda_2)
+%     \\
+%     & \quad
+%       -\tilde{\Psi}_{t}^0(\Lambda_1, \Lambda_2, \mu).
+%   \end{split}
+% \end{equation}
+% Define
+% \begin{align*}
+%   R_{1}^N
+%   & =
+%     g(\tau, A, W; \Lambda_1, \Lambda_2)
+%     \int_0^{\tau} e^{[\Gamma+\Lambda_1 + \Lambda_2](t- \mid A, W)}
+%     [N_1+N_2](\diff t)
+%   \\
+%   & =
+%     g(\tau, A, W; \Lambda_1, \Lambda_2)
+%     \1{\{\tilde{D} \not = 0\}} \1{\{\tilde{T} \leq \tau \}}
+%     e^{[\Gamma+\Lambda_1 + \Lambda_2](\tilde{T}- \mid A, W)},
+%   \\
+%   R_{1}^{\Lambda}
+%   & =
+%     g(\tau, A, W; \Lambda_1, \Lambda_2)
+%     \int_0^{\tau} e^{[\Gamma+\Lambda_1 + \Lambda_2](t- \mid A, W)}
+%     \1{\{\tilde{T} \geq t\}}
+%     [\Lambda_1+\Lambda_2](\diff t \mid A, W),
+%   \\
+%   R_{2}^N
+%   & =    
+%     \int_0^{\tau}
+%     g(t, A, W; \Lambda_1, \Lambda_2)e^{[\Gamma+\Lambda_1 + \Lambda_2](t- \mid A, W)}
+%     [N_1+N_2](\diff t)
+%   \\
+%   & =
+%     g(\tilde{T}, A, W; \Lambda_1, \Lambda_2)
+%     \1{\{\tilde{D} \not = 0\}} \1{\{\tilde{T} \leq \tau \}}
+%     e^{[\Gamma+\Lambda_1 + \Lambda_2](\tilde{T}- \mid A, W)},
+%   \\
+%   R_{2}^{\Lambda}
+%   & =    
+%     \int_0^{\tau}
+%     g(t, A, W; \Lambda_1, \Lambda_2)e^{[\Gamma+\Lambda_1 + \Lambda_2](t- \mid A,
+%     W)}
+%     \1{\{\tilde{T} \geq t\}}
+%     [\Lambda_1+\Lambda_2](\diff t \mid A, W),
+% \end{align*}
+
+% Or, with
+% \begin{equation*}
+%   g(s, t, A, W; \Lambda_1, \Lambda_2)
+%   = \int_s^{t}
+%   e^{-\Lambda_1(s- \mid W, A)-\Lambda_2(s- \mid W, A)}  \Lambda_1(\diff s \mid
+%   W, A),
+% \end{equation*}
+% \begin{equation}
+%   \label{eq:6}
+%   \begin{split}
+%     & \psi_{\tau}(O; \Lambda_1, \Lambda_2, \Gamma, \pi)
+%     \\
+%     & =
+%       \sum_{a=0}^{1}
+%       \omega_a(A,W; \pi)
+%       % \Bigg\{
+%       \int_0^{\tau} e^{\Gamma(t- \mid A, W)}   
+%       M_1(\diff t \mid A, W; \Lambda_1)
+%       % \Bigg\}
+%     \\
+%     & \quad
+%       - \sum_{a=0}^{1}
+%       \omega_a(A,W; \pi)      
+%       \int_0^{\tau}
+%       g(t, \tau, A, W; \Lambda_1, \Lambda_2)
+%       e^{[\Gamma+\Lambda_1 + \Lambda_2](t- \mid A, W)}
+%       M(\diff t \mid A, W; \Lambda_1, \Lambda_2)
+%     \\
+%     & \quad + g(0, \tau, 1, W; \Lambda_1, \Lambda_2)
+%       - g(0,\tau, 0, W; \Lambda_1, \Lambda_2)
+%     \\
+%     & \quad
+%       -\tilde{\Psi}_{t}^0(\Lambda_1, \Lambda_2, \mu).
+%   \end{split}
+% \end{equation}
+
+% We can write
+% \begin{align*}
+%   & \int_0^{\tau}
+%     g(t, \tau, A, W; \Lambda_1, \Lambda_2)
+%     e^{[\Gamma+\Lambda_1 + \Lambda_2](t- \mid A, W)}
+%     M(\diff t \mid A, W; \Lambda_1, \Lambda_2)
+%   \\
+%   & =
+%     \int_0^{\tau}
+%     \int_t^{\tau}
+%     e^{-\Lambda_1(s- \mid W, A)-\Lambda_2(s- \mid W, A)}  \Lambda_1(\diff s \mid
+%     W, A)
+%     e^{[\Gamma+\Lambda_1 + \Lambda_2](t- \mid A, W)}
+%     M(\diff t \mid A, W; \Lambda_1, \Lambda_2)
+%   \\
+%   & =
+%     \int_0^{\tau}
+%     e^{-\Lambda_1(s- \mid W, A)-\Lambda_2(s- \mid W, A)} 
+%     \int_0^{s-}
+%     e^{[\Gamma+\Lambda_1 + \Lambda_2](t- \mid A, W)}
+%     M(\diff t \mid A, W; \Lambda_1, \Lambda_2)
+%     \Lambda_1(\diff s \mid W, A)
+%   \\
+%   & =
+%     \int_0^{\tau}
+%     e^{-\Lambda_1(s- \mid W, A)-\Lambda_2(s- \mid W, A)} 
+%     \int_0^{s-}
+%     e^{[\Gamma+\Lambda_1 + \Lambda_2](t- \mid A, W)}
+%     [N_1 + N_2](\diff t)
+%     \Lambda_1(\diff s \mid W, A)
+%   \\
+%   & \quad -
+%     \int_0^{\tau}
+%     e^{-\Lambda_1(s- \mid W, A)-\Lambda_2(s- \mid W, A)} 
+%     \int_0^{s-}
+%     e^{[\Gamma+\Lambda_1 + \Lambda_2](t- \mid A, W)}
+%     \1{\{\tilde{T} \geq t\}}
+%     [\Lambda_1 + \Lambda_2](\diff t \mid A, W)
+%     \Lambda_1(\diff s \mid W, A)
+%   \\
+%   & =
+%     \1{\{\tilde{D} \not = 0\}} \1{\{\tilde{T} \leq \tau\}}
+%     e^{[\Gamma+\Lambda_1 + \Lambda_2](\tilde{T}- \mid A, W)}
+%   \\
+%   & \qquad \times
+%     \left(   
+%     \int_0^{\tau}
+%     \1{\{s > \tilde{T}\}}
+%     e^{-\Lambda_1(s- \mid W, A)-\Lambda_2(s- \mid W, A)}     
+%     \Lambda_1(\diff s \mid W, A)
+%     \right)
+%     % \left( \int_0^{\tau} e^{-\Lambda_1(s- \mid W, A)-\Lambda_2(s- \mid W, A)}
+%     %   \Lambda_1(\diff s \mid W, A) - \int_0^{\tilde{T}} e^{-\Lambda_1(s- \mid
+%     %   W, A)-\Lambda_2(s- \mid W, A)} \Lambda_1(\diff s \mid W, A) \right)
+%   \\
+%   & \quad -
+%     \int_0^{\tau}
+%     e^{-\Lambda_1(s- \mid W, A)-\Lambda_2(s- \mid W, A)} 
+%     \int_0^{s-}
+%     e^{[\Gamma+\Lambda_1 + \Lambda_2](t- \mid A, W)}
+%     \1{\{\tilde{T} \geq t\}}
+%     [\Lambda_1 + \Lambda_2](\diff t \mid A, W)
+%     \Lambda_1(\diff s \mid W, A).
+% \end{align*}
+% Define
+% \begin{align*}
+%   Q_1 & = \1{\{\tilde{D} \not = 0\}} \1{\{\tilde{T} \leq \tau\}}
+%         e^{[\Gamma+\Lambda_1 + \Lambda_2](\tilde{T}- \mid A, W)}
+%         \int_{\tilde{T}}^{\tau}
+%         e^{-\Lambda_1(s- \mid W, A)-\Lambda_2(s- \mid W, A)}     
+%         \Lambda_1(\diff s \mid W, A),
+%   % \\
+%   % Q_2 & = \1{\{\tilde{D} \not = 0\}} \1{\{\tilde{T} \leq \tau\}}
+%   %       e^{[\Gamma+\Lambda_1 + \Lambda_2](\tilde{T}- \mid A, W)}
+%   %       \int_0^{\tilde{T}}
+%   %       e^{-\Lambda_1(s- \mid W, A)-\Lambda_2(s- \mid W, A)}     
+%   %       \Lambda_1(\diff s \mid W, A),
+%   \\
+%   Q_2 & =
+%         \int_0^{\tau}
+%         e^{-\Lambda_1(s- \mid W, A)-\Lambda_2(s- \mid W, A)} 
+%         \int_0^{s-}
+%         e^{[\Gamma+\Lambda_1 + \Lambda_2](t- \mid A, W)}
+%         \1{\{\tilde{T} \geq t\}}
+%         [\Lambda_1 + \Lambda_2](\diff t \mid A, W)
+%         \Lambda_1(\diff s \mid W, A).
+% \end{align*}
+
+% NB: We do not use above expression, because we have no implementation of
+% integral up to \( s- \) ...
+
+% Check that
+% \begin{equation*}
+%   Q_1  - Q_2 = (R_1^N-R_1^{\Lambda})-(R_2^N-R_2^{\Lambda})
+% \end{equation*}
+
+\bibliography{./latex-settings/default-bib.bib}
+
+\end{document}
