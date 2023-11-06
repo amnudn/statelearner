@@ -20,7 +20,7 @@ tar_source(here("R-code/functions"))
 We illustrate how to use the state learner by fitting it to the =Melanoma= data
 set as provided by the =riskRegression= package.
 
-#+BEGIN_SRC R
+#+BEGIN_SRC R :exports both
 library(riskRegression)
 data(Melanoma, package="riskRegression")
 setDT(Melanoma)
