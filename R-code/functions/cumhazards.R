@@ -3,9 +3,9 @@
 ## Author: Anders Munch
 ## Created: Nov  6 2023 (12:03) 
 ## Version: 
-## Last-Updated: Nov  6 2023 (12:11) 
+## Last-Updated: Nov  6 2023 (15:04) 
 ##           By: Anders Munch
-##     Update #: 8
+##     Update #: 11
 #----------------------------------------------------------------------
 ## 
 ### Commentary:
@@ -27,10 +27,10 @@ predictCHF <- function(object, newdata, ...){
 predictCHF.coxph <- function(object, newdata, times,...){
     pred_obj = predictCox(object, newdata, times = times, type = "cumhazard")
     chf = pred_obj$cumhazard
-    ## Fix NA by carrying forward... Maybe not the best...
-    last_event_Time_ii = prodlim::sindex(jump.times = pred_obj$times,eval.times = pred_obj$lastEventTime)
-    if(last_event_Time_ii<ncol(chf))
-        chf[, (last_event_Time_ii+1):ncol(chf)] = chf[, last_event_Time_ii]
+    ## ## Fix NA by carrying forward... Maybe not the best...
+    ## last_event_Time_ii = max(prodlim::sindex(jump.times = pred_obj$times,eval.times = pred_obj$lastEventTime))
+    ## if(last_event_Time_ii<ncol(chf))
+    ##     chf[, (last_event_Time_ii+1):ncol(chf)] = chf[, last_event_Time_ii]
     return(chf)
 }
 predictCHF.GLMnet <- function(object, newdata, times,...){

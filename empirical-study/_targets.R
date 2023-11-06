@@ -3,9 +3,9 @@
 ## Author: Thomas Alexander Gerds
 ## Created: Apr 27 2023 (11:06) 
 ## Version: 
-## Last-Updated: Aug 21 2023 (14:08) 
+## Last-Updated: Nov  6 2023 (14:56) 
 ##           By: Anders Munch
-##     Update #: 171
+##     Update #: 172
 #----------------------------------------------------------------------
 ## 
 ### Commentary: 
@@ -128,7 +128,7 @@ list(
             cox_lasso =  list("GLMnet", x_form = ~logPSA+stage+ggtot+sDose+hormones), ## Does not work without explicit formula?
             cox_elastic =  list("GLMnet", x_form = ~logPSA+stage+ggtot+sDose+hormones, alpha = 0.5),
             cox_strata_stage = list("cox", x_form = ~logPSA+strata(stage)+ggtot+sDose+hormones),
-            km =  list("cox", x_form = ~ 1),                    
+            km =  list("cox", x_form = ~ 1),
             rf = list("rfsrc", ntree = 500)
         )
         statelearner2(list(cause1 = zel_learner,

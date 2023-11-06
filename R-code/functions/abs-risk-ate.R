@@ -3,9 +3,9 @@
 ## Author: Anders Munch
 ## Created: Oct 27 2023 (16:08) 
 ## Version: 
-## Last-Updated: Nov  6 2023 (12:20) 
+## Last-Updated: Nov  6 2023 (14:11) 
 ##           By: Anders Munch
-##     Update #: 388
+##     Update #: 389
 #----------------------------------------------------------------------
 ## 
 ### Commentary:
@@ -126,7 +126,6 @@ termC <- function(data, t, Lambda1, Lambda2, Gamma, jump_points,chunks = 1){
     out = (out_count-out_comp)
     return(out)
 }
-
 os_abs_risk_ate <- function(data, t, Lambda1, Lambda2, Gamma, pi, jump_points,chunks = 1,collapse = TRUE){
     W_i = termW(data = data, pi = pi)
     A_i = termA(data = data, t = t, Lambda1 = Lambda1, Gamma = Gamma, jump_points = jump_points, chunks = chunks)

@@ -1,11 +1,11 @@
-### statelearner-v2.R --- 
+### statelearner.R --- 
 #----------------------------------------------------------------------
 ## Author: Anders Munch
 ## Created: Aug 18 2023 (10:26) 
 ## Version: 
-## Last-Updated: Nov  6 2023 (13:03) 
+## Last-Updated: Nov  6 2023 (14:41) 
 ##           By: Anders Munch
-##     Update #: 366
+##     Update #: 372
 #----------------------------------------------------------------------
 ## 
 ### Commentary: 
@@ -35,20 +35,20 @@ form_data <- function(data, max_time = Inf, time = "time", status = "status", ca
 fit_cause_model <- function(model, data, cause, x_form = NULL, ...){
     cause_names = c("cause1", "cause2", "censor")
     cause_names = cause_names[cause_names %in% names(data)]
-    stopifnot(cause %in% cause_names)
+    stopifnot(cause %in% cause_names, !("internal_event_var" %in% names(data)))
     wd = copy(data)[, -cause_names[cause_names != cause], with = FALSE]
-    setnames(wd, old = cause, new = "event")
+    setnames(wd, old = cause, new = "internal_event_var")
     ## not so elegant
     if(is.null(x_form))
-        form = Surv(time, event) ~ .
+        form = Surv(time, internal_event_var) ~ .
     else
-        form = update(x_form, Surv(time, event) ~ .)
+        form = update(x_form, Surv(time, internal_event_var) ~ .)
     if(model == "cox"){
-        wd[, event := 1*(event == 1)] ## To make this cause of interest
+        wd[, internal_event_var := 1*(internal_event_var == 1)] ## To make this cause of interest
         out = coxph(form, data = wd,x = TRUE,y = TRUE, ...)
     }
     if(model == "GLMnet"){
-        wd[, event := 1*(event == 1)] ## To make this cause of interest
+        wd[, internal_event_var := 1*(internal_event_var == 1)] ## To make this cause of interest
         out = GLMnet(form, data = wd, ...)
     }
     if(model == "rfsrc"){
@@ -125,11 +125,11 @@ statelearner <- function(learners,
             eval_times = eval_times[eval_times <= max(time_grid)]
             ## Construct list of cumulative hazard predictions
             ## This might give memory problems...
-            ## browser()
             time_fit = Sys.time()
             super_list_ch = lapply(names(learners), function(l_name){
                 lapply(learners[[l_name]], function(mm){
                     fit = do.call(fit_cause_model,c(mm, list(data = train, cause = l_name)))
+                    ## browser()
                     ch = predictCHF(fit, newdata = test, times = eval_times)
                     return(ch)
                 })
@@ -226,4 +226,4 @@ statelearner <- function(learners,
 
 
 ######################################################################
-### statelearner-v2.R ends here
+### statelearner.R ends here
