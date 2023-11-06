@@ -1,7 +1,4 @@
-#+PROPERTY: header-args:R :async :results output verbatim  :exports both  :session *R* :cache yes
-# local variables:
-# org-babel-hash-show-time: nil
-# end:
+#+PROPERTY: header-args:R :async :results output verbatim  :exports both  :session *R* :cache no
 #+Title: The state learner
 
 This repository provides code that implements the state learner. We provide
@@ -11,13 +8,17 @@ learning.
 To run the examples below, run the following code to load the needed functions.
 
 #+ATTR_LATEX: :options otherkeywords={}, deletekeywords={t,as}
-#+BEGIN_SRC R :results output example :exports results  :session *R* :cache yes
+#+BEGIN_SRC R :results output example :exports results  :session *R* :cache no
     library(here)
     library(targets)
     tar_source(here("R-code/functions"))
 #+END_SRC
 
-#+RESULTS[f4b34cc75892cd067eb1c7330565234ed071b6da]:
+#+RESULTS:
+
+
+
+
 
 
 
@@ -27,14 +28,14 @@ To run the examples below, run the following code to load the needed functions.
 We illustrate how to use the state learner by fitting it to the =Melanoma= data
 set as provided by the =riskRegression= package.
 
-#+BEGIN_SRC R :results output example :exports both  :session *R* :cache yes
-library(riskRegression)
-data(Melanoma,package="riskRegression")
-setDT(Melanoma)
-head(Melanoma)
+#+BEGIN_SRC R :results output verbatim :exports both  :session *R* :cache no
+  library(riskRegression)
+  data(Melanoma,package="riskRegression")
+  setDT(Melanoma)
+  head(Melanoma)
 #+END_SRC
 
-#+RESULTS[47cddb576a2b4eb9a06430d6614316fa2d933e5b]:
+#+RESULTS:
 :    time status                    event invasion ici      epicel       ulcer thick    sex age   logthick
 : 1:   10      2       death.other.causes  level.1   2     present     present  6.76   Male  76  1.9110229
 : 2:   30      2       death.other.causes  level.0   0 not present not present  0.65   Male  56 -0.4307829
@@ -42,18 +43,6 @@ head(Melanoma)
 : 4:   99      2       death.other.causes  level.0   2 not present not present  2.90 Female  71  1.0647107
 : 5:  185      1 death.malignant.melanoma  level.2   2     present     present 12.08   Male  52  2.4915512
 : 6:  204      1 death.malignant.melanoma  level.2   2 not present     present  4.84   Male  28  1.5769147
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
