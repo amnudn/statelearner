@@ -1,0 +1,5 @@
+#+Title: The state learner
+
+This repository provides code that implements the state learner. We provide
+examples of how to use it as a stand-alone tool and in combination with targeted
+learning.
