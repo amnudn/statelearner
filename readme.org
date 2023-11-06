@@ -60,7 +60,7 @@ cause 1, cause 2, and censoring. The state learner returns a =data.table= of
 triples of learners sorted according to their joint performance in prediction
 the state of the observed data in some time interval. Here we use an interval of
 5 years.
-#+BEGIN_SRC R
+#+BEGIN_SRC R :exports both
 set.seed(111)
 sl = statelearner(learners = list(cause1 = learners,
                                   cause2 = learners,
