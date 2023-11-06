@@ -3,9 +3,9 @@
 ## Author: Anders Munch
 ## Created: Oct 18 2023 (15:10) 
 ## Version: 
-## Last-Updated: Nov  3 2023 (10:43) 
+## Last-Updated: Nov  6 2023 (12:11) 
 ##           By: Anders Munch
-##     Update #: 525
+##     Update #: 527
 #----------------------------------------------------------------------
 ## 
 ### Commentary:
@@ -33,39 +33,6 @@
 library(data.table)
 library(prodlim)
 library(riskRegression)
-
-## Meta functions:
-minus_t_fun <- function(Lambda, jump_points){
-    t_minus = min(diff(sort(unique(jump_points))))/2
-    fun0 = function(newdata, times){
-        times0 = pmax(0, times-t_minus)
-        Lambda(newdata, times0)
-    }
-    return(fun0)
-}
-construct_pred_fun <- function(object, ...){
-    UseMethod("construct_pred_fun",object)
-}
-construct_pred_fun.coxph <- function(model, ...){
-    out = function(newdata,times)
-        matrix(predictCox(model, newdata = newdata, times = times, type = "cumhazard")$cumhazard, ncol = length(times))
-    return(out)
-}
-construct_pred_fun.glm <- function(model, ...){
-    out = function(newdata)
-        matrix(predict(model, newdata = newdata, type = "response"), ncol = 1)
-    return(out)
-    
-}
-#### at risk funcion
-at_risk_fun <- function(newdata,times,time_name = "time"){
-    spring_times = newdata[[time_name]]
-    grid_mat = matrix(times,ncol = length(times),nrow = length(spring_times),byrow = TRUE)
-    ## event_mat = apply(grid_mat, 2, function(x) 1*(spring_times >= x))
-    event_mat = do.call(cbind, lapply(1:ncol(grid_mat), function(xx) 1*(spring_times >= grid_mat[, xx])))
-    return(event_mat)
-}
-
 
 #### Helper functions
 ## Format input and send messages to user

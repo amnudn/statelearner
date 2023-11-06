@@ -3,12 +3,19 @@
 ## Author: Anders Munch
 ## Created: Oct 27 2023 (16:08) 
 ## Version: 
-## Last-Updated: Nov  3 2023 (11:43) 
+## Last-Updated: Nov  6 2023 (12:20) 
 ##           By: Anders Munch
-##     Update #: 376
+##     Update #: 388
 #----------------------------------------------------------------------
 ## 
-### Commentary: 
+### Commentary:
+##
+## Implements a one-step estimator of the average treatment effect
+## on cause 1.
+##
+## Calculation is based on fitted function that calculate cumulative hazard function.
+##
+## See implementation doc for details on the nomenclature.
 ## 
 ### Change Log:
 #----------------------------------------------------------------------
@@ -16,7 +23,6 @@
 ### Code:
 library(here)
 library(data.table)
-source(here("R-code/functions", "integral-calc.R"))
 
 ## naiv (data, t, Lambda1, Lambda2, jump_points)
 naiv <- function(data, t, Lambda1, Lambda2, jump_points, chunks = 1){
@@ -30,9 +36,6 @@ naiv <- function(data, t, Lambda1, Lambda2, jump_points, chunks = 1){
     out = list("A=1" = preds1, "A=0" = preds0)
     return(out)
 }
-
-
-## Checking:
 termW <- function(data, pi){
     pi_fit = as.numeric(pi(data))
     out1 = numeric(nrow(data))
@@ -124,7 +127,7 @@ termC <- function(data, t, Lambda1, Lambda2, Gamma, jump_points,chunks = 1){
     return(out)
 }
 
-abs_risk_ate <- function(data, t, Lambda1, Lambda2, Gamma, pi, jump_points,chunks = 1,collapse = TRUE){
+os_abs_risk_ate <- function(data, t, Lambda1, Lambda2, Gamma, pi, jump_points,chunks = 1,collapse = TRUE){
     W_i = termW(data = data, pi = pi)
     A_i = termA(data = data, t = t, Lambda1 = Lambda1, Gamma = Gamma, jump_points = jump_points, chunks = chunks)
     B_i = termB(data = data, t = t, Lambda1 = Lambda1, Lambda2 = Lambda2, Gamma = Gamma, jump_points = jump_points, chunks = chunks)

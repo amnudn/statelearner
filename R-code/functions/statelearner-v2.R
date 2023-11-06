@@ -3,9 +3,9 @@
 ## Author: Anders Munch
 ## Created: Aug 18 2023 (10:26) 
 ## Version: 
-## Last-Updated: Oct 13 2023 (16:45) 
+## Last-Updated: Nov  6 2023 (13:03) 
 ##           By: Anders Munch
-##     Update #: 363
+##     Update #: 366
 #----------------------------------------------------------------------
 ## 
 ### Commentary: 
@@ -56,40 +56,6 @@ fit_cause_model <- function(model, data, cause, x_form = NULL, ...){
     }
     return(out)
 }
-## PredictCHF functions
-predictCHF <- function(object, newdata, ...){
-    UseMethod("predictCHF",object)
-}
-predictCHF.coxph <- function(object, newdata, times,...){
-    pred_obj = predictCox(object, newdata, times = times, type = "cumhazard")
-    chf = pred_obj$cumhazard
-    ## Fix NA by carrying forward... Maybe not the best...
-    last_event_Time_ii = prodlim::sindex(jump.times = pred_obj$times,eval.times = pred_obj$lastEventTime)
-    if(last_event_Time_ii<ncol(chf))
-        chf[, (last_event_Time_ii+1):ncol(chf)] = chf[, last_event_Time_ii]
-    return(chf)
-}
-predictCHF.GLMnet <- function(object, newdata, times,...){
-    ## Hackidy-hack...
-    risk_pred = riskRegression:::predictRisk.GLMnet(object = object, newdata = newdata, times = times, product.limit = 0, ...)
-    chf = -log(1-risk_pred)
-    return(chf)
-}
-predictCHF.rfsrc <- function(object, newdata, times, ...){
-    ## Unsafe hack...
-    if("time" %in% names(newdata))
-        wd = copy(newdata)[, -c("time"), with = FALSE]
-    else
-        wd = copy(newdata)
-    jump_times = object$time.interest
-    cschf = predict(object, newdata = wd)$chf[, , 1]
-    if(jump_times[1] != 0){
-        jump_times = c(0, jump_times)
-        cschf = cbind(0, cschf)
-    }
-    ii = prodlim::sindex(jump.times = jump_times,eval.times = times)
-    return(cschf[, ii])
-}
 ## Calculate F from CSCHF's
 abs_risk_from_cschf <- function(...){
     chfs = list(...)
@@ -118,19 +84,19 @@ rewrap <- function(ll, comb_fun = rbind){
     return(out)
 }
 ## state learner
-statelearner2 <- function(learners,
-                          data,
-                          time,
-                          integrate = TRUE,
-                          split.method = "cv5",
-                          collapse = TRUE,
-                          B=1,
-                          verbose = FALSE,
-                          time_grid_length = 100,
-                          time_name = "time",
-                          status_name = "status",
-                          cause_codes = c("1" = 1, "2" = 2, "c" = 0),
-                          vars = NULL){
+statelearner <- function(learners,
+                         data,
+                         time,
+                         integrate = TRUE,
+                         split.method = "cv5",
+                         collapse = TRUE,
+                         B=1,
+                         verbose = FALSE,
+                         time_grid_length = 100,
+                         time_name = "time",
+                         status_name = "status",
+                         cause_codes = c("1" = 1, "2" = 2, "c" = 0),
+                         vars = NULL){
     requireNamespace(package = "data.table")
     comp_event_present = !is.null(learners$cause2)
     ## NB: Expecting that time variable is called time

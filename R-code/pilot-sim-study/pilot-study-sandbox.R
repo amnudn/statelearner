@@ -3,9 +3,9 @@
 ## Author: Anders Munch
 ## Created: Nov  3 2023 (11:50) 
 ## Version: 
-## Last-Updated: Nov  3 2023 (19:07) 
+## Last-Updated: Nov  6 2023 (11:59) 
 ##           By: Anders Munch
-##     Update #: 28
+##     Update #: 32
 #----------------------------------------------------------------------
 ## 
 ### Commentary: 
@@ -16,7 +16,10 @@
 ### Code:
 
 
-
+form1 = Surv(time, event==1)~treat+sex+differ+age+adhere+nodes+nodes.squared+treat*sex+treat*perfor
+form2 = Surv(time, event==2)~treat+sex+nodes+differ+age
+form0 = Surv(time, event==0)~treat+sex+nodes+treat*sex
+formA = treat~sex+age+nodes+differ+nodes.squared
 fit.colon.cr <- fit.colon.fun(      
     ## formula.1=Surv(time, event==1)~rx+sex+differ+age+nodes.squared+obstruct+perfor+adhere+extent+surg+rx*sex+rx*perfor+rx*age,
     ## formula.2=Surv(time, event==2)~rx+sex+nodes+differ+age+obstruct+adhere+extent+surg,
@@ -69,19 +72,40 @@ fit_form2 <- update(form2, Surv(time, status==2)~factor(A))
 
 ## fit_form1 <- update(form1, Surv(time, status==1)~.)
 ## fit_form2 <- update(form2, Surv(time, status==2)~.)
-## fit_form0 <- update(form0, Surv(time, status==0)~.)
+fit_form0 <- update(form0, Surv(time, status==0)~.)
 ## fit_formA <- formA
 
 ## setup some models:
-cause1_cox <- coxph(fit_form1,data = sim.colon.cr,x = TRUE, y = TRUE)
-cause2_cox <- coxph(fit_form2,data = sim.colon.cr,x = TRUE, y = TRUE)
-cens_cox <- coxph(fit_form0,data = sim.colon.cr,x = TRUE, y = TRUE)
-treat_model <- glm(fit_formA, family = binomial(), data = sim.colon.cr)
+dd0 <- do.call(colon_simulator, dgm_settings)(1000)
+
+cause1_cox <- coxph(fit_form1,data = dd0,x = TRUE, y = TRUE)
+cause2_cox <- coxph(fit_form2,data = dd0,x = TRUE, y = TRUE)
+cens_cox <- coxph(fit_form0,data = dd0,x = TRUE, y = TRUE)
+treat_model <- glm(fit_formA, family = binomial(), data = dd0)
 
 L1_test <- construct_pred_fun(cause1_cox)
 L2_test <- construct_pred_fun(cause2_cox)
 L0_test <- construct_pred_fun(cens_cox)
 pi_test <- construct_pred_fun(treat_model)
+
+L1_test <- construct_pred_fun(cause1_cox)
+
+L1_test(dd0[1:5], seq(100, 1000, 300))
+
+predictCHF(cause1_cox, dd0[1:5], seq(100, 1000, 300))
+
+## >1 x >1
+L1_test(dd0[1:5], times = seq(100, 500, 100))
+predictCHF(cause1_cox, dd0[1:5], seq(100, 500, 100))
+## > 1 x =1
+L1_test(dd0[1:5], times = 100)
+predictCHF(cause1_cox, dd0[1:5], 100)
+## =1 x >1
+L1_test(dd0[1], times = seq(100, 500, 100))
+predictCHF(cause1_cox, dd0[1], times = seq(100, 500, 100))
+## =1 x =1
+L1_test(dd0[1], times = 100)
+predictCHF(cause1_cox, dd0[1], times = 100)
 
 
 ## L0_test(sim.colon.cr, times = 1000)
