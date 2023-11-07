@@ -3,9 +3,9 @@
 ## Author: Anders Munch
 ## Created: Oct 27 2023 (16:08) 
 ## Version: 
-## Last-Updated: Nov  6 2023 (14:11) 
+## Last-Updated: Nov  7 2023 (11:22) 
 ##           By: Anders Munch
-##     Update #: 389
+##     Update #: 426
 #----------------------------------------------------------------------
 ## 
 ### Commentary:
@@ -126,7 +126,7 @@ termC <- function(data, t, Lambda1, Lambda2, Gamma, jump_points,chunks = 1){
     out = (out_count-out_comp)
     return(out)
 }
-os_abs_risk_ate <- function(data, t, Lambda1, Lambda2, Gamma, pi, jump_points,chunks = 1,collapse = TRUE){
+raw_os_abs_risk_ate <- function(data, t, Lambda1, Lambda2, Gamma, pi, jump_points,chunks = 1,collapse = TRUE){
     W_i = termW(data = data, pi = pi)
     A_i = termA(data = data, t = t, Lambda1 = Lambda1, Gamma = Gamma, jump_points = jump_points, chunks = chunks)
     B_i = termB(data = data, t = t, Lambda1 = Lambda1, Lambda2 = Lambda2, Gamma = Gamma, jump_points = jump_points, chunks = chunks)
@@ -153,6 +153,44 @@ os_abs_risk_ate <- function(data, t, Lambda1, Lambda2, Gamma, pi, jump_points,ch
                             "ATE" = mean(out[["A=1"]])-mean(out[["A=0"]])))
     }
     return(out)
+}
+os_abs_risk_ate <- function(data, eval_times, fit_1, fit_2, fit_cens, fit_treat, jump_points = data[, time],chunks = 1){
+    L1 = function(newdata,times) predictCHF(fit_1, newdata, times)
+    L2 = function(newdata,times) predictCHF(fit_2, newdata, times)
+    G = function(newdata,times) predictCHF(fit_cens, newdata, times)
+    pi = function(newdata) predictTreat(fit_treat, newdata)
+    cause_est = list(cause1 = L1, cause2 = L2)
+    out = do.call(rbind, lapply(eval_times, function(tt){
+        do.call(rbind, lapply(1:length(cause_est), function(ii){
+            cause_interest = names(cause_est)[ii]
+            L1_ii = cause_est[[ii]]
+            L2_ii = cause_est[[1+(ii %% 2)]]
+            raw0 = raw_os_abs_risk_ate(data = data,
+                                       t = tt,
+                                       Lambda1 = L1_ii,
+                                       Lambda2 = L2_ii,
+                                       Gamma = G,
+                                       pi = pi,
+                                       jump_points = jump_points,
+                                       chunks = chunks,
+                                       collapse = 0)
+            naiv1 = mean(raw0$naiv1_i)
+            naiv0 = mean(raw0$naiv0_i)
+            debias_term1 = with(raw0, mean(W1_i*(A_i - B_i + C_i)))
+            debias_term0 = with(raw0, mean(W0_i*(A_i - B_i + C_i)))
+            see_1 = with(raw0, sd(naiv1_i + W1_i*(A_i - B_i + C_i))/sqrt(nrow(data)))
+            see_0 = with(raw0, sd(naiv0_i + W0_i*(A_i - B_i + C_i))/sqrt(nrow(data)))
+            see_ate = with(raw0, sd(naiv1_i + W1_i*(A_i - B_i + C_i) - (naiv0_i + W0_i*(A_i - B_i + C_i)))/sqrt(nrow(data)))
+            effect_names = c("A=1","A=0","ATE")
+            out0 = data.table(cause = cause_interest,
+                              time = tt,
+                              effect = effect_names,
+                              est = c(naiv1+debias_term1, naiv0+debias_term0, naiv1+debias_term1 - (naiv0+debias_term0)),
+                              see = c(see_1, see_0, see_ate))
+        }))
+    }))
+    out[, ":="(lower = est-1.96*see, upper = est+1.96*see)]
+    return(out[])
 }
 
 

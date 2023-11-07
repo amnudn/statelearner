@@ -3,9 +3,9 @@
 ## Author: Anders Munch
 ## Created: Nov  6 2023 (15:48) 
 ## Version: 
-## Last-Updated: Nov  6 2023 (15:48) 
+## Last-Updated: Nov  7 2023 (11:45) 
 ##           By: Anders Munch
-##     Update #: 1
+##     Update #: 4
 #----------------------------------------------------------------------
 ## 
 ### Commentary: 
@@ -61,6 +61,39 @@ cox_pred <- predictRisk(cox, newdata = data.table(epicel = c("present", "not pre
 lines(Melanoma[, sort(time)], 1-cox_pred[1,], type = "s", col = "blue", lwd = 3)
 lines(Melanoma[, sort(time)], 1-cox_pred[2,], type = "s", col = "red", lwd = 3)
 predictCHF(strata_cox, newdata = Melanoma[1:5], times = 1000)
+
+
+
+ggplot(ate_est[effect == "ATE"], aes(x = time, y = est)) +
+  theme_bw() +
+  geom_ribbon(aes(ymin = lower, ymax = upper, fill = cause), alpha = 0.3) +
+  geom_line(aes(col = cause)) +
+  geom_point(aes(col = cause)) +
+  geom_hline(yintercept = 0)
+
+
+wd_dat <- form_data(Melanoma)[, event := NULL]
+wd_dat[, A := as.numeric(epicel)-1]
+wd_dat[, status := 1*(cause1 == 1) + 2*(cause2 == 1)]
+
+cause1_fit <- rfsrc(update(learners[[sl[1, cause1]]]$x_form, Surv(time, cause1)~.),
+                    data = wd_dat,
+                    ntree = 50)
+## predictCHF(cause1_fit, wd_dat[1:5,2:9], times = c(200,400))
+cause2_fit <- coxph(update(learners[[sl[1, cause2]]]$x_form, Surv(time, cause2)~.),
+                    data = wd_dat,
+                    x = TRUE)
+censor_fit <- coxph(update(learners[[sl[1, censor]]]$x_form, Surv(time, censor)~.),
+                    data = wd_dat,
+                    x = TRUE)
+## Fitting treatment mechanism:
+treat_fit <- glm(A ~ sex + age, family = binomial, data = wd_dat)
+
+## predictRisk(treat_fit, Melanoma)
+## predictTreat(treat_fit, Melanoma)
+
+## Fit with build in function:
+
 
 
 

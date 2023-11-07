@@ -3,9 +3,9 @@
 ## Author: Anders Munch
 ## Created: Nov  6 2023 (12:03) 
 ## Version: 
-## Last-Updated: Nov  6 2023 (15:04) 
+## Last-Updated: Nov  7 2023 (11:40) 
 ##           By: Anders Munch
-##     Update #: 11
+##     Update #: 23
 #----------------------------------------------------------------------
 ## 
 ### Commentary:
@@ -20,7 +20,9 @@
 ### Code:
 library(prodlim)
 library(data.table)
+library(riskRegression)
 
+## Cumulative hazard functions
 predictCHF <- function(object, newdata, ...){
     UseMethod("predictCHF",object)
 }
@@ -52,13 +54,26 @@ predictCHF.rfsrc <- function(object, newdata, times, ...){
         cschf = cbind(0, cschf)
     }
     ii = prodlim::sindex(jump.times = jump_times,eval.times = times)
-    return(cschf[, ii])
+    out = matrix(cschf[, ii], ncol = length(times))
+    ## Need to fix problem if prediction for one observation!
+    return(out)
 }
 
-## ## alternative stuff
-## construct_pred_fun <- function(object, ...){
-##     UseMethod("construct_pred_fun",object)
+## Predict functions for treatment
+predictTreat <- function(object, newdata, ...){    
+    out = matrix(predictRisk(object,newdata), ncol = 1)
+    return(out)
+}
+## predictTreat <- function(object, newdata, ...){
+##     UseMethod("predictTreat",object)
 ## }
+## predictTreat.glm <- function(object, newdata, ...){
+##     out = matrix(predict(object, newdata = newdata, type = "response"), ncol = 1)
+##     return(out)    
+## }
+
+
+## ## alternative stuff
 ## construct_pred_fun.coxph <- function(model, ...){
 ##     out = function(newdata,times)
 ##         matrix(predictCox(model, newdata = newdata, times = times, type = "cumhazard")$cumhazard, ncol = length(times))

@@ -7,7 +7,7 @@ learning.
 
 To run the examples below, run the following code to load the needed functions.
 
-#+BEGIN_SRC R 
+#+BEGIN_SRC R :exports code
 library(here)
 library(targets)
 tar_source(here("R-code/functions"))
@@ -41,25 +41,24 @@ We specify a list of learners. Each learner is specified through a list with a
 =x_form= entry, which provides a formula which and how the covariates enter the
 model. Additional arguments can be supplied to each learner by adding entries to
 the list (e.g., =ntree= for a random survival forest).
-#+BEGIN_SRC R
-library(glmnet)
-library(randomForestSRC)
-learners <- list(
-  cox = list("cox", x_form = ~sex+age+logthick),
-  cox_penalty = list("GLMnet", x_form = ~invasion+ici+epicel+ulcer+sex+age+logthick),
-  km = list("cox", x_form = ~1),
-  km_strat = list("cox", x_form = ~strata(epicel)),
-  rf = list("rfsrc", x_form = ~invasion+ici+epicel+ulcer+sex+age+logthick, ntree = 50)
-)
+#+BEGIN_SRC R :exports code
+  library(glmnet)
+  library(randomForestSRC)
+  learners <- list(
+    cox = list(model = "cox", x_form = ~sex+age+logthick),
+    cox_penalty = list(model = "GLMnet", x_form = ~invasion+ici+epicel+ulcer+sex+age+logthick),
+    km = list(model = "cox", x_form = ~1),
+    km_strat = list(model = "cox", x_form = ~strata(epicel)),
+    rf = list(model = "rfsrc", x_form = ~invasion+ici+epicel+ulcer+sex+age+logthick, ntree = 50)
+  )
 #+END_SRC
 
 #+RESULTS:
 
-Below we use the same list of learner to learn all of the cumulative hazard for
-cause 1, cause 2, and censoring. The state learner returns a =data.table= of
-triples of learners sorted according to their joint performance in prediction
-the state of the observed data in some time interval. Here we use an interval of
-5 years.
+Below we use the same list of learners to learn the cumulative hazards for cause
+1, cause 2, and censoring. The state learner returns a =data.table= of triples
+of learners sorted according to their joint performance in predicting the state
+of the observed data in some time interval. Here we use an interval of 5 years.
 #+BEGIN_SRC R :exports both
 set.seed(111)
 sl = statelearner(learners = list(cause1 = learners,
@@ -80,3 +79,64 @@ head(sl)
 : 6:     rf cox_penalty cox_penalty 240.1687 1
 
 ** Use for targeted estimation
+We can fit the triple of models ranked highest by the state learner to the full
+data as follows.
+
+#+BEGIN_SRC R
+  ## format data:
+  wd_dat <- form_data(Melanoma)
+  cause1_fit <- do.call(fit_cause_model, c(learners[[sl[1, cause1]]], list(data = wd_dat, cause = "cause1")))
+  cause2_fit <- do.call(fit_cause_model, c(learners[[sl[1, cause2]]], list(data = wd_dat, cause = "cause2")))
+  censor_fit <- do.call(fit_cause_model, c(learners[[sl[1, censor]]], list(data = wd_dat, cause = "censor")))
+#+END_SRC
+
+#+RESULTS:
+
+We estimate the standardized risk difference between men and women for both
+competing events. To do so, we need an estimate of the "treatment" mechanism.
+
+#+BEGIN_SRC R :exports code
+  Melanoma[,A := as.numeric(ulcer)-1]
+  treat_fit <- GLMnet(A ~ invasion+ici+epicel+sex+age+logthick, family = binomial, data = Melanoma)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+     time status                    event invasion ici      epicel       ulcer thick    sex age   logthick A
+  1:   10      2       death.other.causes  level.1   2     present     present  6.76   Male  76  1.9110229 1
+  2:   30      2       death.other.causes  level.0   0 not present not present  0.65   Male  56 -0.4307829 0
+  3:   35      0                 censored  level.1   2 not present not present  1.34   Male  41  0.2926696 0
+  4:   99      2       death.other.causes  level.0   2 not present not present  2.90 Female  71  1.0647107 0
+  5:  185      1 death.malignant.melanoma  level.2   2     present     present 12.08   Male  52  2.4915512 1
+ ---                                                                                                        
+201: 4492      0                 censored  level.2   3     present     present  7.06   Male  29  1.9544451 1
+202: 4668      0                 censored  level.2   2     present not present  6.12 Female  40  1.8115621 0
+203: 4688      0                 censored  level.0   1     present not present  0.48 Female  42 -0.7339692 0
+204: 4926      0                 censored  level.0   1 not present not present  2.26 Female  50  0.8153648 0
+205: 5565      0                 censored  level.1   2 not present not present  2.90 Female  41  1.0647107 0
+#+end_example
+
+We can now estimate the ATE using the fitted nuisance models. 
+
+#+BEGIN_SRC R
+  ate_est <- os_abs_risk_ate(data = Melanoma, 
+			     eval_times = c(2,5)*365.25,
+			     fit_1 = cause1_fit,
+			     fit_2 = cause2_fit,
+			     fit_cens = censor_fit,
+			     fit_treat = treat_fit)
+#+END_SRC
+
+#+RESULTS:
+
+Below we show the estimated risk difference for 
+#+BEGIN_SRC R
+ate_est[effect=="ATE"]
+#+END_SRC
+
+#+RESULTS:
+:     cause    time effect        est        see       lower     upper
+: 1: cause1  730.50    ATE 0.05638786 0.02677092  0.00391686 0.1088589
+: 2: cause2  730.50    ATE 0.11065602 0.02737314  0.05700467 0.1643074
+: 3: cause1 1826.25    ATE 0.05699237 0.05786330 -0.05641970 0.1704044
+: 4: cause2 1826.25    ATE 0.18535470 0.06423254  0.05945892 0.3112505
