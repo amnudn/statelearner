@@ -38,9 +38,9 @@ head(Melanoma)
 
 We specify a list of learners. Each learner is specified through a list with a
 =model= entry (for now, =cox=, =GLMnet=, and =rfsrc= are implemented), and a
-=x_form= entry, which provides a formula which and how the covariates enter the
-model. Additional arguments can be supplied to each learner by adding entries to
-the list (e.g., =ntree= for a random survival forest).
+=x_form= entry, which provides a formula for which and how the covariates enter
+the model. Additional arguments can be supplied to each learner by adding
+entries to the list (e.g., =ntree= for a random survival forest).
 #+BEGIN_SRC R :exports code
   library(glmnet)
   library(randomForestSRC)
@@ -92,8 +92,10 @@ data as follows.
 
 #+RESULTS:
 
-We estimate the standardized risk difference between men and women for both
-competing events. To do so, we need an estimate of the "treatment" mechanism.
+We estimate the standardized risk difference between patient with and without
+ulcers for both death of malignant melanoma (cause=1) and death from other
+causes (cause=2). To do so, we need an estimate of the "treatment" mechanism,
+i.e., the probability of the presence of ulcers given other covariates.
 
 #+BEGIN_SRC R :exports code
   Melanoma[,A := as.numeric(ulcer)-1]
