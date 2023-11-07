@@ -130,7 +130,7 @@ We can now estimate the ATE using the fitted nuisance models.
 #+RESULTS:
 
 Below we show the estimated risk difference for 
-#+BEGIN_SRC R
+#+BEGIN_SRC R :exports both
 ate_est[effect=="ATE"]
 #+END_SRC
 
