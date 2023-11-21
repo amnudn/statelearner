@@ -45,7 +45,7 @@ sim_fun <- function(seed){
             }
             if(pp == 10){
                 ipcw_lasso = GLMnet(Surv(time, status)~X1+X2+X3+X4+X5+X6+X7+X8+X9+X10+X11, data = train0)
-                ipcw_elastic = GLMnet(Surv(time, status)~X1+X2+X3+X4+X5+X6+X7+X8+X9+X10+X11, data = train0, .5)
+                ipcw_elastic = GLMnet(Surv(time, status)~X1+X2+X3+X4+X5+X6+X7+X8+X9+X10+X11, data = train0, alpha = .5)
             }
             out0 = eval_sl(train0, true_test, eval_time = eval_times,
                            stateL_learners = list(

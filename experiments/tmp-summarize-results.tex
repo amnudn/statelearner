@@ -1,4 +1,4 @@
-% Created 2023-11-21 Tue 08:42
+% Created 2023-11-21 Tue 15:20
 % Intended LaTeX compiler: pdflatex
 \documentclass[a4paper,danish]{article}
 \usepackage[utf8]{inputenc}
@@ -31,7 +31,7 @@
 
 \maketitle
 \section{Super learners}
-\label{sec:orgd3f81f9}
+\label{sec:orgfb13ca2}
 In all simulation studies, we compare five super learners, which are listed
 below. To evaluate performance super learner, we use an independent data set of
 10.000 uncensored samples and calculate the integrated Brier score in this data
@@ -55,7 +55,7 @@ as \texttt{oracle}).
 Only the super learners 1., 2., and 3. provides estimates of the censoring distribution.
 
 \section{Zelefsky based simulation}
-\label{sec:orgf2b767a}
+\label{sec:org1123149}
 We generate data in four different ways:
 
 \begin{enumerate}
@@ -71,7 +71,7 @@ effect on neither outcome nor censoring (referred to as \texttt{noise}).
 \clearpage
 
 \subsection{Kaplan-Meier, Cox, and random forest}
-\label{sec:orgdf8f8f8}
+\label{sec:org0516d66}
 In this setting, we include the following learners in all libraries:
 
 \begin{itemize}
@@ -90,7 +90,7 @@ Zelefsky simulation setting using library consisting of Kaplan-Meier, Cox model,
 \clearpage
 
 \subsection{Add LASSO}
-\label{sec:org25907ea}
+\label{sec:orgd0d0620}
 In this setting we add a learner to all libraries, so that all libraries include
 the learners:
 
@@ -105,7 +105,7 @@ based on Cox' partial likelihood
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=1\linewidth]{/tmp/babel-IUB42s/figure-Ylaz8E.pdf}
+\includegraphics[width=1\linewidth]{/tmp/babel-IUB42s/figure-KMJCXV.pdf}
 Zelefsky simulation setting including LASSO into the library
 \end{figure}
 
@@ -113,12 +113,12 @@ Zelefsky simulation setting including LASSO into the library
 
 
 \section{Effect of number of variables}
-\label{sec:orged3af38}
+\label{sec:orgf46a6e0}
 We generate data in three different way:
 
 \begin{enumerate}
 \item Outcome and censoring depends on one binary covariate (\(X_1\)). Another
-continuous covariates (\(X_2\)) that is correlated with \(X_1\) is generated.
+continuous covariate (\(X_2\)) that is correlated with \(X_1\) is generated.
 \item Same as in 1., but we also add 4 independent Gaussian covariates (\(X_3,
    \dots X_6\)).
 \item Same as in 1., but we also add 9 independent Gaussian covariates (\(X_3,
@@ -126,7 +126,7 @@ continuous covariates (\(X_2\)) that is correlated with \(X_1\) is generated.
 \end{enumerate}
 
 \subsection{Kaplan-Meier, Cox, and random forest}
-\label{sec:org493c472}
+\label{sec:org4b465da}
 In this setting, we include the following learners in all libraries:
 
 \begin{itemize}
@@ -137,14 +137,14 @@ In this setting, we include the following learners in all libraries:
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=1\linewidth]{/tmp/babel-IUB42s/figure-bpNXlw.pdf}
+\includegraphics[width=1\linewidth]{/tmp/babel-IUB42s/figure-TImPsh.pdf}
 Zelefsky simulation setting using library consisting of Kaplan-Meier, Cox model, and random forests
 \end{figure}
 
 \clearpage
 
 \subsection{Add LASSO}
-\label{sec:org8fb1981}
+\label{sec:org79abb0b}
 In this setting we add a learner to all libraries, so that all libraries include
 the learners:
 
@@ -159,14 +159,14 @@ based on Cox' partial likelihood
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=1\linewidth]{/tmp/babel-IUB42s/figure-p5pluf.pdf}
+\includegraphics[width=1\linewidth]{/tmp/babel-IUB42s/figure-ozs9vG.pdf}
 Zelefsky simulation setting including LASSO into the library
 \end{figure}
 
 
 
 \section{References}
-\label{sec:org92fb677}
+\label{sec:org53b63a4}
 \renewcommand{\section}[2]{} 
 \bibliography{./latex-settings/default-bib.bib}
 \end{document}

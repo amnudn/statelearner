@@ -98,7 +98,7 @@ ggplot(summ_zel_all2_results,
 
 #+ATTR_LATEX: :width 1\linewidth :caption Zelefsky simulation setting including LASSO into the library
 #+RESULTS[(2023-11-20 21:32:52) 7154572e45d070033f8f298984961c70f72b828f]:
-[[file:/tmp/babel-IUB42s/figure-Ylaz8E.pdf]]
+[[file:/tmp/babel-IUB42s/figure-KMJCXV.pdf]]
 
 \clearpage
 
@@ -135,7 +135,7 @@ ggplot(summ_zel_all_results,
 We generate data in three different way:
 
 1. Outcome and censoring depends on one binary covariate ($X_1$). Another
-   continuous covariates ($X_2$) that is correlated with $X_1$ is generated.
+   continuous covariate ($X_2$) that is correlated with $X_1$ is generated.
 2. Same as in 1., but we also add 4 independent Gaussian covariates (\(X_3,
    \dots X_6 \)).
 3. Same as in 1., but we also add 9 independent Gaussian covariates (\(X_3,
@@ -159,12 +159,12 @@ ggplot(summ_ipcw_fail_sim0[n_covar != 0],
   geom_line(position=position_dodge(width = 0.1)) +
   geom_point(position=position_dodge(width = 0.1)) +
   scale_x_continuous(trans='log2') +
-  facet_grid(type~n_covar, scales = "free")
+    facet_grid(type~paste0("independent covariates = ", n_covar-1), scales = "free")
 #+END_SRC
 
 #+ATTR_LATEX: :width 1\linewidth :caption Zelefsky simulation setting using library consisting of Kaplan-Meier, Cox model, and random forests
 #+RESULTS[(2023-11-20 21:31:31) e897a858ee051c477737fa181ba6c6b962e2ff67]:
-[[file:/tmp/babel-IUB42s/figure-bpNXlw.pdf]]
+[[file:/tmp/babel-IUB42s/figure-TImPsh.pdf]]
 
 \clearpage
 
@@ -190,12 +190,12 @@ the learners:
     geom_line(position=position_dodge(width = 0.1)) +
     geom_point(position=position_dodge(width = 0.1)) +
     scale_x_continuous(trans='log2') +
-    facet_grid(type~n_covar, scales = "free")
+    facet_grid(type~paste0("independent covariates = ", n_covar-1), scales = "free")
 #+END_SRC
 
 #+ATTR_LATEX: :width 1\linewidth :caption Zelefsky simulation setting including LASSO into the library
 #+RESULTS[(2023-11-21 08:41:53) 3110deedede38bec0b7f808de4e39976da055ed4]:
-[[file:/tmp/babel-IUB42s/figure-p5pluf.pdf]]
+[[file:/tmp/babel-IUB42s/figure-ozs9vG.pdf]]
 
 
 

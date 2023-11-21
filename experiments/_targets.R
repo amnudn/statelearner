@@ -3,9 +3,9 @@
 ## Author: Anders Munch
 ## Created: Nov 14 2023 (09:52) 
 ## Version: 
-## Last-Updated: Nov 21 2023 (08:33) 
+## Last-Updated: Nov 21 2023 (10:43) 
 ##           By: Anders Munch
-##     Update #: 38
+##     Update #: 39
 #----------------------------------------------------------------------
 ## 
 ### Commentary: 
@@ -41,6 +41,7 @@ list(
     tar_target(ipcw_fail_sim0_more, combine_results("ipcw-fail-sim-more-state-learners", results_dir = results_dir)),    
     tar_target(ipcw_fail_sim0, combine_results("ipcw-fail-sim", results_dir = results_dir)),
     tar_target(ipcw_fail_sim2, combine_results("ipcw-fail-sim2", results_dir = results_dir)),
+    tar_target(ipcw_fail_sim3, combine_results("ipcw-fail-sim3", results_dir = results_dir)),
     tar_target(ipcw_fail_sim_without_rf, combine_results("ipcw-fail-sim-without-rf", results_dir = results_dir))
 )
 
