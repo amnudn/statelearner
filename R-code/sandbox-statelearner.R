@@ -1,11 +1,11 @@
-### sandbox-statelearner.R --- 
+o### sandbox-statelearner.R --- 
 #----------------------------------------------------------------------
 ## Author: Anders Munch
 ## Created: Nov  6 2023 (15:48) 
 ## Version: 
-## Last-Updated: Nov  7 2023 (11:45) 
+## Last-Updated: Nov 12 2023 (15:45) 
 ##           By: Anders Munch
-##     Update #: 4
+##     Update #: 7
 #----------------------------------------------------------------------
 ## 
 ### Commentary: 
@@ -93,6 +93,9 @@ treat_fit <- glm(A ~ sex + age, family = binomial, data = wd_dat)
 ## predictTreat(treat_fit, Melanoma)
 
 ## Fit with build in function:
+
+## Testing survival simulator
+
 
 
 

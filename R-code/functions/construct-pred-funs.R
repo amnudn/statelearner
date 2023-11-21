@@ -3,9 +3,9 @@
 ## Author: Anders Munch
 ## Created: Nov  6 2023 (12:03) 
 ## Version: 
-## Last-Updated: Nov  7 2023 (11:40) 
+## Last-Updated: Nov 17 2023 (08:37) 
 ##           By: Anders Munch
-##     Update #: 23
+##     Update #: 32
 #----------------------------------------------------------------------
 ## 
 ### Commentary:
@@ -21,6 +21,9 @@
 library(prodlim)
 library(data.table)
 library(riskRegression)
+library(survival)
+library(randomForestSRC)
+
 
 ## Cumulative hazard functions
 predictCHF <- function(object, newdata, ...){
@@ -64,6 +67,11 @@ predictTreat <- function(object, newdata, ...){
     out = matrix(predictRisk(object,newdata), ncol = 1)
     return(out)
 }
+predictRisk.SuperLearner <- function(object, newdata){
+    rel_newdata = newdata[, object$varNames, with = FALSE]
+    predict(object = object, newdata = rel_newdata, onlySL = TRUE)$pred
+}
+
 ## predictTreat <- function(object, newdata, ...){
 ##     UseMethod("predictTreat",object)
 ## }

@@ -3,9 +3,9 @@
 ## Author: Anders Munch
 ## Created: Aug 18 2023 (10:26) 
 ## Version: 
-## Last-Updated: Nov  7 2023 (10:02) 
+## Last-Updated: Nov 20 2023 (11:06) 
 ##           By: Anders Munch
-##     Update #: 373
+##     Update #: 402
 #----------------------------------------------------------------------
 ## 
 ### Commentary: 
@@ -14,7 +14,6 @@
 #----------------------------------------------------------------------
 ## 
 ### Code:
-
 
 ## Set data on canonical form
 form_data <- function(data, max_time = Inf, time = "time", status = "status", cause_codes = c("1" = 1, "2" = 2, "c" = 0), vars = NULL){
@@ -53,6 +52,9 @@ fit_cause_model <- function(model, data, cause, x_form = NULL, ...){
     }
     if(model == "rfsrc"){
         out = rfsrc(form, data = wd, ...)
+    }
+    if(model == "rfsrc.fast"){
+        out = rfsrc.fast(form, data = wd, forest = TRUE, ...)
     }
     return(out)
 }
@@ -114,7 +116,6 @@ statelearner <- function(learners,
             super_list_ch = lapply(names(learners), function(l_name){
                 lapply(learners[[l_name]], function(mm){
                     fit = do.call(fit_cause_model,c(mm, list(data = train, cause = l_name)))
-                    ## browser()
                     ch = predictCHF(fit, newdata = test, times = eval_times)
                     return(ch)
                 })
@@ -206,7 +207,16 @@ statelearner <- function(learners,
     else
         cv_return <- cv_fits
     setkey(cv_return,loss)
-    return(cv_return)
+    ## Fit winner models
+    cause1_fit = do.call(fit_cause_model, c(learners$cause1[[ave_cv_fit[1, cause1]]], list(data = wd, cause = "cause1")))
+    censor_fit = do.call(fit_cause_model, c(learners$censor[[ave_cv_fit[1, censor]]], list(data = wd, cause = "censor")))
+    if(comp_event_present){
+        cause2_fit = do.call(fit_cause_model, c(learners$cause2[[ave_cv_fit[1, cause2]]], list(data = wd, cause = "cause2")))
+        winners = list(cause1 = cause1_fit,cause2 = cause2_fit,censor = censor_fit)
+    }else{
+        winners = list(cause1 = cause1_fit,censor = censor_fit)
+    }
+    return(list(cv_fit = cv_return, fitted_winners = winners))
 }
 
 

@@ -3,9 +3,9 @@
 ## Author: Anders Munch
 ## Created: Oct 27 2023 (16:08) 
 ## Version: 
-## Last-Updated: Nov  7 2023 (11:22) 
+## Last-Updated: Nov 17 2023 (14:01) 
 ##           By: Anders Munch
-##     Update #: 426
+##     Update #: 441
 #----------------------------------------------------------------------
 ## 
 ### Commentary:
@@ -154,18 +154,22 @@ raw_os_abs_risk_ate <- function(data, t, Lambda1, Lambda2, Gamma, pi, jump_point
     }
     return(out)
 }
-os_abs_risk_ate <- function(data, eval_times, fit_1, fit_2, fit_cens, fit_treat, jump_points = data[, time],chunks = 1){
+os_abs_risk_ate <- function(data, eval_times, fit_1, fit_2, fit_cens, fit_treat, jump_points = data[, sort(unique(time))],chunks = 1){
+    ## TREATMENT VARIABLE SHOULD BE NAMED A!!!
     L1 = function(newdata,times) predictCHF(fit_1, newdata, times)
     L2 = function(newdata,times) predictCHF(fit_2, newdata, times)
     G = function(newdata,times) predictCHF(fit_cens, newdata, times)
     pi = function(newdata) predictTreat(fit_treat, newdata)
     cause_est = list(cause1 = L1, cause2 = L2)
     out = do.call(rbind, lapply(eval_times, function(tt){
-        do.call(rbind, lapply(1:length(cause_est), function(ii){
+        do.call(rbind, lapply(1:2, function(ii){
             cause_interest = names(cause_est)[ii]
             L1_ii = cause_est[[ii]]
             L2_ii = cause_est[[1+(ii %% 2)]]
-            raw0 = raw_os_abs_risk_ate(data = data,
+            cause_data = copy(data)
+            if(ii == 2)
+                cause_data[status != 0, status := 1+status %% 2]
+            raw0 = raw_os_abs_risk_ate(data = cause_data,
                                        t = tt,
                                        Lambda1 = L1_ii,
                                        Lambda2 = L2_ii,
@@ -182,11 +186,19 @@ os_abs_risk_ate <- function(data, eval_times, fit_1, fit_2, fit_cens, fit_treat,
             see_0 = with(raw0, sd(naiv0_i + W0_i*(A_i - B_i + C_i))/sqrt(nrow(data)))
             see_ate = with(raw0, sd(naiv1_i + W1_i*(A_i - B_i + C_i) - (naiv0_i + W0_i*(A_i - B_i + C_i)))/sqrt(nrow(data)))
             effect_names = c("A=1","A=0","ATE")
-            out0 = data.table(cause = cause_interest,
-                              time = tt,
-                              effect = effect_names,
-                              est = c(naiv1+debias_term1, naiv0+debias_term0, naiv1+debias_term1 - (naiv0+debias_term0)),
-                              see = c(see_1, see_0, see_ate))
+            out0_os = data.table(cause = cause_interest,
+                                 time = tt,
+                                 effect = effect_names,
+                                 est_type = "one-step",
+                                 est = c(naiv1+debias_term1, naiv0+debias_term0, naiv1+debias_term1 - (naiv0+debias_term0)),
+                                 see = c(see_1, see_0, see_ate))
+            out0_naiv = data.table(cause = cause_interest,
+                                   time = tt,
+                                   effect = effect_names,
+                                   est_type = "naiv",
+                                   est = c(naiv1, naiv0, naiv1 - naiv0),
+                                   see = as.numeric(NA))
+            return(rbind(out0_os, out0_naiv))
         }))
     }))
     out[, ":="(lower = est-1.96*see, upper = est+1.96*see)]

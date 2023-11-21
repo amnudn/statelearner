@@ -1,0 +1,172 @@
+% Created 2023-11-21 Tue 08:42
+% Intended LaTeX compiler: pdflatex
+\documentclass[a4paper,danish]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{array}
+\usepackage[T1]{fontenc}
+\usepackage{natbib}
+\usepackage[margin=4cm]{geometry}
+\usepackage{dsfont, pgfpages, tikz,amssymb, amsmath,xcolor, caption, subcaption}
+\input{./latex-settings/standard-settings.tex}
+\input{./latex-settings/standard-commands.tex}
+\input{./latex-settings/org-settings.tex}
+\input{./latex-settings/title-compact.tex}
+\author{Anders Munch}
+\date{\today}
+\title{Summary of some simulation results}
+\begin{document}
+
+\maketitle
+\section{Super learners}
+\label{sec:orgd3f81f9}
+In all simulation studies, we compare five super learners, which are listed
+below. To evaluate performance super learner, we use an independent data set of
+10.000 uncensored samples and calculate the integrated Brier score in this data
+set. All results are based on 500 simulated data sets.
+
+\begin{enumerate}
+\item The state learner (referred to as \texttt{statelearner}).
+\item The super learner proposed in \citep{westling2021inference} (referred to as
+\texttt{survSL}).
+\item A super learner based on the estimated integrated Brier score, where the
+censoring mechanism is estimated with the Kaplan-Meier estimator (referred to
+as \texttt{ipcw\_km}).
+\item A super learner based on the estimated integrated Brier score, where the
+censoring mechanism is estimated with a Cox model that includes all available
+covariates as main effects (referred to as \texttt{ipcw\_cox}).
+\item The (discrete) oracle super learner, which picks the model that minimizes the
+Brier score in the independent data of 10.000 uncensored samples (referred to
+as \texttt{oracle}).
+\end{enumerate}
+
+Only the super learners 1., 2., and 3. provides estimates of the censoring distribution.
+
+\section{Zelefsky based simulation}
+\label{sec:orgf2b767a}
+We generate data in four different ways:
+
+\begin{enumerate}
+\item Data as generated in \citep{gerds2013estimating} (referred to as \texttt{original}).
+\item As in 1., but where censoring in completely independent of covariates
+(referred to as \texttt{indep\_cens}).
+\item Same censoring mechanism as in 1., but where the outcome depend only on one
+of the covariates (referred to as \texttt{simple\_effect})
+\item As in 1., but we add 5 independent standard Guassian covariates with no
+effect on neither outcome nor censoring (referred to as \texttt{noise}).
+\end{enumerate}
+
+\clearpage
+
+\subsection{Kaplan-Meier, Cox, and random forest}
+\label{sec:orgdf8f8f8}
+In this setting, we include the following learners in all libraries:
+
+\begin{itemize}
+\item The Kaplan-Meier estimator
+\item A Cox model with main effects
+\item A random forest based on 50 trees
+\end{itemize}
+
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=1\linewidth]{/tmp/babel-IUB42s/figure-EtEIk3.pdf}
+Zelefsky simulation setting using library consisting of Kaplan-Meier, Cox model, and random forests
+\end{figure}
+
+\clearpage
+
+\subsection{Add LASSO}
+\label{sec:org25907ea}
+In this setting we add a learner to all libraries, so that all libraries include
+the learners:
+
+\begin{itemize}
+\item The Kaplan-Meier estimator
+\item A Cox model with main effects
+\item A random forest based on 50 trees
+\item A penalized Cox model with main effects, where the \(\|\blank\|_1\) penalty
+(LASSO) is used and the penalty parameter is selected using cross-validation
+based on Cox' partial likelihood
+\end{itemize}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=1\linewidth]{/tmp/babel-IUB42s/figure-Ylaz8E.pdf}
+Zelefsky simulation setting including LASSO into the library
+\end{figure}
+
+\clearpage
+
+
+\section{Effect of number of variables}
+\label{sec:orged3af38}
+We generate data in three different way:
+
+\begin{enumerate}
+\item Outcome and censoring depends on one binary covariate (\(X_1\)). Another
+continuous covariates (\(X_2\)) that is correlated with \(X_1\) is generated.
+\item Same as in 1., but we also add 4 independent Gaussian covariates (\(X_3,
+   \dots X_6\)).
+\item Same as in 1., but we also add 9 independent Gaussian covariates (\(X_3,
+   \dots X_{11}\)).
+\end{enumerate}
+
+\subsection{Kaplan-Meier, Cox, and random forest}
+\label{sec:org493c472}
+In this setting, we include the following learners in all libraries:
+
+\begin{itemize}
+\item The Kaplan-Meier estimator
+\item A Cox model with main effects
+\item A random forest based on 50 trees
+\end{itemize}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=1\linewidth]{/tmp/babel-IUB42s/figure-bpNXlw.pdf}
+Zelefsky simulation setting using library consisting of Kaplan-Meier, Cox model, and random forests
+\end{figure}
+
+\clearpage
+
+\subsection{Add LASSO}
+\label{sec:org8fb1981}
+In this setting we add a learner to all libraries, so that all libraries include
+the learners:
+
+\begin{itemize}
+\item The Kaplan-Meier estimator
+\item A Cox model with main effects
+\item A random forest based on 50 trees
+\item A penalized Cox model with main effects, where the \(\|\blank\|_1\) penalty
+(LASSO) is used and the penalty parameter is selected using cross-validation
+based on Cox' partial likelihood
+\end{itemize}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=1\linewidth]{/tmp/babel-IUB42s/figure-p5pluf.pdf}
+Zelefsky simulation setting including LASSO into the library
+\end{figure}
+
+
+
+\section{References}
+\label{sec:org92fb677}
+\renewcommand{\section}[2]{} 
+\bibliography{./latex-settings/default-bib.bib}
+\end{document}

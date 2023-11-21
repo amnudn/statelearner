@@ -1,0 +1,41 @@
+% Testing!:
+% Def, theorems, etc. -- maybe review this
+\usepackage{amsthm}
+
+% Style separating env slightly from the rest
+\newtheoremstyle{break}  
+	{\topsep}{\topsep}
+	{}{}
+	{\bfseries}{}
+	{\newline}{}
+% Adjusted thm-environment with bullet at end
+\newcommand{\newmarkedtheorem}[1]{%
+  \newenvironment{#1}
+    {\pushQED{\leavevmode\unskip\penalty9999 \hbox{}\nobreak\hfill
+  \quad\hbox{\(\bullet\)}}
+    \csname inner@#1\endcsname}
+    {\popQED\csname endinner@#1\endcsname}%
+  \newtheorem{inner@#1}%
+}
+
+\theoremstyle{plain} % plain italic style
+\newtheorem{theorem}{Theorem}
+\numberwithin{theorem}{section}
+\newtheorem*{theorem*}{Theorem}
+\newtheorem{conjecture}{Conjecture}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition} % non-italic
+\newtheorem{definition}[theorem]{Definition}
+% \newmarkedtheorem{definition}[theorem]{Definition}
+\newtheorem{assumption}[theorem]{Assumption}
+\newtheorem*{assumption*}{Assumption}
+      
+\theoremstyle{break}
+\newmarkedtheorem{example}[theorem]{Example}
+\newmarkedtheorem{note}[theorem]{Note}
+
+\theoremstyle{remark}
+\newmarkedtheorem{remark}[theorem]{Remark}

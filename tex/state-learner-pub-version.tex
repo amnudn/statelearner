@@ -368,7 +368,7 @@ Note that at time \(t\), we observe that each observation is in one of four
 mutually exclusive states (Figure \ref{fig:multi-state-process}).
 \begin{figure}[h]
   \centering
-  \includegraphics[width=.5\textwidth]{./figures/figure-multi-state-process.pdf}
+  \includegraphics[width=.5\textwidth]{../figures/figure-multi-state-process.pdf}
   \caption{Illustration of the multi-state process \(\eta\) used by
     the state learner. Note that `censored' is a state, hence the
     process is always observed at any time.}
@@ -743,14 +743,13 @@ An example of a targeted estimator is the \fxnote*{also TMLE, depending on
 \end{equation}
 where \( \empmeas \) is the empirical measure of a sample \(\{O_i\}_{i=1}^n\).
 We can make the following asymptotic expansion of the one-step estimator
-\citep{pfanzagl1985contributions,fisher2021visually,kennedy2022semiparametric},
+\citep{pfanzagl1985contributions,van2003unified,fisher2021visually,kennedy2022semiparametric,rytgaard2022continuous},
 \begin{equation*}
   \hat{\Psi}_{\text{OS}}(\data_n)- \Psi(P)
   =  \empmeas{[\psi(\blank ; \Lambda_1, \Lambda_2, \Gamma)]}
   +\mathrm{Rem}{(\hat{\Lambda}_{1,n},\hat{\Lambda}_{2,n},  \hat{\Gamma}_n, P)} + \smallO_{P}(n^{-1/2}),
 \end{equation*}
 where the remainder term is typically such that
-\citep{van2003unified,rytgaard2022continuous}
 \begin{equation}
   \label{eq:4}
   \mathrm{Rem}{(\hat{\Lambda}_{1,n},\hat{\Lambda}_{2,n},  \hat{\Gamma}_n, P)}
@@ -768,7 +767,7 @@ Hence, under a suitable Donsker class regularity condition
 \citep{bickel1993efficient,kennedy2016semiparametric}, when
 equation~(\ref{eq:4}) holds and the nuisance parameters $\Lambda_1$,
 $\Lambda_2$, and $\Gamma$ are consistently estimated at rate
-\( \smallO_P{(n^{-1/4})} \) then
+\( \smallO_P{(n^{-1/4})} \), then
 \begin{equation}
   \label{eq:3}
   \sqrt{n}(\hat{\Psi}_{\text{OS}}(\data_n)- \Psi(P)) \weakly \mathcal{N}(0,
@@ -917,73 +916,154 @@ where
   \mu(\diff w).
   \end{split}
 \end{equation}
-The efficient influence function for the parameter $\tilde{\Psi}_{\tau}$
-depends on the set \( (\Lambda_1, \Lambda_2, \Gamma, \pi) \) of nuisance
-parameters, and is given by \fxnote*{other refs?}{\citep{rytgaard2022targeted}}
+The efficient influence function for the parameter $\tilde{\Psi}_{\tau}$ depends
+on the set \( (\Lambda_1, \Lambda_2, \Gamma, \pi) \) of nuisance parameters.
+% \begin{equation}
+%   \label{eq:5}
+%   \begin{split}
+%     & \psi_{\tau}(O; \Lambda_1, \Lambda_2, \Gamma, \pi)
+%     \\
+%     & =
+%       \sum_{l=1}^{2} \int_0^{\tau}
+%       \left[
+%       h_{\tau,l,1}(t, O  ; \Lambda_1, \Lambda_2, \Gamma, \pi)
+%       - h_{\tau,l,0}(t, O  ; \Lambda_1, \Lambda_2, \Gamma, \pi)
+%       \right]
+%     \\
+%     & \quad\qquad  \qquad
+%       \times
+%       \left(
+%       N_l(\diff t) - \1{\{\tilde{T} \geq t\}}\Lambda_l(\diff t \mid A, W)
+%       \right)
+%     \\
+%     & \quad
+%       -\sum_{a=0}^{1} 
+%       \left\{
+%       (-1)^a
+%       \int_0^{\tau}
+%       e^{-\Lambda_1(s- \mid W, a)-\Lambda_2(s- \mid W, a)}  \Lambda_1(\diff s \mid
+%       W, a)
+%       \right\}
+%       - \tilde{\Psi}_{t}^0(\Lambda_1, \Lambda_2, \mu),
+%     % & \quad+ \int_0^{\tau} e^{-\Lambda_1(s- \mid W, 1)-\Lambda_2(s- \mid W,
+%     % 1)} \Lambda_1(\diff s \mid W, 1)
+%     % \\
+%     % & \quad - \int_0^{\tau} e^{-\Lambda_1(s- \mid W, 0)-\Lambda_2(s- \mid W,
+%     % 0)} \Lambda_1(\diff s \mid W, 0)
+%   \end{split}
+% \end{equation}
+% where
+% \begin{align*}
+%   h_{\tau,l,a}(t, O  ; \Lambda_1, \Lambda_2, \Gamma, \pi)
+%   =&  \frac{\1{\{A=a\}} e^{\Gamma(t-\mid A, W)}}{\pi(W)^{a}(1-\pi(W))^{1-a}}
+%   \\
+%    & \quad \times
+%      \left(
+%      1- \frac{\int_t^{\tau} e^{-\Lambda_1(s- \mid A, W)-\Lambda_2(s- \mid A, W)}
+%      \Lambda_1(\diff s \mid A, W)}
+%      {e^{-\Lambda_1(t \mid A, W)-\Lambda_2(t \mid A, W)}}
+%      \right)^{\1{\{l=1\}}}
+%   \\
+%    & \quad\times
+%      \left(
+%      - \frac{\int_t^{\tau} e^{-\Lambda_1(s- \mid A, W)-\Lambda_2(s- \mid A, W)}
+%      \Lambda_1(\diff s \mid A, W)}
+%      {e^{-\Lambda_1(t \mid A, W)-\Lambda_2(t \mid A, W)}}
+%      \right)^{\1{\{l=2\}}}
+% \end{align*}
+Define the quantities
+\begin{align*}
+  \omega_a(A,W; \pi)
+  &=  \frac{% (-1)^{a+1}
+    \1{\{A=a\}}}{\pi(W)^{a}(1-\pi(W))^{1-a}},
+  \\
+  g(t, A, W; \Lambda_1, \Lambda_2)
+  & = \int_0^{t}
+    e^{-\Lambda_1(s- \mid W, A)-\Lambda_2(s- \mid W, A)}  \Lambda_1(\diff s \mid
+    W, A),
+  \\  
+  M_j(\diff t \mid A, W;  \Lambda_j  )
+  & = N_j(\diff t) -
+    \1{\{\tilde{T} \geq t\}} \Lambda_j(\diff t \mid W, A),
+    \quad j \in \{1,2\},
+  \intertext{and}
+  M(\diff t \mid A, W;  \Lambda_1, \Lambda_2  )
+  & = M_1(\diff t \mid A, W;  \Lambda_1  ) +
+    M_2(\diff t \mid A, W;  \Lambda_2  ).
+\end{align*}
+The efficient influence function can then be written as
+\citep{van2003unified,jewell2007non,rytgaard2022targeted},
+\begin{equation*}
+  \psi_{\tau}(O; \Lambda_1, \Lambda_2, \Gamma, \pi)
+  = \psi_{\tau}^1(O; \Lambda_1, \Lambda_2, \Gamma, \pi)
+  - \psi_{\tau}^0(O; \Lambda_1, \Lambda_2, \Gamma, \pi)
+  -\tilde{\Psi}_{t}^0(\Lambda_1, \Lambda_2, \mu),
+\end{equation*}
+where
 \begin{equation}
   \label{eq:5}
   \begin{split}
-    & \psi_{\tau}(O; \Lambda_1, \Lambda_2, \Gamma, \pi)
+    & \psi_{\tau}^a(O; \Lambda_1, \Lambda_2, \Gamma, \pi)
     \\
     & =
-      \sum_{l=1}^{2} \int_0^{\tau}
-      \left[
-      h_{\tau,l,1}(t, O  ; \Lambda_1, \Lambda_2, \Gamma, \pi)
-      - h_{\tau,l,0}(t, O  ; \Lambda_1, \Lambda_2, \Gamma, \pi)
-      \right]
-    \\
-    & \quad\qquad  \qquad
-      \times
-      \left(
-      N_l(\diff t) - \1{\{\tilde{T} \geq t\}}\Lambda_l(\diff t \mid A, W)
-      \right)
+      \omega_a(A,W; \pi)
+      \int_0^{\tau} e^{\Gamma(t- \mid A, W)}   
+      M_1(\diff t \mid A, W; \Lambda_1)
     \\
     & \quad
-      -\sum_{a=0}^{1} 
-      \left\{
-      (-1)^a
+      -
+      \omega_a(A,W; \pi)
+      g(\tau, A, W; \Lambda_1, \Lambda_2)
       \int_0^{\tau}
-      e^{-\Lambda_1(s- \mid W, a)-\Lambda_2(s- \mid W, a)}  \Lambda_1(\diff s \mid
-      W, a)
-      \right\}
-      - \tilde{\Psi}_{t}^0(\Lambda_1, \Lambda_2, \mu),
-    % & \quad+ \int_0^{\tau} e^{-\Lambda_1(s- \mid W, 1)-\Lambda_2(s- \mid W,
-    % 1)} \Lambda_1(\diff s \mid W, 1)
-    % \\
-    % & \quad - \int_0^{\tau} e^{-\Lambda_1(s- \mid W, 0)-\Lambda_2(s- \mid W,
-    % 0)} \Lambda_1(\diff s \mid W, 0)
+      e^{[\Gamma+\Lambda_1 + \Lambda_2](t- \mid A, W)}
+      M(\diff t \mid A, W; \Lambda_1, \Lambda_2)
+    \\
+    & \quad
+      +
+      \omega_a(A,W; \pi)      
+      \int_0^{\tau}
+      g(t, A, W; \Lambda_1, \Lambda_2)
+      e^{[\Gamma+\Lambda_1 + \Lambda_2](t- \mid A, W)}
+      M(\diff t \mid A, W; \Lambda_1, \Lambda_2)
+    \\
+    & \quad + g(\tau, a, W; \Lambda_1, \Lambda_2).
   \end{split}
 \end{equation}
-where
-\begin{align*}
-  h_{\tau,l,a}(t, O  ; \Lambda_1, \Lambda_2, \Gamma, \pi)
-  =&  \frac{\1{\{A=a\}} e^{\Gamma(t-\mid A, W)}}{\pi(W)^{a}(1-\pi(W))^{1-a}}
-  \\
-   & \quad \times
-     \left(
-     1- \frac{\int_t^{\tau} e^{-\Lambda_1(s- \mid A, W)-\Lambda_2(s- \mid A, W)}
-     \Lambda_1(\diff s \mid A, W)}
-     {e^{-\Lambda_1(t \mid A, W)-\Lambda_2(t \mid A, W)}}
-     \right)^{\1{\{l=1\}}}
-  \\
-   & \quad\times
-     \left(
-     - \frac{\int_t^{\tau} e^{-\Lambda_1(s- \mid A, W)-\Lambda_2(s- \mid A, W)}
-     \Lambda_1(\diff s \mid A, W)}
-     {e^{-\Lambda_1(t \mid A, W)-\Lambda_2(t \mid A, W)}}
-     \right)^{\1{\{l=2\}}}
-\end{align*}
-Equation~(\ref{eq:1}) and~(\ref{eq:5}) then allow us to construct a one-step
+
+Equations~(\ref{eq:1}) and~(\ref{eq:5}) allow us to construct a one-step
 estimator by using the definition given in equation~(\ref{eq:one-step-def}),
 which gives the estimator
 \begin{equation}
   \label{eq:one-step-comp-ate}
-  \tilde{\Psi}_{t, j}^0(\hat{a}_1(\data_n), \hat{a}_2(\data_n), \hat{\mu}_n(\data_n))
+  \begin{split}
+    \hat{\Psi}_{t,\text{OS}}(\data_n)
+    = &
+        \tilde{\Psi}_{t}^0(\hat{a}_1(\data_n), \hat{a}_2(\data_n),
+        \hat{\mu}_n(\data_n))
+    \\
+      &
+        +
+        \empmeas{[\psi_{\tau}(\blank; \hat{a}_{1,n}(\data_n), \hat{a}_{2,n}(\data_n),
+        \hat{b}_n(\data_n), \hat{\pi}_n(\data_n))]}
+    \\
+    = &
+        \empmeas{[\psi_{\tau}^1(\blank; \hat{a}_{1,n}(\data_n), \hat{a}_{2,n}(\data_n),
+        \hat{b}_n(\data_n), \hat{\pi}_n(\data_n))]}
+    \\
+      &
+        - \empmeas{[\psi_{\tau}^0(\blank; \hat{a}_{1,n}(\data_n), \hat{a}_{2,n}(\data_n),
+        \hat{b}_n(\data_n), \hat{\pi}_n(\data_n))]}
+  \end{split}
 \end{equation}
 
 
 \section{Numerical experiments}
 \label{sec:numer-exper}
+
+%% IPCW with potentially misspecified censoring model.
+%%
+%% Applying SL, concrete, and Westling on classical data set. (Where to put
+%% this?)
 
 We compare the state learner with two other discrete super learners and an
 oracle selector in a simulation study without a competing event. The two other
@@ -1040,7 +1120,7 @@ performance of both the IPCW(Cox) super learner and the state learner are close
 to that of the oracle for most sample sizes.
 
 \begin{figure}
-  \centerline{\includegraphics[width=1\linewidth]{./figures/ipcw-fail.pdf}}
+  \centerline{\includegraphics[width=1\linewidth]{../figures/ipcw-fail.pdf}}
   \caption[]{Results for scenario~1 of the simulation study. For the learner
     selected by each of the four discrete super learners, the Brier score
     calculated in a large independent data set without censoring is plotted
@@ -1108,13 +1188,18 @@ sample sizes. The performance of both the IPCW(Cox) super learner and the state
 learner approaches the benchmark provided by the oracle selector for large sample
 sizes.
 \begin{figure}
-  \centerline{\includegraphics[width=1\linewidth]{./figures/zelefski-sim.pdf}}
+  \centerline{\includegraphics[width=1\linewidth]{../figures/zelefski-sim.pdf}}
   \caption[]{Results for scenario~2 of the simulation study. For the learner
     selected by each of the four discrete super learners, the Brier score
     calculated in a large independent data set without censoring is plotted
     against sample size. The results are based on 200 repetitions.}
   \label{fig:zelefski}
 \end{figure}
+
+\section{Case study: Bystander efforts in out-of-hospital cardiac arrest}
+\label{sec:case-study:-byst}
+
+
 
 \section{Real data application}
 \label{sec:real-data-appl}
@@ -1145,7 +1230,7 @@ measured by the integrated Brier score, as long as a random forest is used to
 model the censoring distribution.
 
 \begin{figure}
-  \centerline{\includegraphics[width=1\linewidth]{./figures/zelefski-real-data.pdf}}
+  \centerline{\includegraphics[width=1\linewidth]{../figures/zelefski-real-data.pdf}}
   \caption[]{The results of applying the 125 combinations of learners to the
     prostate cancer data set. The learners are \texttt{KM} (KM), \texttt{Cox
       strata CS} (strata), \texttt{Lasso} (lasso), \texttt{Elastic} (elastic),
@@ -1157,7 +1242,7 @@ model the censoring distribution.
 \end{figure}
 
 \begin{table}[ht]
-  \centering \input{./figures/zel-tab.tex}
+  \centering \input{../figures/zel-tab.tex}
   \caption{The 10 best performing models in terms of integrated Brier score. The
     reported standard errors are based on five repetitions using different
     splits. The models are described in Table~\ref{tab:zel-library}. We refer to

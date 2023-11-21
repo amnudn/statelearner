@@ -1,0 +1,223 @@
+* Setting :noexport:
+Remember to exceture (C-c C-c) the following line:
+#+PROPERTY: header-args:R :async :results output verbatim  :exports results  :session *R* :cache yes
+
+#+BEGIN_SRC R
+library(targets)
+library(here)
+library(data.table)
+library(ggplot2)
+#+END_SRC
+
+#+RESULTS[(2023-11-20 21:22:58) db98fbe22ce69aedc9204017ce5eb5334daf6ae3]:
+
+* Super learners
+In all simulation studies, we compare five super learners, which are listed
+below. To evaluate performance super learner, we use an independent data set of
+10.000 uncensored samples and calculate the integrated Brier score in this data
+set. All results are based on 500 simulated data sets.
+
+1. The state learner (referred to as =statelearner=).
+2. The super learner proposed in \citep{westling2021inference} (referred to as
+   =survSL=).
+3. A super learner based on the estimated integrated Brier score, where the
+   censoring mechanism is estimated with the Kaplan-Meier estimator (referred to
+   as =ipcw_km=).
+4. A super learner based on the estimated integrated Brier score, where the
+   censoring mechanism is estimated with a Cox model that includes all available
+   covariates as main effects (referred to as =ipcw_cox=).
+5. The (discrete) oracle super learner, which picks the model that minimizes the
+   Brier score in the independent data of 10.000 uncensored samples (referred to
+   as =oracle=).
+
+Only the super learners 1., 2., and 3. provides estimates of the censoring distribution.
+
+* Zelefsky based simulation
+We generate data in four different ways:
+
+1. Data as generated in \citep{gerds2013estimating} (referred to as =original=).
+2. As in 1., but where censoring in completely independent of covariates
+   (referred to as =indep_cens=).
+3. Same censoring mechanism as in 1., but where the outcome depend only on one
+   of the covariates (referred to as =simple_effect=)
+4. As in 1., but we add 5 independent standard Guassian covariates with no
+   effect on neither outcome nor censoring (referred to as =noise=).
+
+\clearpage
+
+** Kaplan-Meier, Cox, and random forest
+In this setting, we include the following learners in all libraries:
+
+- The Kaplan-Meier estimator
+- A Cox model with main effects
+- A random forest based on 50 trees
+
+
+#+BEGIN_SRC R :results graphics file :exports results :file (org-babel-temp-file "./figure-" ".pdf") :width 10 :height 7
+tar_load(zel_all0_results, store = here("experiments/_targets"))
+summ_zel_all0_results <- zel_all0_results[, .(brier = mean(scaled_int_brier, na.rm = TRUE), se = sd(scaled_int_brier, na.rm = TRUE)/sqrt(.N)), .(n_obs, sim_set, type, SL)]
+ggplot(summ_zel_all0_results,
+       aes(x = n_obs, y = brier, col = SL)) +
+  theme_bw() +
+  theme(legend.position="top")+
+  geom_errorbar(position=position_dodge(width = dd_ww),aes(ymin = brier-1.96*se, ymax = brier+1.96*se), width = .05, alpha = .5) + 
+  geom_line(position=position_dodge(width = dd_ww)) + geom_point(position=position_dodge(width = dd_ww)) +
+  scale_x_continuous(trans='log2') +
+  facet_wrap(type~sim_set, ncol = 4, scales = "free_y")
+#+END_SRC
+
+#+ATTR_LATEX: :width 1\linewidth :caption Zelefsky simulation setting using library consisting of Kaplan-Meier, Cox model, and random forests
+#+RESULTS[(2023-11-20 21:31:31) e897a858ee051c477737fa181ba6c6b962e2ff67]:
+[[file:/tmp/babel-IUB42s/figure-EtEIk3.pdf]]
+
+\clearpage
+
+** Add LASSO
+In this setting we add a learner to all libraries, so that all libraries include
+the learners:
+
+- The Kaplan-Meier estimator
+- A Cox model with main effects
+- A random forest based on 50 trees
+- A penalized Cox model with main effects, where the $\|\blank\|_1$ penalty
+  (LASSO) is used and the penalty parameter is selected using cross-validation
+  based on Cox' partial likelihood
+
+#+BEGIN_SRC R :results graphics file :exports results :file (org-babel-temp-file "./figure-" ".pdf") :width 10 :height 7
+tar_load(zel_all2_results, store = here("experiments/_targets"))
+summ_zel_all2_results <- zel_all2_results[, .(brier = mean(scaled_int_brier, na.rm = TRUE), se = sd(scaled_int_brier, na.rm = TRUE)/sqrt(.N)), .(n_obs, sim_set, type, SL)]
+ggplot(summ_zel_all2_results,
+       aes(x = n_obs, y = brier, col = SL)) +
+  theme_bw() +
+  theme(legend.position="top")+
+  geom_errorbar(position=position_dodge(width = dd_ww),aes(ymin = brier-1.96*se, ymax = brier+1.96*se), width = .05, alpha = .5) + 
+  geom_line(position=position_dodge(width = dd_ww)) + geom_point(position=position_dodge(width = dd_ww)) +
+  scale_x_continuous(trans='log2') +
+  facet_wrap(type~sim_set, ncol = 4, scales = "free_y")
+#+END_SRC
+
+#+ATTR_LATEX: :width 1\linewidth :caption Zelefsky simulation setting including LASSO into the library
+#+RESULTS[(2023-11-20 21:32:52) 7154572e45d070033f8f298984961c70f72b828f]:
+[[file:/tmp/babel-IUB42s/figure-Ylaz8E.pdf]]
+
+\clearpage
+
+** Add elastic net :noexport:
+In this setting we add a learner to all libraries, so that all libraries include
+the learners:
+
+- The Kaplan-Meier estimator
+- A Cox model with main effects
+- A random forest based on 50 trees
+- A penalized Cox model with main effects, where the $\|\blank\|_1 +
+  \|\blank\|_2$ penalty (elastic net) is used and the penalty parameter is
+  selected using cross-validation based on Cox' partial likelihood
+
+#+BEGIN_SRC R :results graphics file :exports results :file (org-babel-temp-file "./figure-" ".pdf") :width 10 :height 7
+tar_load(zel_all_results, store = here("experiments/_targets"))
+summ_zel_all_results <- zel_all_results[, .(brier = mean(scaled_int_brier, na.rm = TRUE), se = sd(scaled_int_brier, na.rm = TRUE)/sqrt(.N)), .(n_obs, sim_set, type, SL)]
+ggplot(summ_zel_all_results,
+       aes(x = n_obs, y = brier, col = SL)) +
+  theme_bw() +
+  theme(legend.position="top")+
+  geom_errorbar(position=position_dodge(width = dd_ww),aes(ymin = brier-1.96*se, ymax = brier+1.96*se), width = .05, alpha = .5) + 
+  geom_line(position=position_dodge(width = dd_ww)) + geom_point(position=position_dodge(width = dd_ww)) +
+  scale_x_continuous(trans='log2') +
+  facet_wrap(type~sim_set, ncol = 4, scales = "free_y")
+#+END_SRC
+
+#+ATTR_LATEX: :width 1\linewidth :caption Zelefsky simulation setting including elastic net into the library
+#+RESULTS[(2023-11-20 21:32:52) 7154572e45d070033f8f298984961c70f72b828f]:
+[[file:/tmp/babel-IUB42s/figure-zOmpno.pdf]]
+
+
+* Effect of number of variables
+We generate data in three different way:
+
+1. Outcome and censoring depends on one binary covariate ($X_1$). Another
+   continuous covariates ($X_2$) that is correlated with $X_1$ is generated.
+2. Same as in 1., but we also add 4 independent Gaussian covariates (\(X_3,
+   \dots X_6 \)).
+3. Same as in 1., but we also add 9 independent Gaussian covariates (\(X_3,
+   \dots X_{11} \)).
+
+** Kaplan-Meier, Cox, and random forest
+In this setting, we include the following learners in all libraries:
+
+- The Kaplan-Meier estimator
+- A Cox model with main effects
+- A random forest based on 50 trees  
+
+#+BEGIN_SRC R :results graphics file :exports results :file (org-babel-temp-file "./figure-" ".pdf") :width 10 :height 7
+tar_load(ipcw_fail_sim0, store = here("experiments/_targets"))
+summ_ipcw_fail_sim0 <- ipcw_fail_sim0[, .(ave_scaled_int_brier = mean(scaled_int_brier, na.rm = TRUE), se = sd(scaled_int_brier, na.rm = TRUE)/sqrt(.N)), .(n_obs, n_covar, type, SL)]
+ggplot(summ_ipcw_fail_sim0[n_covar != 0],
+       aes(x = n_obs, y = ave_scaled_int_brier, col = SL)) +
+  theme_bw() +
+  theme(legend.position="top")+
+  geom_errorbar(position=position_dodge(width = 0.1),aes(ymin = ave_scaled_int_brier-1.96*se, ymax = ave_scaled_int_brier+1.96*se),width = .1,alpha = .5) + 
+  geom_line(position=position_dodge(width = 0.1)) +
+  geom_point(position=position_dodge(width = 0.1)) +
+  scale_x_continuous(trans='log2') +
+  facet_grid(type~n_covar, scales = "free")
+#+END_SRC
+
+#+ATTR_LATEX: :width 1\linewidth :caption Zelefsky simulation setting using library consisting of Kaplan-Meier, Cox model, and random forests
+#+RESULTS[(2023-11-20 21:31:31) e897a858ee051c477737fa181ba6c6b962e2ff67]:
+[[file:/tmp/babel-IUB42s/figure-bpNXlw.pdf]]
+
+\clearpage
+
+** Add LASSO
+In this setting we add a learner to all libraries, so that all libraries include
+the learners:
+
+- The Kaplan-Meier estimator
+- A Cox model with main effects
+- A random forest based on 50 trees
+- A penalized Cox model with main effects, where the $\|\blank\|_1$ penalty
+  (LASSO) is used and the penalty parameter is selected using cross-validation
+  based on Cox' partial likelihood
+
+#+BEGIN_SRC R :results graphics file :exports results :file (org-babel-temp-file "./figure-" ".pdf") :width 10 :height 7
+  tar_load(ipcw_fail_sim2, store = here("experiments/_targets"))
+  summ_ipcw_fail_sim2 <- ipcw_fail_sim2[, .(ave_scaled_int_brier = mean(scaled_int_brier, na.rm = TRUE), se = sd(scaled_int_brier, na.rm = TRUE)/sqrt(.N)), .(n_obs, n_covar, type, SL)]
+  ggplot(summ_ipcw_fail_sim2[n_covar != 0],
+	 aes(x = n_obs, y = ave_scaled_int_brier, col = SL)) +
+    theme_bw() +
+    theme(legend.position="top")+
+    geom_errorbar(position=position_dodge(width = 0.1),aes(ymin = ave_scaled_int_brier-1.96*se, ymax = ave_scaled_int_brier+1.96*se),width = .1,alpha = .5) + 
+    geom_line(position=position_dodge(width = 0.1)) +
+    geom_point(position=position_dodge(width = 0.1)) +
+    scale_x_continuous(trans='log2') +
+    facet_grid(type~n_covar, scales = "free")
+#+END_SRC
+
+#+ATTR_LATEX: :width 1\linewidth :caption Zelefsky simulation setting including LASSO into the library
+#+RESULTS[(2023-11-21 08:41:53) 3110deedede38bec0b7f808de4e39976da055ed4]:
+[[file:/tmp/babel-IUB42s/figure-p5pluf.pdf]]
+
+
+
+* References
+\renewcommand{\section}[2]{} 
+\bibliography{./latex-settings/default-bib.bib}
+
+* HEADER :noexport:
+#+TITLE: Summary of some simulation results
+#+Author: Anders Munch
+#+Date: \today
+
+#+LANGUAGE:  en
+#+OPTIONS:   num:t toc:nil ':t ^:t
+#+LaTeX_CLASS: article
+#+LaTeX_CLASS_OPTIONS: [a4paper,danish]
+#+LATEX_HEADER:\usepackage[margin=4cm]{geometry}
+#+LATEX_HEADER:\usepackage{dsfont, pgfpages, tikz,amssymb, amsmath,xcolor, caption, subcaption}
+# #+LATEX_HEADER: \hypersetup{ hidelinks, }
+#+LaTeX_HEADER: \input{./latex-settings/standard-settings.tex}
+#+LaTeX_HEADER: \input{./latex-settings/standard-commands.tex}
+#+LaTeX_HEADER: \input{./latex-settings/org-settings.tex}
+#+LaTeX_HEADER: \input{./latex-settings/title-compact.tex}
+#+BIBLIOGRAPHY: ./latex-settings/default-bib plain
+

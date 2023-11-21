@@ -1,0 +1,33 @@
+% New operators and commands
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\blank}{\makebox[1ex]{\textbf{$\cdot$}}}
+\newcommand\independent{\protect\mathpalette{\protect\independenT}{\perp}}
+\def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern2mu{#1#2}}}
+\renewcommand{\phi}{\varphi}
+\renewcommand{\epsilon}{\varepsilon}
+\newcommand*\diff{\mathop{}\!\mathrm{d}}
+\newcommand{\weakly}{\rightsquigarrow}
+\newcommand\smallO{\textit{o}}
+\newcommand\bigO{\textit{O}}
+\newcommand{\midd}{\; \middle|\;}
+\newcommand{\1}{\mathds{1}}
+\usepackage{ifthen} %% Empirical process with default argument
+\newcommand{\G}[2][n]{
+{\ensuremath{\mathbb{G}_{#1}}{\left[#2\right]}}
+}
+\DeclareMathOperator*{\argmin}{\arg\!\min}
+\DeclareMathOperator*{\argmax}{\arg\!\max}
+\newcommand{\V}{\mathrm{Var}} % variance
+\newcommand{\eqd}{\stackrel{d}{=}} % equality in distribution
+\newcommand{\arrow}[1]{\xrightarrow{\; {#1} \;}}
+\newcommand{\arrowP}{\xrightarrow{\; P \;}} % convergence in probability
+\newcommand{\KL}{\ensuremath{D_{\mathrm{KL}}}}
+
+%% Easily change notation
+\newcommand{\leb}{\lambda} % the Lebesgue measure
+\DeclareMathOperator{\TT}{\Psi} % target parameter
+\newcommand{\lp}{\ensuremath{\mathcal{L}_{P}^2}} % shortcut for lp2 space
+\newcommand{\empmeas}{\ensuremath{\mathbb{P}_n}} % empirical measure
+\newcommand{\E}{{\ensuremath{\mathop{{\mathbb{E}}}}}} % expectation
+\newcommand{\ic}{\ensuremath{I}} % influence curve

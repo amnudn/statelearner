@@ -1,0 +1,41 @@
+% Standard library
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{natbib, dsfont, enumitem,
+  amssymb,soul,xcolor,amsmath,graphicx,subcaption,verbatim,pgfplots,tikz,prodint}
+\usetikzlibrary{calc,patterns,angles,quotes,automata, positioning,arrows,shapes}
+
+% Ref and bibliography style 
+\bibliographystyle{abbrvnat}
+
+% Handling new lines
+\setlength{\parskip}{1em}
+\setlength{\parindent}{0em}
+
+% Handling space after sections
+\usepackage{titlesec}
+\titlespacing*{\section}{0em}{2em}{0em}
+\titlespacing*{\subsection}{0em}{2em}{0em}
+\titlespacing*{\subsubsection}{0em}{2em}{0em}
+
+% No spacing after in start of list
+\setlist[itemize]{topsep=0pt}
+\setlist[enumerate]{topsep=0pt}
+
+% Todo and notes
+% Todo and notes
+\usepackage[author=]{fixme}
+\fxusetheme{color}
+\definecolor{fxtarget}{rgb}{.5,.5,.5}
+\definecolor{fxnote}{rgb}{.5,.5,.5}
+
+\newcommand{\darkmode}[1]{ % Set dark mode or not
+  \ifthenelse{ \equal{#1}{1}}{
+    \usepackage{pagecolor}
+    \definecolor{pagecol}{RGB}{0,43,54}
+    \definecolor{textcol}{RGB}{131,148,150}
+    % \definecolor{textcol}{RGB}{38,139,210}
+    \pagecolor{pagecol}
+    \color{textcol}
+  }
+}
