@@ -151,7 +151,7 @@ We simulate data according to the Zelefsky study and evaluate different super le
 #+RESULTS:
 
 The scaled integrated Brier scores are obtained as follows.
-#+BEGIN_SRC R
+#+BEGIN_SRC R :exports both
 sim_est[!(type == "cens" & grepl("ipcw", SL)),
         .(scaled_int_brier = sum(100*brier)*time_inc/end_t),
         .(type, SL)]
