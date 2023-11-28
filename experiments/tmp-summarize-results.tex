@@ -1,4 +1,4 @@
-% Created 2023-11-21 Tue 15:20
+% Created 2023-11-22 Wed 08:53
 % Intended LaTeX compiler: pdflatex
 \documentclass[a4paper,danish]{article}
 \usepackage[utf8]{inputenc}
@@ -31,7 +31,7 @@
 
 \maketitle
 \section{Super learners}
-\label{sec:orgfb13ca2}
+\label{sec:org4d4629b}
 In all simulation studies, we compare five super learners, which are listed
 below. To evaluate performance super learner, we use an independent data set of
 10.000 uncensored samples and calculate the integrated Brier score in this data
@@ -55,7 +55,7 @@ as \texttt{oracle}).
 Only the super learners 1., 2., and 3. provides estimates of the censoring distribution.
 
 \section{Zelefsky based simulation}
-\label{sec:org1123149}
+\label{sec:orgdc8a899}
 We generate data in four different ways:
 
 \begin{enumerate}
@@ -71,7 +71,7 @@ effect on neither outcome nor censoring (referred to as \texttt{noise}).
 \clearpage
 
 \subsection{Kaplan-Meier, Cox, and random forest}
-\label{sec:org0516d66}
+\label{sec:org3ebe586}
 In this setting, we include the following learners in all libraries:
 
 \begin{itemize}
@@ -90,7 +90,7 @@ Zelefsky simulation setting using library consisting of Kaplan-Meier, Cox model,
 \clearpage
 
 \subsection{Add LASSO}
-\label{sec:orgd0d0620}
+\label{sec:org98a9507}
 In this setting we add a learner to all libraries, so that all libraries include
 the learners:
 
@@ -113,7 +113,7 @@ Zelefsky simulation setting including LASSO into the library
 
 
 \section{Effect of number of variables}
-\label{sec:orgf46a6e0}
+\label{sec:org2e42afe}
 We generate data in three different way:
 
 \begin{enumerate}
@@ -126,7 +126,7 @@ continuous covariate (\(X_2\)) that is correlated with \(X_1\) is generated.
 \end{enumerate}
 
 \subsection{Kaplan-Meier, Cox, and random forest}
-\label{sec:org4b465da}
+\label{sec:org7f2bb4f}
 In this setting, we include the following learners in all libraries:
 
 \begin{itemize}
@@ -144,7 +144,7 @@ Zelefsky simulation setting using library consisting of Kaplan-Meier, Cox model,
 \clearpage
 
 \subsection{Add LASSO}
-\label{sec:org79abb0b}
+\label{sec:orgf3d57c9}
 In this setting we add a learner to all libraries, so that all libraries include
 the learners:
 
@@ -163,10 +163,33 @@ based on Cox' partial likelihood
 Zelefsky simulation setting including LASSO into the library
 \end{figure}
 
+\subsection{Add LASSO and elastic net}
+\label{sec:org062c3d9}
+In this setting we add a learner to all libraries, so that all libraries include
+the learners:
+
+\begin{itemize}
+\item The Kaplan-Meier estimator
+\item A Cox model with main effects
+\item A random forest based on 50 trees
+\item A penalized Cox model with main effects, where the \(\|\blank\|_1\) penalty
+(LASSO) is used and the penalty parameter is selected using cross-validation
+based on Cox' partial likelihood
+\item A penalized Cox model with main effects, where the \(\|\blank\|_1 +
+  \|\blank\|_2\) penalty (elastic net) is used and the penalty parameter is
+selected using cross-validation based on Cox' partial likelihood
+\end{itemize}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=1\linewidth]{/tmp/babel-IUB42s/figure-xTZcFV.pdf}
+Zelefsky simulation setting including LASSO into the library
+\end{figure}
+
 
 
 \section{References}
-\label{sec:org53b63a4}
+\label{sec:org3ba31f0}
 \renewcommand{\section}[2]{} 
 \bibliography{./latex-settings/default-bib.bib}
 \end{document}

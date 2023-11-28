@@ -133,3 +133,37 @@ ate_est[effect=="ATE" & est_type=="one-step"]
 : 2: cause2  730.50    ATE one-step 0.08763156 0.08163485 -0.07237275 0.2476359
 : 3: cause1 1826.25    ATE one-step 0.05699237 0.05786330 -0.05641970 0.1704044
 : 4: cause2 1826.25    ATE one-step 0.10442644 0.08226031 -0.05680378 0.2656567
+
+** Simulated data
+
+We simulate data according to the Zelefsky study and evaluate different super learners.
+#+BEGIN_SRC R
+  set.seed(22)
+  start_t = 1
+  end_t = 36
+  time_inc = (end_t-start_t)/100
+  eval_times = seq(start_t, end_t, time_inc)
+  train_data <- simZelefsky_wrapper(n = 500, simulation_input = zelefsky_summary)[, !c("true_time", "cens_time")]
+  eval_data <- simZelefsky_wrapper(n = 1e4, simulation_input = zelefsky_summary)[, !c("time", "status")]
+  sim_est <- eval_sl(train_data, eval_data, eval_times = seq(1, 36, length.out = 100))
+#+END_SRC
+
+#+RESULTS:
+
+The scaled integrated Brier scores are obtained as follows.
+#+BEGIN_SRC R
+sim_est[!(type == "cens" & grepl("ipcw", SL)),
+        .(scaled_int_brier = sum(100*brier)*time_inc/end_t),
+        .(type, SL)]
+#+END_SRC
+
+#+RESULTS:
+:     type           SL scaled_int_brier
+: 1: event       survSL         9.951644
+: 2:  cens       survSL        13.723653
+: 3: event statelearner         9.826543
+: 4:  cens statelearner        14.055743
+: 5: event      ipcw_km         9.826543
+: 6: event     ipcw_cox         9.826543
+: 7: event       oracle         9.826543
+: 8:  cens       oracle        13.725703

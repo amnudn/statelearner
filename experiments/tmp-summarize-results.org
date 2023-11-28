@@ -159,7 +159,7 @@ ggplot(summ_ipcw_fail_sim0[n_covar != 0],
   geom_line(position=position_dodge(width = 0.1)) +
   geom_point(position=position_dodge(width = 0.1)) +
   scale_x_continuous(trans='log2') +
-    facet_grid(type~paste0("independent covariates = ", n_covar-1), scales = "free")
+  facet_grid(type~paste0("independent covariates = ", n_covar-1), scales = "free")
 #+END_SRC
 
 #+ATTR_LATEX: :width 1\linewidth :caption Zelefsky simulation setting using library consisting of Kaplan-Meier, Cox model, and random forests
@@ -196,6 +196,38 @@ the learners:
 #+ATTR_LATEX: :width 1\linewidth :caption Zelefsky simulation setting including LASSO into the library
 #+RESULTS[(2023-11-21 08:41:53) 3110deedede38bec0b7f808de4e39976da055ed4]:
 [[file:/tmp/babel-IUB42s/figure-ozs9vG.pdf]]
+
+** Add LASSO and elastic net :noexport:
+In this setting we add a learner to all libraries, so that all libraries include
+the learners:
+
+- The Kaplan-Meier estimator
+- A Cox model with main effects
+- A random forest based on 50 trees
+- A penalized Cox model with main effects, where the $\|\blank\|_1$ penalty
+  (LASSO) is used and the penalty parameter is selected using cross-validation
+  based on Cox' partial likelihood
+- A penalized Cox model with main effects, where the $\|\blank\|_1 +
+  \|\blank\|_2$ penalty (elastic net) is used and the penalty parameter is
+  selected using cross-validation based on Cox' partial likelihood
+
+#+BEGIN_SRC R :results graphics file :exports results :file (org-babel-temp-file "./figure-" ".pdf") :width 10 :height 7
+  tar_load(ipcw_fail_sim3, store = here("experiments/_targets"))
+  summ_ipcw_fail_sim3 <- ipcw_fail_sim3[, .(ave_scaled_int_brier = mean(scaled_int_brier, na.rm = TRUE), se = sd(scaled_int_brier, na.rm = TRUE)/sqrt(.N)), .(n_obs, n_covar, type, SL)]
+  ggplot(summ_ipcw_fail_sim3[n_covar != 0],
+	 aes(x = n_obs, y = ave_scaled_int_brier, col = SL)) +
+    theme_bw() +
+    theme(legend.position="top")+
+    geom_errorbar(position=position_dodge(width = 0.1),aes(ymin = ave_scaled_int_brier-1.96*se, ymax = ave_scaled_int_brier+1.96*se),width = .1,alpha = .5) + 
+    geom_line(position=position_dodge(width = 0.1)) +
+    geom_point(position=position_dodge(width = 0.1)) +
+    scale_x_continuous(trans='log2') +
+    facet_grid(type~paste0("independent covariates = ", n_covar-1), scales = "free")
+#+END_SRC
+
+#+ATTR_LATEX: :width 1\linewidth :caption Zelefsky simulation setting including LASSO into the library
+#+RESULTS[(2023-11-21 08:41:53) 3110deedede38bec0b7f808de4e39976da055ed4]:
+[[file:/tmp/babel-IUB42s/figure-xTZcFV.pdf]]
 
 
 
