@@ -10,8 +10,99 @@ library(ggplot2)
 #+END_SRC
 
 #+RESULTS[(2023-11-20 21:22:58) db98fbe22ce69aedc9204017ce5eb5334daf6ae3]:
+: here() starts at /home/amnudn/Documents/phd/statelearner
+: data.table 1.14.8 using 4 threads (see ?getDTthreads).  Latest news: r-datatable.com
 
-* Super learners
+* The state learner vs IPCW super learners
+
+We compare the state learner to two IPCW-based super learners using different
+estimators of the censoring distribution. As benchmark we use the (discrete)
+oracle. This gives the following 4 super learners.
+
+
+1. The state learner (referred to as =statelearner=).
+2. A super learner based on the estimated integrated Brier score, where the
+   censoring mechanism is estimated with the Kaplan-Meier estimator (referred to
+   as =ipcw_km=).
+3. A super learner based on the estimated integrated Brier score, where the
+   censoring mechanism is estimated with a Cox model that includes all available
+   covariates as main effects (referred to as =ipcw_cox=).
+4. The (discrete) oracle super learner, which picks the model that minimizes the
+   Brier score in an independent data set of 10.000 uncensored samples (referred to
+   as =oracle=).
+
+We used data generated in two different ways:
+1. Data as generated in \citep{gerds2013estimating} (referred to as =original=).
+2. As in 1., but where censoring in completely independent of covariates
+   (referred to as =indep_cens=).
+   
+To evaluate performance super learner, we use an independent data set of 10.000
+uncensored samples and calculate the integrated Brier score in this data set.
+All results are based on 500 simulated data sets.
+
+#+BEGIN_SRC R :results graphics file :exports results :file /tmp/tmp-fig-sl-plot1.pdf :width 6 :height 3
+  tar_load(zel_all0_results, store = here("experiments/_targets"))
+  summ_zel_all0_results <- zel_all0_results[, .(brier = mean(scaled_int_brier, na.rm = TRUE), se = sd(scaled_int_brier, na.rm = TRUE)/sqrt(.N)), .(n_obs, sim_set, type, SL)]
+
+  summ_zel_all0_results
+
+  ggplot(summ_zel_all0_results[type == "event" &
+			       sim_set %in% c("original", "indep_cens") &
+			       SL%in%c("statelearner", "ipcw_km", "ipcw_cox", "oracle")],
+	 aes(x = n_obs, y = brier, col = SL)) +
+    theme_bw() +
+    scale_color_manual(values = c("green", "red", "gray", "blue")) +
+    theme(legend.position="top")+
+    geom_errorbar(position=position_dodge(width = 0.1),aes(ymin = brier-1.96*se, ymax = brier+1.96*se), width = .05, alpha = .5) + 
+    geom_line(position=position_dodge(width = 0.1), size=.8) + geom_point(position=position_dodge(width = 0.1), size=1) +
+    scale_x_continuous(trans='log2') +
+    facet_wrap(~sim_set, ncol = 2, scales = "free_y")
+#+END_SRC
+
+#+RESULTS[(2023-11-29 11:24:08) 6bcff9d035a71735047b6312d3e66a9a3e945f65]:
+[[file:/tmp/tmp-fig-sl-plot1.pdf]]
+
+\clearpage 
+
+
+* The state learner vs SurvSL
+
+We compare the state learner to the super learner proposed by
+\cite{westling2021inference}. As benchmark we use again the (discrete) oracle.
+This gives the following 3 super learners.
+
+
+1. The state learner (referred to as =statelearner=).
+2. The super learner proposed in \citep{westling2021inference} (referred to as
+   =survSL=).
+3. The (discrete) oracle super learner, which picks the model that minimizes the
+   Brier score in an independent data set of 10.000 uncensored samples (referred to
+   as =oracle=).
+
+We use the same data-generating mechanisms and method of evaluation as described
+in the section above.
+
+#+BEGIN_SRC R :results graphics file :exports results :file /tmp/tmp-fig-sl-plot2.pdf :width 6 :height 3
+  ggplot(summ_zel_all0_results[type == "event" &
+			       sim_set %in% c("original", "indep_cens") &
+			       SL%in%c("statelearner", "survSL", "oracle")],
+	 aes(x = n_obs, y = brier, col = SL)) +
+    theme_bw() +
+    scale_color_manual(values = c("gray", "blue", "orange")) +
+    theme(legend.position="top")+
+    geom_errorbar(position=position_dodge(width = 0.1),aes(ymin = brier-1.96*se, ymax = brier+1.96*se), width = .05, alpha = .5) + 
+    geom_line(position=position_dodge(width = 0.1), size=.8) + geom_point(position=position_dodge(width = 0.1), size=1) +
+    scale_x_continuous(trans='log2') +
+    facet_wrap(~sim_set, ncol = 2, scales = "free_y")
+#+END_SRC
+
+#+RESULTS[(2023-11-29 11:28:42) 276eaf71ba8671312f9a90b9fb8875845bc48e35]:
+[[file:/tmp/tmp-fig-sl-plot2.pdf]]
+
+
+
+
+* Super learners :noexport:
 In all simulation studies, we compare five super learners, which are listed
 below. To evaluate performance super learner, we use an independent data set of
 10.000 uncensored samples and calculate the integrated Brier score in this data
@@ -30,9 +121,11 @@ set. All results are based on 500 simulated data sets.
    Brier score in the independent data of 10.000 uncensored samples (referred to
    as =oracle=).
 
-Only the super learners 1., 2., and 3. provides estimates of the censoring distribution.
+Only the super learners 1., 2., and 5. provide estimates of the censoring
+distribution that are not pre-specified.
 
-* Zelefsky based simulation
+
+* Zelefsky based simulation :noexport:
 We generate data in four different ways:
 
 1. Data as generated in \citep{gerds2013estimating} (referred to as =original=).
@@ -131,7 +224,7 @@ ggplot(summ_zel_all_results,
 [[file:/tmp/babel-IUB42s/figure-zOmpno.pdf]]
 
 
-* Effect of number of variables
+* Effect of number of variables :noexport:
 We generate data in three different way:
 
 1. Outcome and censoring depends on one binary covariate ($X_1$). Another
