@@ -3,15 +3,14 @@ Remember to exceture (C-c C-c) the following line:
 #+PROPERTY: header-args:R :async :results output verbatim  :exports results  :session *R* :cache yes
 
 #+BEGIN_SRC R
+try(setwd("~/Documents/phd/statelearner/experiments/"))
 library(targets)
 library(here)
 library(data.table)
 library(ggplot2)
 #+END_SRC
 
-#+RESULTS[(2023-11-20 21:22:58) db98fbe22ce69aedc9204017ce5eb5334daf6ae3]:
-: here() starts at /home/amnudn/Documents/phd/statelearner
-: data.table 1.14.8 using 4 threads (see ?getDTthreads).  Latest news: r-datatable.com
+#+RESULTS[(2024-01-04 15:11:02) f2dacdf5f7d6e45c6aa9da8521472432cce50fd9]:
 
 * The state learner vs IPCW super learners
 
@@ -30,6 +29,11 @@ oracle. This gives the following 4 super learners.
 4. The (discrete) oracle super learner, which picks the model that minimizes the
    Brier score in an independent data set of 10.000 uncensored samples (referred to
    as =oracle=).
+
+We include the following learners in all libraries:
+- The Kaplan-Meier estimator
+- A Cox model with main effects
+- A random forest based on 50 trees
 
 We used data generated in two different ways:
 1. Data as generated in \citep{gerds2013estimating} (referred to as =original=).
@@ -54,12 +58,12 @@ All results are based on 500 simulated data sets.
     scale_color_manual(values = c("green", "red", "gray", "blue")) +
     theme(legend.position="top")+
     geom_errorbar(position=position_dodge(width = 0.1),aes(ymin = brier-1.96*se, ymax = brier+1.96*se), width = .05, alpha = .5) + 
-    geom_line(position=position_dodge(width = 0.1), size=.8) + geom_point(position=position_dodge(width = 0.1), size=1) +
+    geom_line(position=position_dodge(width = 0.1), linewidth=.8) + geom_point(position=position_dodge(width = 0.1), size=1) +
     scale_x_continuous(trans='log2') +
     facet_wrap(~sim_set, ncol = 2, scales = "free_y")
 #+END_SRC
 
-#+RESULTS[(2023-11-29 11:24:08) 6bcff9d035a71735047b6312d3e66a9a3e945f65]:
+#+RESULTS[(2024-01-04 15:11:22) bda3c65863c5a50771712d56875fcb3a7006c92d]:
 [[file:/tmp/tmp-fig-sl-plot1.pdf]]
 
 \clearpage 
@@ -83,17 +87,17 @@ We use the same data-generating mechanisms and method of evaluation as described
 in the section above.
 
 #+BEGIN_SRC R :results graphics file :exports results :file /tmp/tmp-fig-sl-plot2.pdf :width 6 :height 3
-  ggplot(summ_zel_all0_results[type == "event" &
-			       sim_set %in% c("original", "indep_cens") &
-			       SL%in%c("statelearner", "survSL", "oracle")],
-	 aes(x = n_obs, y = brier, col = SL)) +
-    theme_bw() +
-    scale_color_manual(values = c("gray", "blue", "orange")) +
-    theme(legend.position="top")+
-    geom_errorbar(position=position_dodge(width = 0.1),aes(ymin = brier-1.96*se, ymax = brier+1.96*se), width = .05, alpha = .5) + 
-    geom_line(position=position_dodge(width = 0.1), size=.8) + geom_point(position=position_dodge(width = 0.1), size=1) +
-    scale_x_continuous(trans='log2') +
-    facet_wrap(~sim_set, ncol = 2, scales = "free_y")
+ggplot(summ_zel_all0_results[type == "event" &
+                             sim_set %in% c("original", "indep_cens") &
+                             SL%in%c("statelearner", "survSL", "oracle")],
+       aes(x = n_obs, y = brier, col = SL)) +
+  theme_bw() +
+  scale_color_manual(values = c("gray", "blue", "orange")) +
+  theme(legend.position="top")+
+  geom_errorbar(position=position_dodge(width = 0.1),aes(ymin = brier-1.96*se, ymax = brier+1.96*se), width = .05, alpha = .5) + 
+  geom_line(position=position_dodge(width = 0.1), linewidth=.8) + geom_point(position=position_dodge(width = 0.1), size=1) +
+  scale_x_continuous(trans='log2') +
+  facet_wrap(~sim_set, ncol = 2, scales = "free_y")
 #+END_SRC
 
 #+RESULTS[(2023-11-29 11:28:42) 276eaf71ba8671312f9a90b9fb8875845bc48e35]:
@@ -328,7 +332,7 @@ the learners:
 \renewcommand{\section}[2]{} 
 \bibliography{./latex-settings/default-bib.bib}
 
-* HEADER :noexport:
+* HEADER                                                           :noexport:
 #+TITLE: Summary of some simulation results
 #+Author: Anders Munch
 #+Date: \today

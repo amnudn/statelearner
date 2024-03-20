@@ -1,4 +1,4 @@
-% Created 2023-11-29 Wed 11:31
+% Created 2024-01-04 Thu 15:19
 % Intended LaTeX compiler: pdflatex
 \documentclass[a4paper,danish]{article}
 \usepackage[utf8]{inputenc}
@@ -31,7 +31,7 @@
 
 \maketitle
 \section{The state learner vs IPCW super learners}
-\label{sec:org4c83351}
+\label{sec:org8bdf483}
 
 We compare the state learner to two IPCW-based super learners using different
 estimators of the censoring distribution. As benchmark we use the (discrete)
@@ -50,6 +50,13 @@ covariates as main effects (referred to as \texttt{ipcw\_cox}).
 Brier score in an independent data set of 10.000 uncensored samples (referred to
 as \texttt{oracle}).
 \end{enumerate}
+
+We include the following learners in all libraries:
+\begin{itemize}
+\item The Kaplan-Meier estimator
+\item A Cox model with main effects
+\item A random forest based on 50 trees
+\end{itemize}
 
 We used data generated in two different ways:
 \begin{enumerate}
@@ -70,7 +77,7 @@ All results are based on 500 simulated data sets.
 
 
 \section{The state learner vs SurvSL}
-\label{sec:org09707c3}
+\label{sec:orgd930776}
 
 We compare the state learner to the super learner proposed by
 \cite{westling2021inference}. As benchmark we use again the (discrete) oracle.
@@ -97,7 +104,7 @@ in the section above.
 
 
 \section{References}
-\label{sec:orgdc8dbd8}
+\label{sec:orgb7dc71d}
 \renewcommand{\section}[2]{} 
 \bibliography{./latex-settings/default-bib.bib}
 \end{document}

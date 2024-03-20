@@ -3,9 +3,9 @@
 ## Author: Anders Munch
 ## Created: Oct 18 2023 (15:10) 
 ## Version: 
-## Last-Updated: Nov  6 2023 (12:11) 
+## Last-Updated: Jan 24 2024 (12:32) 
 ##           By: Anders Munch
-##     Update #: 527
+##     Update #: 530
 #----------------------------------------------------------------------
 ## 
 ### Commentary:
@@ -214,147 +214,23 @@ count_integral <- function(A,
     return(out)
 }
 
+## Support/meta funcions:
+at_risk_fun <- function(newdata,times,time_name = "time"){
+    spring_times = newdata[[time_name]]
+    grid_mat = matrix(times,ncol = length(times),nrow = length(spring_times),byrow = TRUE)
+    ## event_mat = apply(grid_mat, 2, function(x) 1*(spring_times >= x))
+    event_mat = do.call(cbind, lapply(1:ncol(grid_mat), function(xx) 1*(spring_times >= grid_mat[, xx])))
+    return(event_mat)
+}
 
-#### Old versions
-## internal_integral1 <- function(A,
-##                                 B,
-##                                 end,
-##                                 start = 0,
-##                                 data,
-##                                 jump_points,
-##                                 integrate = TRUE){
-##     ## Calculate the integral/sum:
-##     ## \int_start^end A(s) B(ds)
-##     ##
-##     jump_points = sort(unique(c(start, jump_points, end)))
-##     stopifnot(length(jump_points)>1)
-##     wtimes = jump_points[start <= jump_points & jump_points <= end]
-##     n_t = length(wtimes)
-##     A0 = A(newdata = data,times = wtimes)
-##     B0 = B(newdata = data,times = wtimes)
-##     ## B0_diff = t(apply(B0, 1, diff))
-##     B0_diff = do.call(rbind, lapply(1:nrow(B0), function(xx) diff(B0[xx,])))    
-##     ## Why not:
-##     integrands = A0[, -1] * B0_diff
-##     if(integrate)
-##         out = rowSums(integrands)
-##     else
-##         out = integrands
-##     return(out)
-## }
-
-## internal_integral2 <- function(A, B, C, D, end, start = 0, data, jump_points, integrate = TRUE){
-##     ## Calculate the double integral/sum:
-##     ## \int_start^end C(t) [\int_0^t A(s) B(ds)] D(dt)
-##     ##
-##     jump_points = sort(unique(c(start, jump_points, end)))
-##     wtimes = jump_points[start <= jump_points & jump_points <= end]    
-##     n_t = length(wtimes)
-##     mf0 = function(newdata, times){
-##         integrands = internal_intergral1_v2(A = A, B = B, start = start, end = end, jump_points = times, newdata = newdata, integrate = FALSE)
-##         out = do.call(rbind, lapply(1:nrow(integrands), function(xx) cumsum(integrands[xx,])))
-##         ## Must be 0 at time 0, because it is \int_start^start ...
-##         out = cbind(0, out)
-##         return(out)
-##     }
-##     A_meta = function(newdata,times) (mf0(newdata,times) * C(newdata,times))
-##     outer_int = internal_intergral1_v2(A = A_meta,
-##                                        B = D,
-##                                        end = end,
-##                                        start = start,
-##                                        newdata = data,
-##                                        jump_points = wtimes,
-##                                        integrate = integrate)
-##     return(outer_int)
-## }
-
-
-## internal_intergral1 <- function(A,
-##                                 B = function(newdata,times) matrix(1,nrow = nrow(newdata),ncol = length(times)),
-##                                 C,
-##                                 end,
-##                                 start = 0,
-##                                 newdata,
-##                                 jump_points,
-##                                 integrate = TRUE){
-##     ## Calculate the integral/sum:
-##     ## \int_start^end exp(A(s)) * B(s) C(ds)
-##     ##
-##     jump_points = sort(unique(c(start, jump_points, end)))
-##     stopifnot(length(jump_points)>1)
-##     wtimes = jump_points[start <= jump_points & jump_points <= end]
-##     n_t = length(wtimes)
-##     A0 = A(newdata = newdata,times = wtimes)
-##     B0 = B(newdata = newdata,times = wtimes)
-##     C0 = C(newdata = newdata,times = wtimes)
-##     C0_diff = t(apply(C0, 1, diff))
-##     ## integrands = exp(A0[, -length(n_t)]) * B0[, -length(n_t)] * C0_diff
-##     ## Why not:
-##     integrands = exp(A0[, -1]) * B0[, -1] * C0_diff
-##     if(integrate)
-##         out = rowSums(integrands)
-##     else
-##         out = integrands
-##     return(out)
-## }
-
-## internal_intergral2 <- function(A = function(newdata,times) matrix(1,nrow = nrow(newdata),ncol = length(times)), B, C, D, end, start = 0, newdata, jump_points, integrate = TRUE){
-##     ## Calculate the double integral/sum:
-##     ## \int_start^end A(t) [\int_0^t exp(B(s)) C(ds)] D(dt)
-##     ##
-##     jump_points = sort(unique(c(start, jump_points, end)))
-##     wtimes = jump_points[start <= jump_points & jump_points <= end]    
-##     n_t = length(wtimes)
-##     mf0 = function(newdata, times){
-##         integrands = internal_intergral1(A = B, C = C, start = start, end = end, jump_points = times, newdata = newdata, integrate = FALSE)
-##         out = do.call(rbind, lapply(1:nrow(integrands), function(xx) cumsum(integrands[xx,])))
-##         ## Must be 0 at time 0, because it is \int_start^start ...
-##         out = cbind(0, out)
-##         return(out)
-##     }
-##     outer_int = internal_intergral1(A = function(newdata,times) matrix(0,nrow = nrow(newdata),ncol = length(times)),
-##                                     B = mf0,
-##                                     C = D,
-##                                     end = end,
-##                                     start = start,
-##                                     newdata = newdata,
-##                                     jump_points = wtimes,
-##                                     integrate = integrate)
-##     return(outer_int)
-## }
-
-
-## internal_intergral2_check <- function(A = function(newdata,times) matrix(1,nrow = nrow(newdata),ncol = length(times)),
-##                                       B,
-##                                       C,
-##                                       D,
-##                                       end,
-##                                       start = 0,
-##                                       newdata,
-##                                       jump_points,
-##                                       integrate = TRUE){
-##     ## Calculate the double integral/sum:
-##     ## \int_start^end A(t) [\int_0^t exp(B(s)) C(ds)] D(dt)
-##     ##
-##     jump_points = sort(unique(c(start, jump_points, end)))
-##     wtimes = jump_points[start <= jump_points & jump_points <= end]    
-##     n_t = length(wtimes)
-##     B0 = B(newdata = newdata,times = wtimes)
-##     C0 = C(newdata = newdata,times = wtimes)
-##     C0_diff = t(apply(C0, 1, diff))
-##     meta_B0_int = exp(B0[, -1]) * C0_diff
-##     meta_B0 = do.call(rbind, lapply(1:nrow(meta_B0_int), function(xx) cumsum(c(meta_B0_int[xx,]))))
-##     A0 = A(newdata = newdata,times = wtimes)
-##     D0 = D(newdata = newdata,times = wtimes)
-##     D0_diff = t(apply(D0, 1, diff))
-##     integrands = A0[, -1] * meta_B0 * D0_diff
-##     if(integrate)
-##         out = rowSums(integrands)
-##     else
-##         out = integrands
-##     return(out)
-## }
-
+minus_t_fun <- function(Lambda, jump_points){
+    t_minus = min(diff(sort(unique(jump_points))))/2
+    fun0 = function(newdata, times){
+        times0 = pmax(0, times-t_minus)
+        Lambda(newdata, times0)
+    }
+    return(fun0)
+}
 
 ######################################################################
 ### integral-calc.R ends here

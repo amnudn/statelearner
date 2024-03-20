@@ -3,9 +3,9 @@
 ## Author: Anders Munch
 ## Created: Nov 10 2023 (14:28) 
 ## Version: 
-## Last-Updated: Nov 20 2023 (13:54) 
+## Last-Updated: Jan  5 2024 (15:33) 
 ##           By: Anders Munch
-##     Update #: 283
+##     Update #: 296
 #----------------------------------------------------------------------
 ## 
 ### Commentary: 
@@ -95,11 +95,10 @@ eval_sl <- function(train_data,
     X_test = uncens_test_data[, !c("true_time", "cens_time")]
     event_ind = at_risk_fun(uncens_test_data, eval_times, "true_time")
     cens_ind = at_risk_fun(uncens_test_data, eval_times, "cens_time")
-    ## Fit SurvSL from Westling et als and eval performance
-    inner_eval_fun = function(surv_pred, cens_pred){
+    inner_eval_fun = function(surv_pred, cens_pred, eval_measure = "brier"){
         out = data.table(time = rep(eval_times,2),
-                         type = rep(c("event", "cens"), each = length(eval_times)),
-                         brier = as.numeric(NA))
+                         type = rep(c("event", "cens"), each = length(eval_times)))
+        out[, brier := as.numeric(NA)]
         if(!is.null(surv_pred)){
             eval_event = colSums((event_ind-surv_pred)^2)/nrow(uncens_test_data)
             out[type == "event", brier := eval_event]
@@ -110,6 +109,7 @@ eval_sl <- function(train_data,
         }
         return(out[])
     }
+    ## Fit SurvSL from Westling et als and eval performance
     if(is.null(SurvSL_learners)){
         eval_survSL = NULL
     }else{

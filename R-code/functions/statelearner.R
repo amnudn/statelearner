@@ -3,9 +3,9 @@
 ## Author: Anders Munch
 ## Created: Aug 18 2023 (10:26) 
 ## Version: 
-## Last-Updated: Nov 20 2023 (11:06) 
+## Last-Updated: Jan 23 2024 (14:42) 
 ##           By: Anders Munch
-##     Update #: 402
+##     Update #: 406
 #----------------------------------------------------------------------
 ## 
 ### Commentary: 
@@ -58,7 +58,7 @@ fit_cause_model <- function(model, data, cause, x_form = NULL, ...){
     }
     return(out)
 }
-## Calculate F from CSCHF's
+## Calculate F from CSCHFs
 abs_risk_from_cschf <- function(...){
     chfs = list(...)
     S = exp(-Reduce("+", chfs))

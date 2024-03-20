@@ -3,9 +3,9 @@
 ## Author: Anders Munch
 ## Created: Nov  6 2023 (12:03) 
 ## Version: 
-## Last-Updated: Nov 17 2023 (08:37) 
+## Last-Updated: Jan 23 2024 (14:52) 
 ##           By: Anders Munch
-##     Update #: 32
+##     Update #: 33
 #----------------------------------------------------------------------
 ## 
 ### Commentary:
@@ -71,27 +71,6 @@ predictRisk.SuperLearner <- function(object, newdata){
     rel_newdata = newdata[, object$varNames, with = FALSE]
     predict(object = object, newdata = rel_newdata, onlySL = TRUE)$pred
 }
-
-## predictTreat <- function(object, newdata, ...){
-##     UseMethod("predictTreat",object)
-## }
-## predictTreat.glm <- function(object, newdata, ...){
-##     out = matrix(predict(object, newdata = newdata, type = "response"), ncol = 1)
-##     return(out)    
-## }
-
-
-## ## alternative stuff
-## construct_pred_fun.coxph <- function(model, ...){
-##     out = function(newdata,times)
-##         matrix(predictCox(model, newdata = newdata, times = times, type = "cumhazard")$cumhazard, ncol = length(times))
-##     return(out)
-## }
-## construct_pred_fun.glm <- function(model, ...){
-##     out = function(newdata)
-##         matrix(predict(model, newdata = newdata, type = "response"), ncol = 1)
-##     return(out)    
-## }
 
 
 ######################################################################
