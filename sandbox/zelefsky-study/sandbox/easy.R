@@ -1,0 +1,50 @@
+library(riskRegression)
+library(survival)
+library(lava)
+library(data.table)
+library(prodlim)
+try(setwd("~/research/SuperVision/Anders/survival-loss/statelearner/empirical-study/"))
+tar_source("functions")
+m <- lvm()
+formula_event <- ~f(age,-1)+f(sex,1)+f(agesex,0.5)
+formula_cens <- ~f(age,-0.8)+f(sex,1.3)
+event_scale <- 1/1000
+cens_scale <- 1/1000
+lava::distribution(m, ~age) <- lava::binomial.lvm(p = .4)
+lava::distribution(m,~sex) <- lava::binomial.lvm(p = .3)
+transform(m,agesex~age+sex) <- prod
+lava::distribution(m,~censtime) <- lava::coxWeibull.lvm(scale=event_scale)
+lava::distribution(m,~eventtime) <- lava::coxWeibull.lvm(scale=cens_scale)
+m <- lava::eventTime(m, time ~ min(eventtime = 1, censtime = 0), "event")
+lava::regression(m) <- stats::update(formula_event, "eventtime~.")
+lava::regression(m) <- stats::update(formula_cens, "censtime~.")
+d <- setDT(sim(m,20000))
+d[,table(event)]
+dlarge <- setDT(sim(m,5000))
+dlarge[,dummy := 1]
+## pdf("~/tmp/test.pdf",width = 12,height = 6)
+pdf("~/tmp/test.pdf",width = 10,height = 10)
+par(mfrow = c(2,2))
+plot(prodlim(Hist(time,event)~sex,data = d),xlim = c(0,50),newdata = expand.grid(sex =c(0,1)),type = "risk",plot.main = "Event probability",confint = FALSE,legend.cex = 0.5)
+plot(prodlim(Hist(time,event)~age,data = d),xlim = c(0,50),newdata = expand.grid(age = c(0,1)),type = "risk",plot.main = "Event probability",confint = FALSE,legend.cex = 0.5)
+plot(prodlim(Hist(censtime,dummy)~age,data = dlarge),xlim = c(0,50),newdata = expand.grid(age =c(0,1)),plot.main = "Censoring probability",confint = FALSE,legend.cex = 0.5,type = "risk")
+plot(prodlim(Hist(time,event)~1,data = d,rev = TRUE),xlim = c(0,50),plot.main = "Censoring probability",confint = FALSE,legend.cex = 0.5,add = TRUE,type = "risk",lty = 3)
+dev.off()
+
+mod1 <- coxph(Surv(time,event)~age+sex,data = d,x = TRUE,y = TRUE)
+mod2 <- coxph(Surv(time,event)~sex,data = d,x = TRUE,y = TRUE)
+mod3 <- coxph(Surv(time,event)~age,data = d,x = TRUE,y = TRUE)
+cmod1 <- coxph(Surv(time,event==0)~age+sex,data = d,x = TRUE,y = TRUE)
+cmod2 <- coxph(Surv(time,event==0)~sex,data = d,x = TRUE,y = TRUE)
+cmod3 <- coxph(Surv(time,event==0)~age,data = d,x = TRUE,y = TRUE)
+dgm <- coxph(Surv(time,event)~sex*age,data = d,x = TRUE,y = TRUE)
+## x <- Score(list(mod2 = mod2,mod3 = mod3,dgm = dgm),data = dlarge,formula = Hist(time,event)~1,metrics = "brier",se.fit = FALSE,times = seq(0,13,length.out = 100),summary = "ibs",contrasts = FALSE,null.model = FALSE)
+## x1 <- Score(list(mod2 = mod2,mod3 = mod3,dgm = dgm),data = dlarge,formula = Hist(time,event)~age,metrics = "brier",se.fit = FALSE,times = seq(0,13,length.out = 100),summary = "ibs",contrasts = FALSE,null.model = FALSE)
+x <- Score(list(mod2 = mod2,mod3 = mod3),data = dlarge,formula = Hist(time,event)~1,metrics = "brier",se.fit = FALSE,times = seq(0,13,length.out = 100),summary = "ibs",contrasts = FALSE,null.model = FALSE)
+x1 <- Score(list(mod2 = mod2,mod3 = mod3),data = dlarge,formula = Hist(time,event)~age+sex,metrics = "brier",se.fit = FALSE,times = seq(0,13,length.out = 100),summary = "ibs",contrasts = FALSE,null.model = FALSE)
+## x2 <- statelearner(learners = list(state = list(mod2 = mod2,mod3 = mod3),censoring = list(cmod1 = cmod1,cmod2 = cmod2,cmod3 = cmod3)),data = dlarge,B = 1,times = 8)
+setkey(x$Brier$score,IBS)
+setkey(x1$Brier$score,IBS)
+x$Brier$score[times ==  13,.(model,IBS = round(100*IBS,1))]
+x1$Brier$score[times ==  13,.(model,IBS = round(100*IBS,1))]
+## x2

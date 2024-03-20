@@ -1,0 +1,381 @@
+#+TITLE: statelearner sim results
+#+Author: Anders Munch
+#+Date: \today
+
+#+LANGUAGE:  en
+#+OPTIONS:   num:t toc:nil ':t ^:t
+
+* Setting :noexport:
+Remember to exceture (C-c C-c) the following line:
+#+PROPERTY: header-args:R :async :results output verbatim  :exports results  :session *R* :cache yes
+
+#+BEGIN_SRC R
+  try(setwd("~/research/SuperVision/Anders/survival-loss/statelearner/empirical-study/"))
+  try(setwd("/home/amnudn/Documents/phd/survival-loss-function/statelearner/empirical-study"))
+  library(targets)
+  library(data.table)
+  library(ggplot2)
+  library(MetBrewer)
+#+END_SRC
+
+#+RESULTS[(2023-07-24 08:58:47) 7fbb3ecfaf432007f9589f6eeed8680b72b01302]:
+: Error in setwd("~/research/SuperVision/Anders/survival-loss/statelearner/empirical-study/") : 
+:   cannot change working directory
+: data.table 1.14.8 using 4 threads (see ?getDTthreads).  Latest news: r-datatable.com
+
+* IPCW with KM can fail
+#+BEGIN_SRC R
+  ## IPCW fail example:
+  tar_load(ipcw_fail)
+  ipcw_fail[loss_type == "sl-brier", learner := "statelearner"]
+  ipcw_fail[loss_type == "brier", learner := paste0("IPCW(", cens_model , ")")]
+  winners <- rbind(ipcw_fail[!is.na(loss), .SD[min(loss) == loss, .(winner = out_model[1], oracle_loss = oracle_loss[1])], .(learner, n, n_sim)],
+		   ipcw_fail[learner == "IPCW(dgm)", .SD[min(oracle_loss) == oracle_loss, .(winner = out_model[1], oracle_loss = oracle_loss[1])], .(learner, n, n_sim)][, learner := "oracle"])
+  winners_summ <- winners[,.(correct_prop = mean(winner == "dgm"),
+			     oracle_risk = mean(100*oracle_loss),
+			     oracle_risk_sd = sd(100*oracle_loss),
+			     total_sim = winners[, max(n_sim)]), .(learner, n)]
+  winners_summ[,learner:=factor(learner,levels=c("IPCW(dgm)","IPCW(km)","oracle","statelearner"),labels=c("IPCW(Cox)","IPCW(KM)","Oracle","State learner"))]
+#+END_SRC
+
+#+RESULTS[(2023-08-02 17:44:19) 9f27853523b0e10fa70c8c3fbb5a35d5ff53218d]:
+#+begin_example
+      out_model cens_model      loss loss_type time    n oracle_loss n_sim      learner
+   1:       dgm        dgm 0.5474039  sl-brier   20  300   0.2404399     1 statelearner
+   2:       dgm         km 0.5625857  sl-brier   20  300   0.2404399     1 statelearner
+   3:       dgm         km 0.2541704     brier   20  300   0.2404399     1         <NA>
+   4:       dgm        dgm 0.2367411     brier   20  300   0.2404399     1         <NA>
+   5:        km        dgm 0.5496703  sl-brier   20  300   0.2574259     1 statelearner
+  ---                                                                                  
+7996:       dgm        dgm 0.2400599     brier   20 1500   0.2375345   200         <NA>
+7997:        km        dgm 0.5776817  sl-brier   20 1500   0.2518855   200 statelearner
+7998:        km         km 0.6126097  sl-brier   20 1500   0.2518855   200 statelearner
+7999:        km         km 0.2499137     brier   20 1500   0.2518855   200         <NA>
+8000:        km        dgm 0.2512689     brier   20 1500   0.2518855   200         <NA>
+      out_model cens_model      loss loss_type time    n oracle_loss n_sim      learner
+   1:       dgm        dgm 0.5474039  sl-brier   20  300   0.2404399     1 statelearner
+   2:       dgm         km 0.5625857  sl-brier   20  300   0.2404399     1 statelearner
+   3:       dgm         km 0.2541704     brier   20  300   0.2404399     1     IPCW(km)
+   4:       dgm        dgm 0.2367411     brier   20  300   0.2404399     1    IPCW(dgm)
+   5:        km        dgm 0.5496703  sl-brier   20  300   0.2574259     1 statelearner
+  ---                                                                                  
+7996:       dgm        dgm 0.2400599     brier   20 1500   0.2375345   200    IPCW(dgm)
+7997:        km        dgm 0.5776817  sl-brier   20 1500   0.2518855   200 statelearner
+7998:        km         km 0.6126097  sl-brier   20 1500   0.2518855   200 statelearner
+7999:        km         km 0.2499137     brier   20 1500   0.2518855   200     IPCW(km)
+8000:        km        dgm 0.2512689     brier   20 1500   0.2518855   200    IPCW(dgm)
+          learner    n correct_prop oracle_risk oracle_risk_sd total_sim
+ 1: State learner  300        0.945    24.08473      0.4932228       200
+ 2:      IPCW(KM)  300        0.235    24.96864      0.5589883       200
+ 3:     IPCW(Cox)  300        0.760    24.27510      0.6402930       200
+ 4: State learner  600        0.980    23.86145      0.2762100       200
+ 5:      IPCW(KM)  600        0.150    24.95532      0.4942050       200
+ 6:     IPCW(Cox)  600        0.905    23.93219      0.4175151       200
+ 7: State learner  900        1.000    23.76603      0.1730906       200
+ 8:      IPCW(KM)  900        0.140    24.88565      0.4815349       200
+ 9:     IPCW(Cox)  900        0.970    23.79321      0.2652248       200
+10: State learner 1200        1.000    23.73233      0.1098252       200
+11:      IPCW(KM) 1200        0.200    24.79303      0.5233916       200
+12:     IPCW(Cox) 1200        1.000    23.73233      0.1098252       200
+13: State learner 1500        1.000    23.72103      0.1157123       200
+14:      IPCW(KM) 1500        0.165    24.81887      0.4926586       200
+15:     IPCW(Cox) 1500        1.000    23.72103      0.1157123       200
+16:        Oracle  300        0.990    24.03111      0.4025398       200
+17:        Oracle  600        1.000    23.84506      0.2180779       200
+18:        Oracle  900        1.000    23.76603      0.1730906       200
+19:        Oracle 1200        1.000    23.73233      0.1098252       200
+20:        Oracle 1500        1.000    23.72103      0.1157123       200
+#+end_example
+
+#+BEGIN_SRC R :results graphics file :exports results :file ipcw-fail.pdf  :width 7 :height 4
+  ggplot(winners_summ, aes(x = n, y = oracle_risk)) +
+    ## geom_ribbon(aes(ymin = oracle_risk-2*oracle_risk_sd/sqrt(total_sim), ymax = oracle_risk+2*oracle_risk_sd/sqrt(total_sim), fill = learner), alpha = .3) +
+    geom_line(aes(col = learner), linewidth=1.5) +
+    geom_point(aes(col = learner), size=2) +
+    theme_bw() + ylab("Brier score (%)") + theme(legend.position="top") +
+    scale_color_manual("Super learner", values=c("#0072B2", "darkred", "black","#E69F00")) +
+    scale_fill_manual("Super learner", values=c("#0072B2", "darkred", "black","#E69F00"))
+#+END_SRC
+
+#+RESULTS[(2023-08-23 11:01:26) b79b085f4a29462ef8f19bc9da88f896a5659479]:
+[[file:ipcw-fail.pdf]]
+
+
+* Zelefski sim data
+** Initial, small sim :noexport:
+#+BEGIN_SRC R :results graphics file :exports results :file (org-babel-temp-file "./figure-" ".pdf") 
+  tar_load(sim_zel_learners)
+  z_out_winner <- do.call(rbind, lapply(sim_zel_learners[, unique(n_sim)], function(ii){
+      w0 = rbind(sim_zel_learners[n_sim == ii & out_model != "pre-KM" & learner != "oracle",
+				  .(winner = .SD[min(loss) == loss, out_model[1]]), .(learner, n)],
+		 sim_zel_learners[n_sim == ii & out_model != "pre-KM" & learner == "oracle" & cens_model == "no-cens",
+				  .(winner = .SD[min(loss) == loss, out_model[1]]), .(learner, n)])
+      oracle0 = sim_zel_learners[n_sim == ii & learner == "oracle" & cens_model == "no-cens", .(n, model = out_model, oracle_loss = loss)]
+      out = merge(w0, oracle0, by.x = c("winner", "n"), by.y = c("model", "n"), all.x = TRUE)
+      out[, oracle_loss := 100*oracle_loss]
+      out[, n_sim := ii]
+      return(out[])
+  }))
+  z_out_winner_summ <- z_out_winner[, .(loss = mean(oracle_loss, na.rm = TRUE), sd = sd(oracle_loss, na.rm = TRUE)), .(n,learner)]
+
+  ## Oracle risk for outcome model
+  ggplot(z_out_winner_summ, aes(x = n, y = loss)) +
+      geom_ribbon(aes(ymin = loss-2*sd/sqrt(200), ymax = loss+2*sd/sqrt(200), fill = learner), alpha = .3) +
+      geom_line(aes(col = learner)) + geom_point(aes(col = learner)) +
+    theme_bw() + ylab("oracle risk")
+#+END_SRC
+
+#+RESULTS[(2023-07-24 09:02:25) 2f8b7edf549adcc493d392c540cceb1e1534ccb5]:
+[[file:/tmp/babel-pnWJjG/figure-TeqyON.pdf]]
+
+** Larger sim study with rf and glmnet :noexport:
+#+BEGIN_SRC R :results graphics file :exports results :file (org-babel-temp-file "./figure-" ".pdf") 
+  tar_load(sim_zel_learners2)
+  z_out_winner2 <- do.call(rbind, lapply(sim_zel_learners2[, unique(n_sim)], function(ii){
+      w0 = rbind(sim_zel_learners2[n_sim == ii & out_model != "pre-KM" & learner != "oracle",
+				  .(winner = .SD[min(loss) == loss, out_model[1]]), .(learner, n)],
+		 sim_zel_learners2[n_sim == ii & out_model != "pre-KM" & learner == "oracle" & cens_model == "no-cens",
+				  .(winner = .SD[min(loss) == loss, out_model[1]]), .(learner, n)])
+      oracle0 = sim_zel_learners2[n_sim == ii & learner == "oracle" & cens_model == "no-cens", .(n, model = out_model, oracle_loss = loss)]
+      out = merge(w0, oracle0, by.x = c("winner", "n"), by.y = c("model", "n"), all.x = TRUE)
+      out[, oracle_loss := 100*oracle_loss]
+      out[, n_sim := ii]
+      return(out[])
+  }))
+  z_out_winner_summ2 <- z_out_winner2[, .(loss = mean(oracle_loss, na.rm = TRUE), sd = sd(oracle_loss, na.rm = TRUE), total_sim = z_out_winner2[, max(n_sim)]), .(n,learner)]
+
+  ## Oracle risk for outcome model
+  ggplot(z_out_winner_summ2, aes(x = n, y = loss)) +
+    geom_ribbon(aes(ymin = loss-2*sd/sqrt(total_sim), ymax = loss+2*sd/sqrt(total_sim), fill = learner), alpha = .3) +
+    geom_line(aes(col = learner)) + geom_point(aes(col = learner)) +
+    theme_bw() + ylab("oracle risk") + theme(legend.position="top")
+#+END_SRC
+
+#+RESULTS[(2023-07-26 18:30:54) bcbaab725a094b3f5e51eea1e5dd1e7e4c1efe92]:
+[[file:/tmp/babel-pnWJjG/figure-WlhRBt.pdf]]
+
+Visualize selected models. If the results below are valid, it is a bit
+interesting. IPCW(KM) selects random forest while the other methods does not --
+in particular, the oracle selector barely ever selects RF. Could this be because
+random forest is constructed using something like IPCW(KM) weights in the split?
+Or something equivalent that assumes independent censoring?
+
+#+BEGIN_SRC R :results graphics file :exports results :file (org-babel-temp-file "./figure-" ".pdf") :height 12
+  selected_models <- z_out_winner2[!is.na(oracle_loss), {
+    tab = prop.table(table(winner))
+    data.table(model = names(tab), select_prop = as.numeric(tab))
+  }, .(learner, n)][!(model %in% c("pre-KM", "no-cens"))]
+  ggplot(selected_models, aes(x = n, y = select_prop, col = model)) +
+    geom_line() + geom_point() +
+    theme_bw() + theme(legend.position="top") +
+    facet_wrap(~learner, ncol=1) + ylab("Proportion of times the model is selected")
+#+END_SRC
+
+#+RESULTS[(2023-07-26 18:24:18) 11edc76794e36e4df8bff35efb026475c6b97dbf]:
+[[file:/tmp/babel-P8DnIK/figure-m1SQaK.pdf]]
+
+** Larger sim study with rf and glmnet including IPCW(cox)
+
+#+BEGIN_SRC R
+  tar_load(sim_zel_learners2)
+  tar_load(sim_zel_learners2_dgm_cens)
+  sim_zel_learners2_all <- rbind(sim_zel_learners2,sim_zel_learners2_dgm_cens)
+  z_out_winner2 <- do.call(rbind, lapply(sim_zel_learners2_all[, unique(n_sim)], function(ii){
+    w0 = rbind(sim_zel_learners2_all[n_sim == ii & out_model != "pre-cox" & out_model != "pre-KM" & learner != "oracle",
+				     .(winner = .SD[min(loss) == loss, out_model[1]]), .(learner, n)],
+	       sim_zel_learners2_all[n_sim == ii & out_model != "pre-cox" & out_model != "pre-KM" & learner == "oracle" & cens_model == "no-cens",
+				     .(winner = .SD[min(loss) == loss, out_model[1]]), .(learner, n)])
+    oracle0 = sim_zel_learners2_all[n_sim == ii & learner == "oracle" & cens_model == "no-cens", .(n, model = out_model, oracle_loss = loss)]
+    out = merge(w0, oracle0, by.x = c("winner", "n"), by.y = c("model", "n"), all.x = TRUE)
+    out[, oracle_loss := 100*oracle_loss]
+    out[, n_sim := ii]
+    return(out[])
+  }))
+  z_out_winner_summ2 <- z_out_winner2[, .(loss = mean(oracle_loss, na.rm = TRUE), sd = sd(oracle_loss, na.rm = TRUE), total_sim = z_out_winner2[, max(n_sim)]), .(n,learner)]
+z_out_winner_summ2[,learner:=factor(learner,levels=c("ipcw-cox","ipcw-km","oracle","sl"),labels=c("IPCW(Cox)","IPCW(KM)","Oracle","State learner"))]
+#+END_SRC
+
+#+RESULTS[(2023-08-02 17:44:01) 5b1978200940aca8dc4b74a0c1232835c56af5e2]:
+#+begin_example
+       n       learner     loss        sd total_sim
+ 1:  300 State learner 16.92301 0.5762981       200
+ 2:  300      IPCW(KM) 17.37164 0.7986872       200
+ 3:  300        Oracle 16.60382 0.3583489       200
+ 4:  600        Oracle 16.26438 0.2108109       200
+ 5:  900      IPCW(KM) 16.53740 0.5383858       200
+ 6: 1200      IPCW(KM) 16.41192 0.3844836       200
+ 7: 1500     IPCW(Cox) 16.11647 0.2014273       200
+ 8:  600 State learner 16.37007 0.2772922       200
+ 9:  900 State learner 16.20045 0.2334255       200
+10:  900     IPCW(Cox) 16.24984 0.3172165       200
+11: 1500        Oracle 16.06212 0.1606531       200
+12:  300     IPCW(Cox) 17.00901 0.6691146       200
+13: 1200 State learner 16.14634 0.2138830       200
+14: 1200     IPCW(Cox) 16.17261 0.2997085       200
+15: 1200        Oracle 16.09384 0.1890050       200
+16: 1500 State learner 16.10060 0.1750803       200
+17:  600      IPCW(KM) 16.72963 0.6338869       200
+18:  600     IPCW(Cox) 16.43263 0.3926741       200
+19: 1500      IPCW(KM) 16.33080 0.3418835       200
+20:  900        Oracle 16.14013 0.1975061       200
+#+end_example
+
+#+BEGIN_SRC R :results graphics file :exports results :file zelefski-sim.pdf :width 7 :height 4
+  ggplot(z_out_winner_summ2, aes(x = n, y = loss)) +
+    ## geom_ribbon(aes(ymin = loss-2*sd/sqrt(total_sim), ymax = loss+2*sd/sqrt(total_sim),
+    ##       	  fill = learner), alpha = .2) +
+    # col = learner), alpha = 0, linetype=2) +
+    geom_line(aes(col = learner), linewidth=1.5) + geom_point(aes(col = learner),size=2) +
+    theme_bw() + ylab("Brier score (%)") + theme(legend.position="top") +
+    scale_color_manual("Super learner", values=c("#0072B2", "darkred", "black","#E69F00")) +
+    scale_fill_manual("Super learner", values=c("#0072B2", "darkred", "black","#E69F00"))  
+#+END_SRC
+
+#+RESULTS[(2023-08-23 10:59:57) b7d950ca7e7834fb28c486b41e4f9ad22a1bdff0]:
+[[file:zelefski-sim.pdf]]
+
+Oracle risk for all models.
+
+#+BEGIN_SRC R :results graphics file :exports results :file (org-babel-temp-file "./figure-" ".pdf") 
+  indiv_mm_summ2 <- sim_zel_learners2_all[learner == "oracle" & cens_model == "no-cens"][, .(loss = mean(100*loss, na.rm = TRUE), sd = sd(100*loss, na.rm = TRUE), total_sim = z_out_winner2[, max(n_sim)]), .(n,learner = out_model)]
+  comp_sl_to_indiv_mm <- rbind(z_out_winner_summ2,indiv_mm_summ2)
+  ggplot(data = indiv_mm_summ2,aes(x = n, y = loss, group = learner)) +
+    geom_line(alpha = .3) +
+    geom_point(alpha = .3) +
+    theme_bw() + ylab("oracle risk") + theme(legend.position="top") +
+    geom_ribbon(data = z_out_winner_summ2, aes(ymin = loss-2*sd/sqrt(total_sim), ymax = loss+2*sd/sqrt(total_sim), fill = learner), alpha = .3) +
+    geom_line(data = z_out_winner_summ2,aes(col = learner), linewidth = 2) +
+    geom_point(data = z_out_winner_summ2,aes(col = learner), size = 2) 
+#+END_SRC
+
+#+RESULTS[(2023-08-02 16:37:56) af70bb335930e9b8e68e8a3dd779936919252626]:
+[[file:/tmp/babel-P8DnIK/figure-FTlXlU.pdf]]
+
+* Real Zelefski data with competing event
+
+#+BEGIN_SRC R  :results graphics file :exports results :file zelefski-real-data.pdf :width 7 :height 4
+tar_load(zelefsky_statelearner_real_data_comp)
+zel_real_plot_dt <- copy(zelefsky_statelearner_real_data_comp)
+zel_real_plot_dt[,cause1:=factor(cause1,levels=c("cox_lasso","cox_elastic","cox_strata_stage","km","rf"),labels=c("lasso","elastic","strata","KM","RF"))]
+zel_real_plot_dt[,cause2:=factor(cause2,levels=c("cox_lasso","cox_elastic","cox_strata_stage","km","rf"),labels=c("lasso","elastic","strata","KM","RF"))]
+zel_real_plot_dt[,censor:=factor(censor,levels=c("cox_lasso","cox_elastic","cox_strata_stage","km","rf"),labels=paste("Censoring learner\n", c("lasso","elastic","strata","KM","RF")))]
+
+library(ggplot2)
+ggplot(zel_real_plot_dt, aes(x = cause1, y = loss, col = cause2)) +
+  geom_point(position=position_dodge(width=1), size=.8) +
+  geom_errorbar(aes(ymin = loss-2*sd, ymax = loss+2*sd), width = .4,
+                position=position_dodge(width=1)) +
+  theme_bw() + ylab("Integrated Brier score") +
+  theme(legend.position="top",
+        axis.text.x = element_text(angle = 45, vjust = .8)) +
+  xlab("Tumor learner") +
+  facet_grid( ~ censor) +
+  scale_colour_grey("Death learner", start = 0, end = 0.7)
+#+END_SRC
+
+#+RESULTS[(2023-08-21 15:53:02) e135c76b3e5cc3a53798901e319b8212029ea0b7]:
+[[file:zelefski-real-data.pdf]]
+
+Table
+
+#+BEGIN_SRC R
+  tar_load(zelefsky_statelearner_real_data_comp)
+  library(xtable)
+  zel_real_tab_dt <- copy(zelefsky_statelearner_real_data_comp)
+  zel_real_tab_dt[,cause1:=factor(cause1,levels=c("cox_lasso","cox_elastic","cox_strata_stage","km","rf"),labels=c("\\texttt{Lasso}","\\texttt{Elastic}","\\texttt{Cox strata CT}","\\texttt{KM}","\\texttt{RF}"))]
+  zel_real_tab_dt[,cause2:=factor(cause2,levels=c("cox_lasso","cox_elastic","cox_strata_stage","km","rf"),labels=c("\\texttt{Lasso}","\\texttt{Elastic}","\\texttt{Cox strata CT}","\\texttt{KM}","\\texttt{RF}"))]
+  zel_real_tab_dt[,censor:=factor(censor,levels=c("cox_lasso","cox_elastic","cox_strata_stage","km","rf"),labels=c("\\texttt{Lasso}","\\texttt{Elastic}","\\texttt{Cox strata CT}","\\texttt{KM}","\\texttt{RF}"))]
+  xtab <- zel_real_tab_dt[1:10, .(cause1, cause2, censor, IBS = paste0("$", round(loss, digits = 2), "\\pm", round(sd, digits = 2), "$"))]
+  setnames(xtab,
+	   c("cause1", "cause2", "censor", "IBS"),
+	   new = c("Tumor learner", "Death learner", "Censoring learner", "Integrated Brier score"))
+  print.xtable(xtable(xtab, align = c(rep("l", 4), "|", "l")),
+	       include.rownames=FALSE,
+	       floating=FALSE,
+	       sanitize.text.function = force,
+	       booktabs=TRUE,
+	       file = "zel-tab.tex")
+#+END_SRC
+
+#+RESULTS[(2023-08-21 15:53:26) f2ee7e2467e0d7cc46cbcad1f0c5fd7f860c07de]:
+#+begin_example
+                cause1           cause2 censor      loss         sd
+  1: \\texttt{Elastic}      cox_elastic     rf  7.034702 0.02159417
+  2: \\texttt{Elastic}               km     rf  7.034812 0.02286074
+  3:   \\texttt{Lasso}      cox_elastic     rf  7.035051 0.02142064
+  4:   \\texttt{Lasso}               km     rf  7.035231 0.02266556
+  5: \\texttt{Elastic}        cox_lasso     rf  7.036116 0.02102182
+ ---                                                               
+121:      \\texttt{KM}               rf     km 10.310009 0.01690905
+122:      \\texttt{KM}      cox_elastic     km 10.319369 0.01322889
+123:      \\texttt{KM}        cox_lasso     km 10.319741 0.01335233
+124:      \\texttt{KM} cox_strata_stage     km 10.322298 0.01455127
+125:      \\texttt{KM}               km     km 10.337965 0.01296003
+                cause1                  cause2 censor      loss         sd
+  1: \\texttt{Elastic}       \\texttt{Elastic}     rf  7.034702 0.02159417
+  2: \\texttt{Elastic}            \\texttt{KM}     rf  7.034812 0.02286074
+  3:   \\texttt{Lasso}       \\texttt{Elastic}     rf  7.035051 0.02142064
+  4:   \\texttt{Lasso}            \\texttt{KM}     rf  7.035231 0.02266556
+  5: \\texttt{Elastic}         \\texttt{Lasso}     rf  7.036116 0.02102182
+ ---                                                                      
+121:      \\texttt{KM}            \\texttt{RF}     km 10.310009 0.01690905
+122:      \\texttt{KM}       \\texttt{Elastic}     km 10.319369 0.01322889
+123:      \\texttt{KM}         \\texttt{Lasso}     km 10.319741 0.01335233
+124:      \\texttt{KM} \\texttt{Cox strata CT}     km 10.322298 0.01455127
+125:      \\texttt{KM}            \\texttt{KM}     km 10.337965 0.01296003
+                cause1                  cause2       censor      loss         sd
+  1: \\texttt{Elastic}       \\texttt{Elastic} \\texttt{RF}  7.034702 0.02159417
+  2: \\texttt{Elastic}            \\texttt{KM} \\texttt{RF}  7.034812 0.02286074
+  3:   \\texttt{Lasso}       \\texttt{Elastic} \\texttt{RF}  7.035051 0.02142064
+  4:   \\texttt{Lasso}            \\texttt{KM} \\texttt{RF}  7.035231 0.02266556
+  5: \\texttt{Elastic}         \\texttt{Lasso} \\texttt{RF}  7.036116 0.02102182
+ ---                                                                            
+121:      \\texttt{KM}            \\texttt{RF} \\texttt{KM} 10.310009 0.01690905
+122:      \\texttt{KM}       \\texttt{Elastic} \\texttt{KM} 10.319369 0.01322889
+123:      \\texttt{KM}         \\texttt{Lasso} \\texttt{KM} 10.319741 0.01335233
+124:      \\texttt{KM} \\texttt{Cox strata CT} \\texttt{KM} 10.322298 0.01455127
+125:      \\texttt{KM}            \\texttt{KM} \\texttt{KM} 10.337965 0.01296003
+#+end_example
+
+* Sandbox :noexport:
+#+BEGIN_SRC R
+
+z_cens_winner <- do.call(rbind, lapply(sim_zel_learners[, unique(n_sim)], function(ii){
+    w0 = rbind(sim_zel_learners[n_sim == ii & cens_model != "pre-KM" & learner != "oracle",
+                                .(winner = .SD[min(loss) == loss, cens_model[1]]), .(learner, n)],
+               sim_zel_learners[n_sim == ii & cens_model != "pre-KM" & learner == "oracle" & out_model == "no-cens",
+                                .(winner = .SD[min(loss) == loss, cens_model[1]]), .(learner, n)])
+    oracle0 = sim_zel_learners[n_sim == ii & learner == "oracle" & out_model == "no-cens", .(n, model = cens_model, oracle_loss = loss)]
+    out = merge(w0, oracle0, by.x = c("winner", "n"), by.y = c("model", "n"), all.x = TRUE)
+    out[, oracle_loss := 100*oracle_loss]
+    out[, n_sim := ii]
+    return(out[])
+}))
+z_cens_winner_summ <- z_cens_winner[, .(loss = mean(oracle_loss, na.rm = TRUE), sd = sd(oracle_loss, na.rm = TRUE)), .(n,learner)]
+
+## Oracle risk for censoring model
+ggplot(z_cens_winner_summ, aes(x = n, y = loss)) +
+    geom_ribbon(aes(ymin = loss-2*sd/sqrt(200), ymax = loss+2*sd/sqrt(200), fill = learner), alpha = .3) +
+    geom_line(aes(col = learner)) + geom_point(aes(col = learner)) +
+  theme_bw() + ylab("oracle risk")
+
+## Censoring
+z_cens_winner2 <- do.call(rbind, lapply(sim_zel_learners2[, unique(n_sim)], function(ii){
+    w0 = rbind(sim_zel_learners2[n_sim == ii & cens_model != "pre-KM" & learner != "oracle",
+                                .(winner = .SD[min(loss) == loss, cens_model[1]]), .(learner, n)],
+               sim_zel_learners2[n_sim == ii & cens_model != "pre-KM" & learner == "oracle" & out_model == "no-cens",
+                                .(winner = .SD[min(loss) == loss, cens_model[1]]), .(learner, n)])
+    oracle0 = sim_zel_learners2[n_sim == ii & learner == "oracle" & out_model == "no-cens", .(n, model = cens_model, oracle_loss = loss)]
+    out = merge(w0, oracle0, by.x = c("winner", "n"), by.y = c("model", "n"), all.x = TRUE)
+    out[, oracle_loss := 100*oracle_loss]
+    out[, n_sim := ii]
+    return(out[])
+}))
+z_cens_winner_summ2 <- z_cens_winner2[, .(loss = mean(oracle_loss, na.rm = TRUE), sd = sd(oracle_loss, na.rm = TRUE)), .(n,learner)]
+
+## Oracle risk for censoring model
+ggplot(z_cens_winner_summ2, aes(x = n, y = loss)) +
+    geom_ribbon(aes(ymin = loss-2*sd/sqrt(200), ymax = loss+2*sd/sqrt(200), fill = learner), alpha = .3) +
+    geom_line(aes(col = learner)) + geom_point(aes(col = learner)) +
+  theme_bw() + ylab("oracle risk")
+#+END_SRC
