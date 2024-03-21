@@ -424,7 +424,7 @@ mutually exclusive states (Figure \ref{fig:multi-state-process}).
   \label{fig:multi-state-process}
 \end{figure}
 The conditional distribution of \( \eta(t) \) given \( X=x \) is determined by
-the \fxnote*{reconsider letting censoring state be \( -1 \)?}{function}
+the function
 \begin{equation}
   \label{eq:F-def}
   F(t, k, x) = P(\eta(t) = k \mid X=x),
@@ -1290,22 +1290,22 @@ Define
   in equation~(\ref{eq:norm}).
 \end{lemma}
 \begin{proof}
-  For any \( t \in [0, \tau] \) and \( k\in \{0,1,2\} \) we have
+  For any \( t \in [0, \tau] \) and \( j\in \{-1,0,1,2\} \) we have
   \begin{align*}
-    & \E_{P_0}{\left[ (F(t, k, X) - \1{\{\eta(t) = k \}})^2 \right]}
+    & \E_{P_0}{\left[ (F(t, j, X) - \1{\{\eta(t) = j \}})^2 \right]}
     \\
-    & =    \E_{P_0}{\left[ (F(t, k, X) - F_0(t, k, X) + F_0(t, k, X) - \1{\{\eta(t) = k
+    & =    \E_{P_0}{\left[ (F(t, j, X) - F_0(t, j, X) + F_0(t, j, X) - \1{\{\eta(t) = j
       \}})^2 \right]}
     \\
-    & =    \E_{P_0}{\left[ (F(t, k, X) - F_0(t, k, X))^2\right]}
-      + \E_{P_0}{\left[ (F_0(t, k, X) - \1{\{\eta(t) = k \}})^2\right]}
+    & =    \E_{P_0}{\left[ (F(t, j, X) - F_0(t, j, X))^2\right]}
+      + \E_{P_0}{\left[ (F_0(t, j, X) - \1{\{\eta(t) = j \}})^2\right]}
     \\
     & \quad
-      + 2\E_{P_0}{\left[ (F(t, k, X) - F_0(t, k, X))(F_0(t, k, X) - \1{\{\eta(t) = k
+      + 2\E_{P_0}{\left[ (F(t, j, X) - F_0(t, j, X))(F_0(t, j, X) - \1{\{\eta(t) = j
       \}})\right]}
     \\
-    & =    \E_{P_0}{\left[ (F(t, k, X) - F_0(t, k, X))^2\right]}
-      + \E_{P_0}{\left[ (F_0(t, k, X) - \1{\{\eta(t) = k \}})^2\right]},
+    & =    \E_{P_0}{\left[ (F(t, j, X) - F_0(t, j, X))^2\right]}
+      + \E_{P_0}{\left[ (F_0(t, j, X) - \1{\{\eta(t) = j \}})^2\right]},
   \end{align*}
   where the last equality follows from the tower property. Hence, using Fubini,
   we have
@@ -1366,21 +1366,21 @@ the function \(o \mapsto \bar{B}_{\tau,0}(F, o) \). As
      a + b -2c
     \right\},
 \end{align*}
-so using this with \( a=F(t, k, x) \), \( b=F_0(t, k, x) \), and
-\( c = \1{\{\eta(t) = k\}} \), we have by Jensen's inequality
+so using this with \( a=F(t, j, x) \), \( b=F_0(t, j, x) \), and
+\( c = \1{\{\eta(t) = j\}} \), we have by Jensen's inequality
 \begin{align*}
   & P_0{[\bar{B}_{\tau,0}(F, \blank)^2]}
   \\
   & \leq
     2\tau\E_{P_0}{\left[
-    \sum_{k=-1}^{2} \int_0^{\tau}
+    \sum_{j=-1}^{2} \int_0^{\tau}
     \left\{
     \left(
-    F(t, k, X) - \1{\{\eta(t) = k\}}
+    F(t, j, X) - \1{\{\eta(t) = j\}}
     \right)^2
     -
     \left(
-    F_0(t, k, X) - \1{\{\eta(t) = k\}}
+    F_0(t, j, X) - \1{\{\eta(t) = j\}}
     \right)^2
     \right\}^2
     \diff t 
@@ -1388,23 +1388,23 @@ so using this with \( a=F(t, k, x) \), \( b=F_0(t, k, x) \), and
   \\
   & =2\tau
     \E_{P_0}\Bigg[
-    \sum_{k=-1}^{2} \int_0^{\tau}
+    \sum_{j=-1}^{2} \int_0^{\tau}
     \left(
-    F(t, k, X) - F_0(t, k, X)
+    F(t, j, X) - F_0(t, j, X)
     \right)^2
   \\
   & \quad \quad \quad\quad \quad \quad \times
     \left\{
-    F(t, k, X) +  F_0(t, k, X)-2 \1{\{\eta(t) = k\}}
+    F(t, j, X) +  F_0(t, j, X)-2 \1{\{\eta(t) = j\}}
     \right\}^2
     \diff t 
     \Bigg]
   \\
   & \leq
     8\tau \E_{P_0}{\left[
-    \sum_{k=-1}^{2} \int_0^{\tau}
+    \sum_{j=-1}^{2} \int_0^{\tau}
     \left(
-    F(t, k, X) - F_0(t, k, X)
+    F(t, j, X) - F_0(t, j, X)
     \right)^2
     \diff t 
     \right]}.
