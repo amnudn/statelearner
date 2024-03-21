@@ -191,7 +191,7 @@ Table
   setnames(xtab,
 	   c("cause1", "cause2", "censor", "IBS"),
 	   new = c("Tumor learner", "Death learner", "Censoring learner", "Integrated Brier score"))
-  print.xtable(xtable(xtab, align = c(rep("l", 4), "|", "l")),
+  print.xtable(xtable(xtab, align = c(rep("l", 4), "r")),
 	       include.rownames=FALSE,
 	       floating=FALSE,
 	       sanitize.text.function = force,
@@ -199,7 +199,7 @@ Table
 	       file = "zel-tab.tex")
 #+END_SRC
 
-#+RESULTS[(2024-03-14 10:20:05) 4526490e5cd8de54598321056782cfe3e5a346b3]:
+#+RESULTS[(2024-03-21 11:25:25) b123138d1f9c78238575ab485661ff859c3da9a4]:
 #+begin_example
                       cause1           cause2 censor      loss          sd
   1:            \\texttt{RF}               km     rf  7.022057 0.046024265
