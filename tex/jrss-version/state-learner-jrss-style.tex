@@ -24,7 +24,7 @@
 \bibliographystyle{rss}
 
 %% Toggle with or without figures
-\def\nofig{1}
+% \def\nofig{1}
 
 %% TODO: Update figures with name 'figure-'.
 %% Write macro for including figure or not.
@@ -409,7 +409,8 @@ distribution \( P \). The discrete state learner ranks a tuple of learners of
 observed data. To formally introduce the state learner, we define the
 multi-state process
 \begin{equation*}
-  \eta(t) = \1\{\tilde{T} \leq t, \tilde D=1\} + 2\,\1\{\tilde{T} \leq t, \tilde D=2\}+ 3\,\1\{\tilde{T} \leq t, \tilde D=0\},
+  \eta(t) = \1\{\tilde{T} \leq t, \tilde D=1\} + 2\,\1\{\tilde{T} \leq t, \tilde
+  D=2\} - \1\{\tilde{T} \leq t, \tilde D=0\},
   \quad \text{for} \quad t \in [0, \tau].
 \end{equation*}
 Note that at time \(t\), we observe that each observation is in one of four
@@ -429,7 +430,7 @@ the \fxnote*{reconsider letting censoring state be \( -1 \)?}{function}
   F(t, k, x) = P(\eta(t) = k \mid X=x),
   \quad \text{for all} \quad
   t \in [0,\tau],
-  k \in \{0,1,2,3\},
+  k \in \{-1,0,1,2\},
   x \in \mathcal{X}.
 \end{equation}
 The function \( F \) describes the conditional state occupation
@@ -452,7 +453,7 @@ learners of \( \Lambda_1 \), \( \Lambda_2 \), and $\Gamma$ as follows:
   & = P(\tilde{T} \leq t, \Delta=2 \mid X=x)
     = \int_0^t e^{\{-\Lambda_{1}(s \mid x)-\Lambda_{2}(s \mid x) - \Gamma(s \mid x)\} }  \Lambda_{2}(\diff s \mid x),
   \\
-  F(t, 3, x)
+  F(t, -1, x)
   & =
     P(\tilde{T} \leq t, \Delta=0 \mid X=x)
     = \int_0^t e^{\{-\Lambda_{1}(s \mid x)-\Lambda_{2}(s \mid x) - \Gamma(s \mid x)\} }  \Gamma(\diff s \mid x),
@@ -460,7 +461,7 @@ learners of \( \Lambda_1 \), \( \Lambda_2 \), and $\Gamma$ as follows:
   F(t, 0, x)
   &
     = P(\tilde{T} > t \mid X= x)
-    = 1- F(t, 1, x) - F(t, 2, x)- F(t, 3, x).
+    = 1- F(t, 1, x) - F(t, 2, x)- F(t, -1, x).
   \end{split}
 \end{equation}
 The state learner requires three libraries of learners, \(\mathcal{A}_1\),
@@ -488,15 +489,20 @@ for \( F \):
     \intertext{where in correspondance with  the relations in equation \eqref{eq:transition},} 
     \phi_{a_1,a_2, b}(\data_n)(t,1,x) &= \int_0^t e^{\{-a_1(\data_n)(s \mid x)-a_2(\data_n)(s \mid x) - b(\data_n)(s \mid x)\} }  a_1(\data_n)(\diff s \mid x),\\
   \phi_{a_1,a_2, b}(\data_n)(t,2,x) &= \int_0^t e^{\{-a_1(\data_n)(s \mid x)-a_2(\data_n)(s \mid x) - b(\data_n)(s \mid x)\} }  a_2(\data_n)(\diff s \mid x),\\
-  \phi_{a_1,a_2, b}(\data_n)(t,3,x) &= \int_0^t e^{\{-a_1(\data_n)(s \mid x)-a_2(\data_n)(s \mid x) - b(\data_n)(s \mid x)\} }  b(\data_n)(\diff s \mid x),\\
-  \phi_{a_1,a_2, b}(\data_n)(t,0,x) &= 1-  \sum_{j=1}^3\phi_{a_1,a_2, b}(\data_n)(t,j,x).
+  \phi_{a_1,a_2, b}(\data_n)(t,-1,x) &= \int_0^t e^{\{-a_1(\data_n)(s \mid x)-a_2(\data_n)(s \mid x) - b(\data_n)(s \mid x)\} }  b(\data_n)(\diff s \mid x),\\
+  \phi_{a_1,a_2, b}(\data_n)(t,0,x) &= 1
+                                      - \phi_{a_1,a_2, b}(\data_n)(t,1,x)
+                                      - \phi_{a_1,a_2, b}(\data_n)(t,2,x)
+  \\
+  & \qquad
+    -\phi_{a_1,a_2, b}(\data_n)(t,-1,x)
 \end{align*}
 To evaluate how well a function \( F \) predicts the observed
 multi-state process we use the integrated Brier score
 \( \bar B_\tau( F,O) = \int_0^{\tau} B_t(F,O) \diff t \), where \( B_t \) is the
 Brier score \citep{brier1950verification} at time \( t \in [0, \tau] \),
 \begin{equation*}
-  B_t(F,O) = \sum_{j=0}^{3}
+  B_t(F,O) = \sum_{j=-1}^{2}
   \left(
       F(t,j,X) - \1{\{\eta(t)=j\}}
   \right)^2.
@@ -555,7 +561,7 @@ by substituting a specific \(P_0\in\mathcal{P}\) for \(P\) in equation
 where the minimum is taken over all \( F \), such that \( F \) is a conditional
 state occupation probability function for some measure \( P \) as defined in equation~(\ref{eq:F-def}).
 Then \( F^*(t,j,\blank) = F_0(t,j,\blank) \) \( H \)-almost surely for
-any \( j\in \{0,1,2,3\} \) and almost any \( t \in [0, \tau]\).
+any \( j\in \{-1,0,1,2\} \) and almost any \( t \in [0, \tau]\).
 \end{proposition}
 \begin{proof}
   See Appendix~\ref{sec:proof-proposition}.
@@ -581,7 +587,7 @@ In the following we let \( \| \blank \|_{P_0} \) denote the norm
   \label{eq:norm}
   \| F \|_{P_0} = 
   \left\{
-    \sum_{j=0}^{3}\int_{\mathcal{X}} \int_0^{\tau} F(t, j, x)^2 \diff t H_0( \diff x)
+    \sum_{j=-1}^{2}\int_{\mathcal{X}} \int_0^{\tau} F(t, j, x)^2 \diff t H_0( \diff x)
   \right\}^{1/2}.
 \end{equation}
 \begin{corollary}
@@ -635,7 +641,7 @@ we have
 \begin{equation}
   \label{eq:7}
   \Gamma(t , x) 
-  = \int_0^t  \frac{F(\diff s, 3, x )}{F(s-, 0, x )},
+  = \int_0^t  \frac{F(\diff s, -1, x )}{F(s-, 0, x )},
   \quad \text{and} \quad
   \Lambda_j(t , x) 
   = \int_0^t  \frac{F(\diff s, j, x )}{F(s-, 0, x )},
@@ -1367,7 +1373,7 @@ so using this with \( a=F(t, k, x) \), \( b=F_0(t, k, x) \), and
   \\
   & \leq
     2\tau\E_{P_0}{\left[
-    \sum_{k=0}^{3} \int_0^{\tau}
+    \sum_{k=-1}^{2} \int_0^{\tau}
     \left\{
     \left(
     F(t, k, X) - \1{\{\eta(t) = k\}}
@@ -1382,7 +1388,7 @@ so using this with \( a=F(t, k, x) \), \( b=F_0(t, k, x) \), and
   \\
   & =2\tau
     \E_{P_0}\Bigg[
-    \sum_{k=0}^{3} \int_0^{\tau}
+    \sum_{k=-1}^{2} \int_0^{\tau}
     \left(
     F(t, k, X) - F_0(t, k, X)
     \right)^2
@@ -1396,7 +1402,7 @@ so using this with \( a=F(t, k, x) \), \( b=F_0(t, k, x) \), and
   \\
   & \leq
     8\tau \E_{P_0}{\left[
-    \sum_{k=0}^{3} \int_0^{\tau}
+    \sum_{k=-1}^{2} \int_0^{\tau}
     \left(
     F(t, k, X) - F_0(t, k, X)
     \right)^2
