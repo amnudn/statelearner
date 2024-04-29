@@ -118,22 +118,24 @@ estimator of the conditional censoring distribution.
 \section{Introduction}
 \label{sec:introduction}
 
-Medical decision making is traditionally based on the discrepancy
-between intuitive jugdment and the law of chance
-\citep{redelmeier1995probability}. We are concerned with the
-statistical models that provide probabilistic predictions about the
-medical future of a patient. We have two different applications of
-these models in mind. One is as a stand-alone tool where the model
-provides information for a freshly diagnosed patient. The other is as
-input to an algorithm which estimates a causal target parameter such
-as an average treatment effect. The models are learned on data from
-previous patients. A super learner is a machine learning algorithm
-that combines a finite set of learners into a meta learner by
-estimating prediction performance in hold-out samples using a
-pre-specified loss function \citep{van2007super}. When the aim is to
-make a prediction model, super learners combine strong learners, such
-as Cox regression models and random survival forests
-\citep{gerds2021medical}.
+Medical decision making is traditionally based on the discrepancy between
+intuitive judgment and the law of chance \citep{redelmeier1995probability}. We
+are concerned with the statistical models that provide probabilistic predictions
+about the medical future of a patient. We have two different applications of
+these models in mind.
+% THOMAS: I think we only really have one in mind in this article. For
+% stand-alone prediction, I think some further things should be
+% addressed/discussed, which I had thought could be for another article. But
+% maybe we can but it in here.
+One is as a stand-alone tool where the model provides
+information for a freshly diagnosed patient. The other is as input to an
+algorithm which estimates a causal target parameter such as an average treatment
+effect. The models are learned on data from previous patients. A super learner
+is a machine learning algorithm that combines a finite set of learners into a
+meta learner by estimating prediction performance in hold-out samples using a
+pre-specified loss function \citep{van2007super}. When the aim is to make a
+prediction model, super learners combine strong learners, such as Cox regression
+models and random survival forests \citep{gerds2021medical}.
 % For targeted learning of a low dimensional
 % target parameter in presence of a high-dimensional nuisance parameter,
 % a super learner will usually also include the highly adaptive lasso
@@ -167,14 +169,24 @@ pre-specified model for the censoring
 distribution. In \cite{westling2021inference} this problem is tackled by
 iterating between super learning of the censoring distribution and the
 event time
-distribution. % ANDERS: mangler afrundning efter sidste saetning. eller maaske kan saetningen flyttes laenger ned?
+distribution. 
+% ANDERS: mangler afrundning efter sidste saetning. eller maaske kan saetningen
+% flyttes laenger ned?
+% 
+% THOMAS: Tror du har skrevet den her bid. Har forsøgt at afrunde.
+It is not clear, however, whether such a procedure converges towards an element
+minimizing the average loss.
 
 In this article we define the state learner, a new super learner for
 right-censored data, which simultaneously estimates the expected loss
 of learners of the event time distribution and the censoring
 distribution. The loss function which is used to define the state
 learner is based on the observable
-quantities. % ANDERS: hvad mener vi med observable quantities? distribution of the observed random variables?
+variables. % ANDERS: hvad mener vi med observable quantities? distribution of
+% the observed random variables?
+% 
+% THOMAS: Changed to 'variables'. It is important that the loss is based on the
+% observed variables directly, not just their distribution.
 The state learner can be applied to all types of survival models,
 works in the presence of competing risks, and does not require a
 single pre-specified estimator of the conditional censoring
@@ -182,15 +194,20 @@ distribution.  To analyze the theoretical properties of the state
 learner we focus on the discrete super learner which combines the
 library of learners by picking the one that minimises the
 cross-validated loss
-\citep{van2011targeted}. % ANDERS: er der bedre referencer fra Mark paper/bog for discrete super learner?
+\citep{van2007super}.
+% ANDERS: er der bedre referencer fra Mark paper/bog for discrete super learner?
+% 
+% THOMAS: Yes, har taget Hubbard+laan super learner article i stedet.
 In the presence of competing risks, our algorithm uses separate
-libraries to model the hazard rates of the competing risks and the
+libraries to model the cumulative hazard functions of the competing risks and the
 censoring distribution. We show that the oracle selector of the state
 learner is consistent if all libraries contain a consistent learner
 and prove a finite sample oracle inequality. The result of the state
 learner algorithm is a model which predicts the probability of an
 event based on covariates in the presence of competing risks
-\citep{gerds2021medical}. The other application is in targeted
+\citep{gerds2021medical}.
+% THOMAS: This is not the output directly, but can easily be obtained.
+The other application is in targeted
 learning where conditional event probabilities occur as
 high-dimensional nuisance parameters which need to be estimated at a
 certain rate \citep{van2011targeted, rytgaard2021estimation,
@@ -233,14 +250,22 @@ defined by
   \Lambda_{j}(t \mid x) = \int_0^t\frac{  Q(T \in \diff s, D=j \mid X=x )}{Q(T \geq s \mid X=x )}.
 \end{equation*}
 For ease of notation we assume throughout that \( \Lambda_j(\blank \mid x) \) is
-continuous for all \( x \) and \( j \). %ANDERS: need a note here which says that this is not a limitation?
-We denote by \(S\) the conditional
-event-free survival function:
+continuous for all \( x \) and \( j \). 
+% ANDERS: need a note here which says that this is not a limitation?
+% 
+% THOMAS: I think it is already there in 'For ease of notation...', but I have
+% added the next sentence. We could also just work with the product integral,
+% would that be better?
+This is not a limitation as everything caries over directly to the general case
+and is solely imposed to simplify the formulas. We denote by \(S\) the
+conditional event-free survival function:
 \begin{equation}
   \label{eq:surv-def}
   S(t \mid x)=\exp\left\{-\Lambda_{1}(t \mid x)-\Lambda_{2}(t \mid x)\right\}.
 \end{equation}
 % ANDERS: I prefer to have the \tau explicit
+% 
+% THOMAS: OK
 Let \( \mathcal{M}_{\tau}\) denote the space of all conditional cumulative hazard
 functions on \( [0,\tau] \times\mathcal{X}\). Any distribution
 \( Q \in \mathcal{Q} \) can be characterised by
@@ -268,7 +293,10 @@ by a distribution \( Q \in \mathcal{Q} \) and a conditional cumulative
 hazard function for \( C \) given \( X \)
 \citep[c.f.,][]{begun1983information,gill1997coarsening}. We use
 \(\Gamma\in\mathcal M\) to denote the conditional cumulative hazard
-function for censoring. % ANDERS: can we not allow Gamma to be discrete?
+function for censoring.
+% ANDERS: can we not allow Gamma to be discrete?
+% 
+% THOMAS: Yes, no problem, it is only for notation convenience. 
 For notational convenience, we assume that \( \Gamma(\blank \mid x) \) is
 continuous for all \( x \), and let
 \(G(t \mid x)=\exp\left\{-\Gamma(t \mid x)\right\}\) denote the
@@ -284,6 +312,8 @@ is characterized by
   \end{split}
 \end{equation}
 % ANDERS: H is missing in the model?
+% 
+% THOMAS: H is part of Q (see equation between equation 1 and 2).
 Hence, we may write
 \( \mathcal{P} = \{ P_{Q, \Gamma} : Q \in \mathcal{Q}, \Gamma \in
 \mathcal{G} \} \) for some \( \mathcal{G} \subset \mathcal{M}_{\tau} \). We
@@ -403,7 +433,17 @@ data. This implies that when event times are observed in continuous
 time, any of these learners will almost surely have infinite loss in
 an independent test set according to the negative partial
 log-likelihood loss.
-% ANDERS: would be good to have a formula for a the negative partial log-likelihood loss showing that the result is infitity
+% ANDERS: would be good to have a formula for a the negative partial
+% log-likelihood loss showing that the result is infitity
+%
+% THOMAS: I would argue that this should be clear from the previous sentence and
+% the definition of the log-likelihood function: If a discrete model assigns a
+% probability of zero to an event, then the log-likelihood of that event is
+% log(0) = -infinity.
+%
+% Such a formula was part of one of the earlier versions where I had put more
+% focus on the problem than on the solution. If we add this, we should work with
+% the product integral notation.
 
 When a proportional hazards model is assumed, the baseline hazard
 function can be profiled out of the likelihood to give a new partial
@@ -412,8 +452,18 @@ suggested as a loss function for super learning
 \citep{golmakani2020super,verweij1993cross}. While this allows the
 library of learners to include Cox' proportional hazard models, the
 drawback is that the library is now restricted to include only these
-models. % ANDERS: can the library really include multiple proportional hazards models? only one of them can be correct ...
-% also, would be good to merge this paragraph with the previous somehow
+models.
+% ANDERS: can the library really include multiple proportional hazards models?
+% only one of them can be correct ... also, would be good to merge this
+% paragraph with the previous somehow
+%
+% THOMAS: Yes, it can include multiple PH models (if I understand you
+% correctly). A major point is that there is no proof that this works, and when
+% you start to think about it, it is not completely obvious whether it should
+% work or not. I think it works and am trying to prove it.
+%
+% I disagree about merging this section with the previous one, I see them as
+% describing two completely different approaches and issues.
 
 Another approach for super learning with right-censored data is to use an
 inverse probability of censoring weighted (IPCW) loss function
@@ -443,13 +493,21 @@ the situation with competing risks.
 % The problem with most existing super learners for right-censored data is that
 % they depend on a pre-specified estimator of the censoring distribution.
 The main idea of the state learner is to jointly use learners of
-\( \Lambda_1 \), \( \Lambda_2 \), and \( \Gamma \), and the relations
-in equation~(\ref{eq:parametrizeP}), to learn a feature of the
-observed data distribution \( P \). The discrete state learner ranks a
-tuple of learners of \( (\Lambda_1, \Lambda_2, \Gamma) \) based on how
-well they jointly model the observed data. %ANDERS: would be good to add one sentence about how to obtain a prediction model from such a ranking.
-To formally introduce the
-state learner, we define the multi-state process
+\( \Lambda_1 \), \( \Lambda_2 \), and \( \Gamma \), and the relations in
+equation~(\ref{eq:parametrizeP}), to learn a feature of the observed data
+distribution \( P \). The discrete state learner ranks a tuple of learners of
+\( (\Lambda_1, \Lambda_2, \Gamma) \) based on how well they jointly model the
+observed
+data.
+% ANDERS: would be good to add one sentence about how to obtain a prediction
+% model from such a ranking.
+%
+% THOMAS: I think this depends on whether or not we want prediction to be one of
+% the tasks addressed in this article. I have focused on something else. We
+% could add something like:
+Risk predictions for causes one and two can then be obtained from
+\( \Lambda_1 \) and $\Lambda_2$ \citep{benichou1990estimates}. To formally
+introduce the state learner, we define the multi-state process
 \begin{equation*}
   \eta(t) = \1\{\tilde{T} \leq t, \tilde D=1\} + 2\,\1\{\tilde{T} \leq t, \tilde
   D=2\} - \1\{\tilde{T} \leq t, \tilde D=0\},
@@ -465,7 +523,12 @@ mutually exclusive states (Figure \ref{fig:multi-state-process}).
     process is always observed at any time.}
   \label{fig:multi-state-process}
 \end{figure}
-% ANDERS: Figuren er lavet med prodlim, ik? du kan angive nummer for boksene (0 = initial, 1 = cause 1, 2= cause 2 og jeg ville foretraekke 3 i stedet for -1 for censored)
+% ANDERS: Figuren er lavet med prodlim, ik? du kan angive nummer for boksene (0
+% = initial, 1 = cause 1, 2= cause 2 og jeg ville foretraekke 3 i stedet for -1
+% for censored)
+%
+% THOMAS: Jeg foretrækker -1 frem for 3, så vil gerne høre dine argumenter for
+% 3.
 The conditional distribution of \( \eta(t) \) given \( X \) is determined by
 the function
 \begin{equation}
@@ -481,13 +544,19 @@ probabilities of the multi-state process \(\eta\). We construct a
 super learner for \( F \). The target of this super learner is the
 function-valued parameter $\Psi(P) = F$ which is identified through
 equation~(\ref{eq:F-def}).
-% ANDERS: the next sentence requires conditional independent censoring and restriction to [0,\tau], right?
-Because each quadruple
+% ANDERS: the next sentence requires conditional independent censoring and
+% restriction to [0,\tau], right?
+%
+% THOMAS: Yes, added now.
+Under conditional independent censoring each quadruple
 $(\Lambda_{1}, \Lambda_{2}, \Gamma, H)$ characterizes a distribution
-\(P\in\mathcal P\) which in turn determines \( (F, H) \),
-% ANDERS: and we should refer to equations (2) and (6) 
-a learner for \( F \) can be constructed from learners of \( \Lambda_1 \),
-\( \Lambda_2 \), and $\Gamma$ as follows:
+\(P\in\mathcal P\), c.f.\ equation~\eqref{eq:parametrizeP}, which in turn
+determines \( (F, H) \),
+% ANDERS: and we should refer to equations (2) and (6)
+%
+% THOMAS: Yes, added above -- OK?
+and so a learner for \( F \) can be constructed from learners of
+\( \Lambda_1 \), \( \Lambda_2 \), and $\Gamma$ as follows:
 \begin{equation}\label{eq:transition}
   \begin{split}
   F(t, 1, x)
@@ -580,35 +649,45 @@ and the discrete state learner is given by
 \section{Theoretical results for the state learner}
 \label{sec:theor-results-prop}
 
-In this section we establish theoretical guarantees for the state learner.
+In this section we establish theoretical guarantees for the state learner. We
+show that the state learner is consistent if its library contains a consistent
+learner, and we establish a finite sample inequality for the excess risk of the
+state learner compared to the oracle. Finally we show that a certain second
+order structure is preserved when the state learner is used for targeted
+learning.
+
+\subsection{Consistency}
+\label{sec:consistency}
+
 % We let \( \E_P \) denote
 % expectation under \( P \) and use \( \Theta \) to denote the
 % collection of all conditional state-occupation probability functions.
-Proposition~\ref{prop:stric-prop} can be derived from the fact that
-the integrated Brier score (also called the continuous ranked
-probability score) is a strictly proper scoring rule
-\citep{gneiting2007strictly}. This implies that if we minimise the
-average loss of the integrated Brier score, we recover the parameters
-of the data-generating distribution. Specifically, this implies that
-the oracle of a state learner is consistent if the library of learners
-contains at least one learner that is consistent for estimation of
-\( F \). Recall that the function \(F\) implicitly depends on the data
-generating probability measure \(P\in\mathcal P\) but that this was
-suppressed in the notation. We now make this dependence explicit by
-writing \(F_0\) for the function which is obtained by substituting a
-specific \(P_0\in\mathcal{P}\) for \(P\) in equation
-\eqref{eq:transition}.
+Proposition~\ref{prop:stric-prop} can be derived from the fact that the
+integrated Brier score (also called the continuous ranked probability score) is
+a strictly proper scoring rule \citep{gneiting2007strictly}. This implies that
+if we minimise the average loss of the integrated Brier score, we recover the
+parameters of the data-generating distribution. Specifically, this implies that
+the oracle of a state learner is consistent if the library of learners contains
+at least one learner that is consistent for estimation of \( F \). Recall that
+the function \(F\) implicitly depends on the data generating probability measure
+\(P\in\mathcal P\) but that this was suppressed in the notation. We now make
+this dependence explicit by writing \(F_0\) for the function which is obtained
+by substituting a specific \(P_0\in\mathcal{P}\) for \(P\) in equation
+\eqref{eq:transition}. In the following we let
+\( \mathcal{H} = \{F_P : P \in \mathcal{P}\} \) where \( F_P \) is defined as in
+equation~(\ref{eq:F-def}) using the measure \( P \in \mathcal{P} \).
 
 \begin{proposition}
   \label{prop:stric-prop}
   For \(P_0\in\mathcal{P}\) define
   \begin{equation*}
-    F^* = \argmin_{F} P_0{[\bar{B}_\tau(F, \blank)]},
+    F^* = \argmin_{F \in \mathcal{H}} P_0{[\bar{B}_\tau(F, \blank)]}.
   % F^* = \argmin_{(\Lambda_1,\Lambda_2,\Gamma) \in \mathcal{M}_{\tau}\otimes\mathcal{M}_{\tau}\otimes\mathcal{M}_{\tau}} P_0{[\bar B_\tau(\phi_{(\Lambda_1,\Lambda_2,\Gamma)}, \blank)]},
   \end{equation*}
-  %ANDERS: would be good to define the set over which F is minimized with a symbol rather than only words
-where the minimum is taken over all \( F \), such that \( F \) is a conditional
-state occupation probability function for some measure \( P \) as defined in equation~(\ref{eq:F-def}).
+  % ANDERS: would be good to define the set over which F is minimized with a
+  % symbol rather than only words
+  %
+  % THOMAS: How about now? \mathcal{H} is now defined just before this proposition.
 Then \( F^*(t,j,\blank) = F_0(t,j,\blank) \) \( H \)-almost surely for
 any \( j\in \{-1,0,1,2\} \) and almost any \( t \in [0, \tau]\).
 \end{proposition}
@@ -616,23 +695,31 @@ any \( j\in \{-1,0,1,2\} \) and almost any \( t \in [0, \tau]\).
   See Appendix~\ref{sec:proof-proposition}.
 \end{proof}
 
-We now establish a finite sample oracle result for the state learner.
-Our Corollary~\ref{cor:oracle-prop} is in essence a special case of Theorem 2.3
-in \cite{vaart2006oracle}. % ANDERS: is Theo 2.3 correct?
-We assume
-that we split the data into equally sized folds, and for simplicity of
-presentation we take \( n \) to be such that
-\( |\data_n^{-k}| = n/K \) with \( K \) fixed. We will allow the
-number of learners to grow with \( n \) and write
+\subsection{Oracle inequalities}
+\label{sec:finite-sample-oracle}
+
+We establish a finite sample oracle result for the state learner. Our
+Corollary~\ref{cor:oracle-prop} is in essence a special case of Theorem 2.3 in
+\cite{vaart2006oracle}.
+% ANDERS: is Theo 2.3 correct?
+%
+% THOMAS: Yes. What do you mean?
+We assume that we split the data into equally sized folds, and for simplicity of
+presentation we take \( n \) to be such that \( |\data_n^{-k}| = n/K \) with
+\( K \) fixed. We will allow the number of learners to grow with \( n \) and
+write
 \( \mathcal{F}_n=\mathcal{F}(\mathcal{A}_{1,n}, \mathcal{A}_{2,n},
-\mathcal{B}_n)\) as short-hand notation and to emphasise the
-dependence on \( n \).
+\mathcal{B}_n)\) as short-hand notation and to emphasise the dependence on
+\( n \).
 % The discrete super $\hat{\phi}_n$ and the
 % oracle $\tilde{\phi}_n$ are defined as in Section~\ref{sec:framework}
 % but now with respect to the library \( \mathcal{F}_n \) and the loss
 % \( B \).
-In the following we let \( \| \blank \|_{P_0} \) denote the norm
-% ANDERS: norm on which space? 
+In the following we let the space \( \mathcal{H} \) be equipped with the norm
+\( \| \blank \|_{P_0} \) defined as
+% ANDERS: norm on which space?
+%
+% THOMAS: Fixed.
 \begin{equation}
   \label{eq:norm}
   \| F \|_{P_0} = 
@@ -640,6 +727,7 @@ In the following we let \( \| \blank \|_{P_0} \) denote the norm
     \sum_{j=-1}^{2}\int_{\mathcal{X}} \int_0^{\tau} F(t, j, x)^2 \diff t H_0( \diff x)
   \right\}^{1/2}.
 \end{equation}
+
 \begin{corollary}
   \label{cor:oracle-prop}
   For all \(P_0\in\mathcal{P}\), \( n \in \N \), \( k \in \{1, \dots, K\} \),
@@ -683,8 +771,18 @@ Corollary~\ref{cor:oracle-prop} has the following asymptotic consequences.
   See Appendix~\ref{sec:proof-proposition}.
 \end{proof}
 
-% ANDERS: would be good to separate 2-3 subsection in this section. here is a vague proposal. above could be under \subsection{Oracle property of the state learner}
-\subsection{Transience of double-robustness}
+% ANDERS: would be good to separate 2-3 subsection in this section. here is a
+% vague proposal. above could be under \subsection{Oracle property of the state
+% learner}
+%
+% THOMAS: OK, I have added a suggestion for two sections more. 
+
+
+% \subsection{Transience of double-robustness}
+\subsection{Transience of second order remainder structure}
+% THOMAS: It is not clear that double-robustness is preserved, but a second
+% order product structure is, so I have changed the title. 
+% 
 % In Section~\ref{sec:targeted-learning} we demonstrate how the state learner can
 % be used for targeted learning.
 A targeted estimator is typically obtained from
@@ -702,12 +800,17 @@ we have
 \end{equation}
 and thus a targeted estimator can also be obtained from an estimator of $F$
 using equation~(\ref{eq:7}). The key feature of a targeted estimator
-% ANDERS: at this point we have not defined "targeted estimator" does fisher 2021 define this? Bickel does not ...
-is that it
-is asymptotically equivalent to a sum of i.i.d.\ random variables plus a second
-order remainder term \citep{bickel1993efficient,fisher2021visually}. For the
-setting with competing risks, the remainder term is dominated by terms
-of the form
+% ANDERS: at this point we have not defined "targeted estimator" does fisher
+% 2021 define this? Bickel does not ...
+%
+% THOMAS: I would think that Fisher+Kennedy does define it. But my solution to
+% this problem was to reference Section 7, which you have removed.
+% Alternatively, this could be part of Section 7, but I am quite sure you once
+% moved it from there to here. What do you suggest?
+is that it is asymptotically equivalent to a sum of i.i.d.\ random variables
+plus a second order remainder term
+\citep{bickel1993efficient,fisher2021visually}. For the setting with competing
+risks, the remainder term is dominated by terms of the form
 \begin{equation}
   \label{eq:dr-term}
   P{\left[
@@ -794,13 +897,21 @@ treatment effect and \( \Theta = [-1,1] \).
 % ANDERS: need a sentence a la: Before we discuss the role of the
 % state learner for targeted learning we review some results from
 % semiparametric efficiency theory. The reader may want to skip this ...
-Under the assumption of
-conditional independent censoring and positivity, $\theta$ is
-identifiable from \( \mathcal{P} \) which means that there exists an
+%
+% THOMAS: Hmm, I think this is already stated below ('Using tools from
+% semi-parametric efficiency theory...'). But we could add something like the
+% following? Depending on the framing of the paper (with focus exclusively on
+% state learner for targeted learning or also on prediction?), I don't think the
+% reader can skip this section.
+To discuss the role of the state learner for targeted learning we briefly review
+some results from semiparametric efficiency theory. Extensive reviews and
+introductions are available elsewhere
+\cite[e.g.,][]{pfanzagl1985contributions,bickel1993efficient,van2003unified,tsiatis2007semiparametric,kennedy2016semiparametric}.
+Under the assumption of conditional independent censoring and positivity,
+$\theta$ is identifiable from \( \mathcal{P} \) which means that there exists an
 operator \( \Psi \colon \mathcal{P} \rightarrow \Theta \) such that
-\( \theta(Q) = \Psi(P_{Q, \Gamma}) \) for all
-$\Gamma \in \mathcal{M}_{\tau}$. By equation~(\ref{eq:parametrizeP})
-this implies that we may write
+\( \theta(Q) = \Psi(P_{Q, \Gamma}) \) for all $\Gamma \in \mathcal{M}_{\tau}$.
+By equation~(\ref{eq:parametrizeP}) this implies that we may write
 \begin{equation*}
   \theta(Q) = \Psi(P) = \tilde{\Psi}^0(\Lambda_1, \Lambda_2, H),
 \end{equation*}
@@ -824,6 +935,11 @@ involved in the estimation of the nuisance parameters $\Lambda_1$ and
 $\Lambda_2$. In addition, the estimator will typically have an
 asymptotic bias that vanishes at a too slow 
 % ANDERS: is sub-optimal = too slow?
+%
+% THOMAS: Hmm, we could use 'too slow', but it is then unclear why it is too
+% slow -- too slow for what? Writing 'sub-optimal' suggests (too me at least),
+% that there exists a rate that is better -- i.e., this rate it not the optimal
+% one for this problem, but an optimal one exists.
 rate. Using tools from semi-parametric efficiency theory, it is
 possible to construct a so-called targeted or debiased estimator with
 smaller asymptotic bias and a asymptotic distribution which we know
@@ -854,6 +970,9 @@ An example of a targeted estimator is the one-step estimator, defined as
 where \( \empmeas \) is the empirical measure of a data set
 \(\{O_i\}_{i=1}^n\).  Under a Donsker class condition
 % ANDERS: Donsker class condition on what set?
+%
+% THOMAS: Things are quite informal here so I don't see the point in making this
+% precise.
 we have the
 following asymptotic expansion of the one-step estimator
 \citep{pfanzagl1985contributions,van2003unified,fisher2021visually,kennedy2022semiparametric,rytgaard2022continuous},
@@ -913,6 +1032,10 @@ that the covariate vector \( X \in \R^p \) contains a binary treatment
 indicator \( A \) and a vector of potential confounders,
 \( W \in \mathcal{W}\subset \R^{p-1} \).
 % ANDERS: why is this abuse of notation?
+%
+% THOMAS: Because we should write \Lambda_j(t \mid (a, w)), because \Lambda as
+% originally defined only takes two arguments and not three.
+%
 % We abuse notation slightly by writing
 % \( \Lambda_j(t \mid x) = \Lambda_j(t \mid a, w) \) and
 % \( S(t \mid x) = S(t \mid a, w) \) when \( x=(a, w) \).
@@ -943,7 +1066,13 @@ cause 1 at time $\tau$:
   \mu(\diff w).
 \end{equation*}
 Under a set of
-% ANDERS: better to give these assumptions a name: positivity, ... and refer to Helene's paper?
+% ANDERS: better to give these assumptions a name: positivity, ... and refer to
+% Helene's paper?
+%
+% THOMAS: Alternatively, we could just call it a 'standardized risk difference'
+% and then not discuss counterfactuals, but say that it can be given a causal
+% interpretation and reference some papers? I would like to not discuss
+% assumptions from causality as it is not very important for the state learner.
 additional assumptions, \( \theta_{{\tau}} \) can be given the causal
 interpretation
 \begin{equation*}
