@@ -118,24 +118,22 @@ estimator of the conditional censoring distribution.
 \section{Introduction}
 \label{sec:introduction}
 
-Medical decision making is traditionally based on the discrepancy between
-intuitive judgment and the law of chance \citep{redelmeier1995probability}. We
-are concerned with the statistical models that provide probabilistic predictions
-about the medical future of a patient. We have two different applications of
-these models in mind.
-% THOMAS: I think we only really have one in mind in this article. For
-% stand-alone prediction, I think some further things should be
-% addressed/discussed, which I had thought could be for another article. But
-% maybe we can but it in here.
-One is as a stand-alone tool where the model provides
-information for a freshly diagnosed patient. The other is as input to an
-algorithm which estimates a causal target parameter such as an average treatment
-effect. The models are learned on data from previous patients. A super learner
-is a machine learning algorithm that combines a finite set of learners into a
-meta learner by estimating prediction performance in hold-out samples using a
-pre-specified loss function \citep{van2007super}. When the aim is to make a
-prediction model, super learners combine strong learners, such as Cox regression
-models and random survival forests \citep{gerds2021medical}.
+Medical decision making is traditionally based on the discrepancy
+between intuitive judgment and the law of chance
+\citep{redelmeier1995probability}. We are concerned with the
+statistical models that provide probabilistic predictions about the
+medical future of a patient. We have two different applications of
+these models in mind. One is as a stand-alone tool where the model
+provides information for a freshly diagnosed patient. The other is as
+input to an algorithm which estimates a causal target parameter such
+as an average treatment effect. The models are learned on data from
+previous patients. A super learner is a machine learning algorithm
+that combines a finite set of learners into a meta learner by
+estimating prediction performance in hold-out samples using a
+pre-specified loss function \citep{van2007super}. When the aim is to
+make a prediction model, super learners combine strong learners, such
+as Cox regression models and random survival forests
+\citep{gerds2021medical}.
 % For targeted learning of a low dimensional
 % target parameter in presence of a high-dimensional nuisance parameter,
 % a super learner will usually also include the highly adaptive lasso
@@ -163,51 +161,38 @@ learner constructed with the negative partial log-likelihood loss
 implicitly depends on the censoring distribution
 \citep{hjort1992inference,whitney2019comment}. Inverse probability of
 censoring weighted loss has been studied for decades
-\citep{graf1999assessment, hothorn2006survival, gerds2006consistent}. A disadvantage of inverse probability of
+\citep{graf1999assessment, hothorn2006survival,
+  gerds2006consistent}. A disadvantage of inverse probability of
 censoring weighted loss estimators is that they require a
-pre-specified model for the censoring
-distribution. In \cite{westling2021inference} this problem is tackled by
-iterating between super learning of the censoring distribution and the
-event time
-distribution. 
-% ANDERS: mangler afrundning efter sidste saetning. eller maaske kan saetningen
-% flyttes laenger ned?
-% 
-% THOMAS: Tror du har skrevet den her bid. Har forsøgt at afrunde.
-It is not clear, however, whether such a procedure converges towards an element
-minimizing the average loss.
+pre-specified model for the censoring distribution. Recently
+\cite{westling2021inference} proposed a procedure which iterates
+between super learning of the censoring distribution and super
+learning of the event time distribution. In this article we pursue a
+different route.
 
 In this article we define the state learner, a new super learner for
 right-censored data, which simultaneously estimates the expected loss
 of learners of the event time distribution and the censoring
 distribution. The loss function which is used to define the state
-learner is based on the observable
-variables. % ANDERS: hvad mener vi med observable quantities? distribution of
-% the observed random variables?
-% 
-% THOMAS: Changed to 'variables'. It is important that the loss is based on the
-% observed variables directly, not just their distribution.
+learner is based on the observed variables, that is the minimum and
+the order of the censoring time and the event
+time.
+
 The state learner can be applied to all types of survival models,
 works in the presence of competing risks, and does not require a
 single pre-specified estimator of the conditional censoring
 distribution.  To analyze the theoretical properties of the state
 learner we focus on the discrete super learner which combines the
 library of learners by picking the one that minimises the
-cross-validated loss
-\citep{van2007super}.
-% ANDERS: er der bedre referencer fra Mark paper/bog for discrete super learner?
-% 
-% THOMAS: Yes, har taget Hubbard+laan super learner article i stedet.
-In the presence of competing risks, our algorithm uses separate
-libraries to model the cumulative hazard functions of the competing risks and the
-censoring distribution. We show that the oracle selector of the state
-learner is consistent if all libraries contain a consistent learner
-and prove a finite sample oracle inequality. The result of the state
-learner algorithm is a model which predicts the probability of an
-event based on covariates in the presence of competing risks
-\citep{gerds2021medical}.
-% THOMAS: This is not the output directly, but can easily be obtained.
-The other application is in targeted
+cross-validated loss \citep{van2007super}. In the presence of
+competing risks, our algorithm uses separate libraries to model the
+cumulative hazard functions of the competing risks and the censoring
+distribution. We show that the oracle selector of the state learner is
+consistent if all libraries contain a consistent learner and prove a
+finite sample oracle inequality. A result of the state learner
+algorithm is a model which predicts the probability of an event based
+on covariates in the presence of competing risks
+\citep{gerds2021medical}. The other application is in targeted
 learning where conditional event probabilities occur as
 high-dimensional nuisance parameters which need to be estimated at a
 certain rate \citep{van2011targeted, rytgaard2021estimation,
@@ -249,23 +234,15 @@ defined by
   % \label{eq:cum-haz}
   \Lambda_{j}(t \mid x) = \int_0^t\frac{  Q(T \in \diff s, D=j \mid X=x )}{Q(T \geq s \mid X=x )}.
 \end{equation*}
-For ease of notation we assume throughout that \( \Lambda_j(\blank \mid x) \) is
-continuous for all \( x \) and \( j \). 
-% ANDERS: need a note here which says that this is not a limitation?
-% 
-% THOMAS: I think it is already there in 'For ease of notation...', but I have
-% added the next sentence. We could also just work with the product integral,
-% would that be better?
-This is not a limitation as everything caries over directly to the general case
-and is solely imposed to simplify the formulas. We denote by \(S\) the
-conditional event-free survival function:
+For ease of presentation we assume throughout that
+\( \Lambda_j(\blank \mid x) \) is continuous for all \( x \) and
+\( j \). This is not a limitation as everything caries over directly
+to the general case. We denote by \(S\) the conditional event-free
+survival function:
 \begin{equation}
   \label{eq:surv-def}
   S(t \mid x)=\exp\left\{-\Lambda_{1}(t \mid x)-\Lambda_{2}(t \mid x)\right\}.
 \end{equation}
-% ANDERS: I prefer to have the \tau explicit
-% 
-% THOMAS: OK
 Let \( \mathcal{M}_{\tau}\) denote the space of all conditional cumulative hazard
 functions on \( [0,\tau] \times\mathcal{X}\). Any distribution
 \( Q \in \mathcal{Q} \) can be characterised by
@@ -293,15 +270,11 @@ by a distribution \( Q \in \mathcal{Q} \) and a conditional cumulative
 hazard function for \( C \) given \( X \)
 \citep[c.f.,][]{begun1983information,gill1997coarsening}. We use
 \(\Gamma\in\mathcal M\) to denote the conditional cumulative hazard
-function for censoring.
-% ANDERS: can we not allow Gamma to be discrete?
-% 
-% THOMAS: Yes, no problem, it is only for notation convenience. 
-For notational convenience, we assume that \( \Gamma(\blank \mid x) \) is
-continuous for all \( x \), and let
+function for censoring. For ease of presentation we now also assume
+that \( \Gamma(\blank \mid x) \) is continuous for all \( x \). We let
 \(G(t \mid x)=\exp\left\{-\Gamma(t \mid x)\right\}\) denote the
-survival function of the conditional censoring distribution. The distribution 
-is characterized by
+survival function of the conditional censoring distribution. The
+distribution is characterized by
 \begin{equation}\label{eq:parametrizeP}
   \begin{split}
     P(\diff t, j, \diff x) &= \left\{G(t- \mid x)S(t- \mid x)\Lambda_1(\diff t \mid x)H(\diff x)\right\}^{\1{{\{j=1\}}}}\\
@@ -311,13 +284,10 @@ is characterized by
                            &\quad\left\{G(t- \mid x)S(t- \mid x)\Gamma(\diff t \mid x)H(\diff x)\right\}^{\1{{\{j=0\}}}}.
   \end{split}
 \end{equation}
-% ANDERS: H is missing in the model?
-% 
-% THOMAS: H is part of Q (see equation between equation 1 and 2).
 Hence, we may write
 \( \mathcal{P} = \{ P_{Q, \Gamma} : Q \in \mathcal{Q}, \Gamma \in
 \mathcal{G} \} \) for some \( \mathcal{G} \subset \mathcal{M}_{\tau} \). We
-also have
+also have \(H\)-almost everywhere
 \begin{equation*}
 P(\tilde T>t \mid X=x) = S(t \mid x)G(t \mid x) = \exp\left\{-\Lambda_{1}(t \mid x)-\Lambda_{2}(t \mid x)-\Gamma(t \mid x) \right\}.
 \end{equation*}
@@ -423,47 +393,27 @@ suppressed in the notation.
 Machine learning based on right-censored data commonly use the
 negative partial log-likelihood as loss function
 \citep[e.g.,][]{li2016regularized,yao2017deep,lee2018deephit,katzman2018deepsurv,gensheimer2019scalable,lee2021boosted,kvamme2021continuous}.
-It seems however that this loss function is not perfectly suited for
-super learning, because it cannot be applied to important survival
-learners: The Kaplan-Meier estimator, the random survival forest, and
-the semi-parametric Cox regression model provide cumulative hazard
-functions that are piece-wise constant in the time argument, and hence
-assign zero probability to event times not observed in the training
-data. This implies that when event times are observed in continuous
-time, any of these learners will almost surely have infinite loss in
-an independent test set according to the negative partial
-log-likelihood loss.
-% ANDERS: would be good to have a formula for a the negative partial
-% log-likelihood loss showing that the result is infitity
-%
-% THOMAS: I would argue that this should be clear from the previous sentence and
-% the definition of the log-likelihood function: If a discrete model assigns a
-% probability of zero to an event, then the log-likelihood of that event is
-% log(0) = -infinity.
-%
-% Such a formula was part of one of the earlier versions where I had put more
-% focus on the problem than on the solution. If we add this, we should work with
-% the product integral notation.
+This loss function is however not perfectly suited for super
+learning. The reason is that it cannot be applied to important
+survival learners: The Kaplan-Meier estimator, the random survival
+forest, and the semi-parametric Cox regression model provide
+cumulative hazard functions that are piece-wise constant in the time
+argument. Suppose these methods are applied to a learning data set and
+the aim is to evaluate the partial log-likelihood loss in an
+independent test data set. Suppose further that the test data set
+contains event times that were not also seen in the learning data set,
+as it would naturally happen when the events are observed in
+continuous time. The problem is that these methods assign zero
+probability to the test set event times that were not also in the
+training data set, and hence (the logarithm of zero is infitity) the
+partial likelihood loss in the test set would be infitity.
 
 When a proportional hazards model is assumed, the baseline hazard
-function can be profiled out of the likelihood to give a new partial
-log-likelihood loss \citep{cox1972regression}, which has been
-suggested as a loss function for super learning
-\citep{golmakani2020super,verweij1993cross}. While this allows the
-library of learners to include Cox' proportional hazard models, the
-drawback is that the library is now restricted to include only these
-models.
-% ANDERS: can the library really include multiple proportional hazards models?
-% only one of them can be correct ... also, would be good to merge this
-% paragraph with the previous somehow
-%
-% THOMAS: Yes, it can include multiple PH models (if I understand you
-% correctly). A major point is that there is no proof that this works, and when
-% you start to think about it, it is not completely obvious whether it should
-% work or not. I think it works and am trying to prove it.
-%
-% I disagree about merging this section with the previous one, I see them as
-% describing two completely different approaches and issues.
+function can be profiled out of the likelihood \citep{cox1972regression}.
+The cross-validated partial log-likelihood loss  \citep{verweij1993cross} has therefore been
+suggested as a loss function for super learning which however
+restricts the library of learners to include only Cox proportional
+hazards models \citep{golmakani2020super}.
 
 Another approach for super learning with right-censored data is to use an
 inverse probability of censoring weighted (IPCW) loss function
@@ -499,14 +449,8 @@ distribution \( P \). The discrete state learner ranks a tuple of learners of
 \( (\Lambda_1, \Lambda_2, \Gamma) \) based on how well they jointly model the
 observed
 data.
-% ANDERS: would be good to add one sentence about how to obtain a prediction
-% model from such a ranking.
-%
-% THOMAS: I think this depends on whether or not we want prediction to be one of
-% the tasks addressed in this article. I have focused on something else. We
-% could add something like:
-Risk predictions for causes one and two can then be obtained from
-\( \Lambda_1 \) and $\Lambda_2$ \citep{benichou1990estimates}. To formally
+Risk predictions can then be obtained from
+\( \Lambda_1 \) and $\Lambda_2$ \citep{benichou1990estimates, ozenne2017riskregression}. To formally
 introduce the state learner, we define the multi-state process
 \begin{equation*}
   \eta(t) = \1\{\tilde{T} \leq t, \tilde D=1\} + 2\,\1\{\tilde{T} \leq t, \tilde
@@ -523,12 +467,6 @@ mutually exclusive states (Figure \ref{fig:multi-state-process}).
     process is always observed at any time.}
   \label{fig:multi-state-process}
 \end{figure}
-% ANDERS: Figuren er lavet med prodlim, ik? du kan angive nummer for boksene (0
-% = initial, 1 = cause 1, 2= cause 2 og jeg ville foretraekke 3 i stedet for -1
-% for censored)
-%
-% THOMAS: Jeg foretrækker -1 frem for 3, så vil gerne høre dine argumenter for
-% 3.
 The conditional distribution of \( \eta(t) \) given \( X \) is determined by
 the function
 \begin{equation}
@@ -544,17 +482,10 @@ probabilities of the multi-state process \(\eta\). We construct a
 super learner for \( F \). The target of this super learner is the
 function-valued parameter $\Psi(P) = F$ which is identified through
 equation~(\ref{eq:F-def}).
-% ANDERS: the next sentence requires conditional independent censoring and
-% restriction to [0,\tau], right?
-%
-% THOMAS: Yes, added now.
 Under conditional independent censoring each quadruple
 $(\Lambda_{1}, \Lambda_{2}, \Gamma, H)$ characterizes a distribution
 \(P\in\mathcal P\), c.f.\ equation~\eqref{eq:parametrizeP}, which in turn
 determines \( (F, H) \),
-% ANDERS: and we should refer to equations (2) and (6)
-%
-% THOMAS: Yes, added above -- OK?
 and so a learner for \( F \) can be constructed from learners of
 \( \Lambda_1 \), \( \Lambda_2 \), and $\Gamma$ as follows:
 \begin{equation}\label{eq:transition}
@@ -674,20 +605,16 @@ the function \(F\) implicitly depends on the data generating probability measure
 this dependence explicit by writing \(F_0\) for the function which is obtained
 by substituting a specific \(P_0\in\mathcal{P}\) for \(P\) in equation
 \eqref{eq:transition}. In the following we let
-\( \mathcal{H} = \{F_P : P \in \mathcal{P}\} \) where \( F_P \) is defined as in
+\( \mathcal{H}_{\mathcal{P}} = \{F_P : P \in \mathcal{P}\} \) where \( F_P \) is defined as in
 equation~(\ref{eq:F-def}) using the measure \( P \in \mathcal{P} \).
 
 \begin{proposition}
   \label{prop:stric-prop}
   For \(P_0\in\mathcal{P}\) define
   \begin{equation*}
-    F^* = \argmin_{F \in \mathcal{H}} P_0{[\bar{B}_\tau(F, \blank)]}.
+    F^* = \argmin_{F \in \mathcal{H}_{\mathcal{P}}} P_0{[\bar{B}_\tau(F, \blank)]}.
   % F^* = \argmin_{(\Lambda_1,\Lambda_2,\Gamma) \in \mathcal{M}_{\tau}\otimes\mathcal{M}_{\tau}\otimes\mathcal{M}_{\tau}} P_0{[\bar B_\tau(\phi_{(\Lambda_1,\Lambda_2,\Gamma)}, \blank)]},
   \end{equation*}
-  % ANDERS: would be good to define the set over which F is minimized with a
-  % symbol rather than only words
-  %
-  % THOMAS: How about now? \mathcal{H} is now defined just before this proposition.
 Then \( F^*(t,j,\blank) = F_0(t,j,\blank) \) \( H \)-almost surely for
 any \( j\in \{-1,0,1,2\} \) and almost any \( t \in [0, \tau]\).
 \end{proposition}
@@ -699,27 +626,21 @@ any \( j\in \{-1,0,1,2\} \) and almost any \( t \in [0, \tau]\).
 \label{sec:finite-sample-oracle}
 
 We establish a finite sample oracle result for the state learner. Our
-Corollary~\ref{cor:oracle-prop} is in essence a special case of Theorem 2.3 in
-\cite{vaart2006oracle}.
-% ANDERS: is Theo 2.3 correct?
-%
-% THOMAS: Yes. What do you mean?
-We assume that we split the data into equally sized folds, and for simplicity of
-presentation we take \( n \) to be such that \( |\data_n^{-k}| = n/K \) with
-\( K \) fixed. We will allow the number of learners to grow with \( n \) and
+Corollary~\ref{cor:oracle-prop} is in essence a special case of
+Theorem 2.3 in \cite{vaart2006oracle}.  We assume that we split the
+data into equally sized folds, and for simplicity of presentation we
+take \( n \) to be such that \( |\data_n^{-k}| = n/K \) with \( K \)
+fixed. We will allow the number of learners to grow with \( n \) and
 write
 \( \mathcal{F}_n=\mathcal{F}(\mathcal{A}_{1,n}, \mathcal{A}_{2,n},
-\mathcal{B}_n)\) as short-hand notation and to emphasise the dependence on
-\( n \).
+\mathcal{B}_n)\) as short-hand notation and to emphasise the
+dependence on \( n \).
 % The discrete super $\hat{\phi}_n$ and the
 % oracle $\tilde{\phi}_n$ are defined as in Section~\ref{sec:framework}
 % but now with respect to the library \( \mathcal{F}_n \) and the loss
 % \( B \).
 In the following we let the space \( \mathcal{H} \) be equipped with the norm
 \( \| \blank \|_{P_0} \) defined as
-% ANDERS: norm on which space?
-%
-% THOMAS: Fixed.
 \begin{equation}
   \label{eq:norm}
   \| F \|_{P_0} = 
@@ -771,21 +692,12 @@ Corollary~\ref{cor:oracle-prop} has the following asymptotic consequences.
   See Appendix~\ref{sec:proof-proposition}.
 \end{proof}
 
-% ANDERS: would be good to separate 2-3 subsection in this section. here is a
-% vague proposal. above could be under \subsection{Oracle property of the state
-% learner}
-%
-% THOMAS: OK, I have added a suggestion for two sections more. 
 
+\subsection{Transience of the second order remainder structure}
 
-% \subsection{Transience of double-robustness}
-\subsection{Transience of second order remainder structure}
-% THOMAS: It is not clear that double-robustness is preserved, but a second
-% order product structure is, so I have changed the title. 
-% 
-% In Section~\ref{sec:targeted-learning} we demonstrate how the state learner can
-% be used for targeted learning.
-A targeted estimator is typically obtained from
+% ANDERS / THOMAS
+We consider 
+anestimator which is obtained from
 estimators of the nuisance parameters $\Lambda_1$, $\Lambda_2$, and $\Gamma$. By
 equations~(\ref{eq:lambdaj}) and~(\ref{eq:gamma}) and the definition of \( F \),
 we have
@@ -800,15 +712,9 @@ we have
 \end{equation}
 and thus a targeted estimator can also be obtained from an estimator of $F$
 using equation~(\ref{eq:7}). The key feature of a targeted estimator
-% ANDERS: at this point we have not defined "targeted estimator" does fisher
-% 2021 define this? Bickel does not ...
-%
-% THOMAS: I would think that Fisher+Kennedy does define it. But my solution to
-% this problem was to reference Section 7, which you have removed.
-% Alternatively, this could be part of Section 7, but I am quite sure you once
-% moved it from there to here. What do you suggest?
 is that it is asymptotically equivalent to a sum of i.i.d.\ random variables
 plus a second order remainder term
+
 \citep{bickel1993efficient,fisher2021visually}. For the setting with competing
 risks, the remainder term is dominated by terms of the form
 \begin{equation}
@@ -894,15 +800,6 @@ of \(\R^d\) or a subset of a function space, for example a subset of
 \(\mathcal{M}_{\tau}\). In subsection~\ref{sec:cause-spec-aver} we
 discuss an example from causal inference where $\theta$ is the average
 treatment effect and \( \Theta = [-1,1] \).
-% ANDERS: need a sentence a la: Before we discuss the role of the
-% state learner for targeted learning we review some results from
-% semiparametric efficiency theory. The reader may want to skip this ...
-%
-% THOMAS: Hmm, I think this is already stated below ('Using tools from
-% semi-parametric efficiency theory...'). But we could add something like the
-% following? Depending on the framing of the paper (with focus exclusively on
-% state learner for targeted learning or also on prediction?), I don't think the
-% reader can skip this section.
 To discuss the role of the state learner for targeted learning we briefly review
 some results from semiparametric efficiency theory. Extensive reviews and
 introductions are available elsewhere
@@ -934,12 +831,6 @@ difficult to analyze due to the cross-validated model selection
 involved in the estimation of the nuisance parameters $\Lambda_1$ and
 $\Lambda_2$. In addition, the estimator will typically have an
 asymptotic bias that vanishes at a too slow 
-% ANDERS: is sub-optimal = too slow?
-%
-% THOMAS: Hmm, we could use 'too slow', but it is then unclear why it is too
-% slow -- too slow for what? Writing 'sub-optimal' suggests (too me at least),
-% that there exists a rate that is better -- i.e., this rate it not the optimal
-% one for this problem, but an optimal one exists.
 rate. Using tools from semi-parametric efficiency theory, it is
 possible to construct a so-called targeted or debiased estimator with
 smaller asymptotic bias and a asymptotic distribution which we know
@@ -968,11 +859,8 @@ An example of a targeted estimator is the one-step estimator, defined as
       \hat{b}_n(\data_n) )]},
 \end{equation}
 where \( \empmeas \) is the empirical measure of a data set
-\(\{O_i\}_{i=1}^n\).  Under a Donsker class condition
-% ANDERS: Donsker class condition on what set?
-%
-% THOMAS: Things are quite informal here so I don't see the point in making this
-% precise.
+\(\{O_i\}_{i=1}^n\).
+Under suitable regularity conditions
 we have the
 following asymptotic expansion of the one-step estimator
 \citep{pfanzagl1985contributions,van2003unified,fisher2021visually,kennedy2022semiparametric,rytgaard2022continuous},
@@ -1031,14 +919,6 @@ estimator of the cause-specific average treatment effect. We assume
 that the covariate vector \( X \in \R^p \) contains a binary treatment
 indicator \( A \) and a vector of potential confounders,
 \( W \in \mathcal{W}\subset \R^{p-1} \).
-% ANDERS: why is this abuse of notation?
-%
-% THOMAS: Because we should write \Lambda_j(t \mid (a, w)), because \Lambda as
-% originally defined only takes two arguments and not three.
-%
-% We abuse notation slightly by writing
-% \( \Lambda_j(t \mid x) = \Lambda_j(t \mid a, w) \) and
-% \( S(t \mid x) = S(t \mid a, w) \) when \( x=(a, w) \).
 We use $\mu$
 to denote the marginal distribution of \( W \) and $\pi$ to denote the
 conditional probability of treatment,
@@ -1065,16 +945,9 @@ cause 1 at time $\tau$:
   \right\}
   \mu(\diff w).
 \end{equation*}
-Under a set of
-% ANDERS: better to give these assumptions a name: positivity, ... and refer to
-% Helene's paper?
-%
-% THOMAS: Alternatively, we could just call it a 'standardized risk difference'
-% and then not discuss counterfactuals, but say that it can be given a causal
-% interpretation and reference some papers? I would like to not discuss
-% assumptions from causality as it is not very important for the state learner.
-additional assumptions, \( \theta_{{\tau}} \) can be given the causal
-interpretation
+Under the usual assumptions for causal inference (consistency,
+positivity, no unmeasured confounding) \( \theta_{{\tau}} \) can be
+given the causal interpretation
 \begin{equation*}
   \theta_{{\tau}}(Q) =
   P{(T^{A=1} \leq \tau, D^{A=1}=1)}-
@@ -1196,28 +1069,38 @@ which gives the estimator
 \section{Numerical experiments}
 \label{sec:numer-exper}
 
-As a proof of concept we conduct two small simulation studies in a setting
-without competing risks. We generate data according to a distribution motivated
-from a real dataset in which censoring depends on the baseline covariates. We
+
+In this section we report results from two settings of our simulation
+studies, both settings are without competing risks. In the next
+section, we consider a setting with competing risks.
+% ANDERS: kan du skrive her hvad forskellen er mellem og formaalet er
+% med de to simulationsstudierscenarier?
+% i den ene sammenligner vi med IPCW i den anden med westling, ik?
+% Maaske en figur (flowchart) eller tabel kunne hjaelpe laeseren at faa overblik.
+% Maaske separation i to subsections kunne hjaelpe yderliger
+
+We generate data according to a distribution motivated from a real
+dataset in which censoring depends on the baseline covariates. We
 simulate data based on a prostate cancer study described in
-\citep{kattan2000pretreatment}. The outcome of interest was the time to tumor
-recurrence, and five baseline covariates were used to predict outcome:
-prostate-specific antigen (PSA, ng/mL), Gleason score sum (GSS, values between 6
-and 10), radiation dose (RD), hormone therapy (HT, yes/no) and clinical stage
-(CS, six values). The study was designed such that a patient's radiation dose
-depended on when the patient entered the study \citep{gerds2013estimating}. This
-in turn implied that the time of censoring depended on the radiation dose. The
-data were re-analyzed in \citep{gerds2013estimating} where a sensitivity
-analysis was conducted based on simulated data. We use the same simulation
-setup, where event and censoring times are generated according to parametric
-Cox-Weibull models estimated from the original data, and the covariates are
-generated according to either marginal Gaussian normal or binomial distributions
-estimated from the original data
-\citep[c.f.,][Section~4.6]{gerds2013estimating}. We refer to this simulation
-setting as ``dependent censoring''. We also considered a simulation setting
-where data were generated in the same way, except that censoring was generated
-completely independently. We refer to this simulation setting as ``independent
-censoring''.
+\citep{kattan2000pretreatment}. The outcome of interest was the time
+to tumor recurrence, and five baseline covariates were used to predict
+outcome: prostate-specific antigen (PSA, ng/mL), Gleason score sum
+(GSS, values between 6 and 10), radiation dose (RD), hormone therapy
+(HT, yes/no) and clinical stage (CS, six values). The study was
+designed such that a patient's radiation dose depended on when the
+patient entered the study \citep{gerds2013estimating}. This in turn
+implied that the time of censoring depended on the radiation dose. The
+data were re-analyzed in \citep{gerds2013estimating} where a
+sensitivity analysis was conducted based on simulated data. We use the
+same simulation setup, where event and censoring times are generated
+according to parametric Cox-Weibull models estimated from the original
+data, and the covariates are generated according to either marginal
+Gaussian normal or binomial distributions estimated from the original
+data \citep[c.f.,][Section~4.6]{gerds2013estimating}. We refer to this
+simulation setting as ``dependent censoring''. We also considered a
+simulation setting where data were generated in the same way, except
+that censoring was generated completely independently. We refer to
+this simulation setting as ``independent censoring''.
 
 For all super learners we use a library consisting of three learners: The
 Kaplan-Meier estimator \citep{kaplan1958nonparametric,Gerds_2019prodlim}, a Cox
@@ -1234,86 +1117,107 @@ for the cumulative hazard function of the outcome to learn the cumulative hazard
 function of the censoring time, we mean that the learner is trained on
 \( \data_n^c \).
 
-We first compare the state learner to two IPCW based super learners: The first
-uses a Cox model with main effects to estimate the censoring probabilities
-(IPCW(Cox)), while the second uses the Kaplan-Meier estimator to estimate the
-censoring probabilities (IPCW(KM)). The Cox model for the censoring distribution
-is correctly specified in both simulation settings while the Kaplan Meier
-estimator only estimates the censoring model correctly in the simulation setting
-where censoring is independent. Both IPCW super learners are fitted using the
-\texttt{R}-package \texttt{riskRegression} \citep{Gerds_Ohlendorff_Ozenne_2023}.
-Each super learner provides a learner for the cumulative hazard function for the
-outcome of interest, and from this a risk prediction model can be obtained
-(c.f., equation~(\ref{eq:surv-def}) with $\Lambda_2 = 0$). We measure
-performance of each super learner by calculating the index of prediction
-accuracy (IPA) \citep{kattan2018index} at a fixed time horizon (36 months) for
-the risk prediction model provided by the super learner. The IPA is 1 minus the
-ratio between the model's Brier score and the null model's Brier score, where
-the null model is the model that does not use any covariate information. The IPA
-is approximated using a large (\( n = 20,000 \)) independent data set of
-uncensored data. As a benchmark we calculate the performance of the risk
-prediction model chosen by the oracle selector. The oracle selector uses the
-large data set of uncensored event times to select the learner with the highest
-IPA.
+We compare the state learner to two IPCW based super learners: The
+first superlearner, called IPCW(Cox), uses a Cox model with main
+effects to estimate the censoring probabilities, while the second
+super learner, called IPCW(KM), uses the Kaplan-Meier estimator to
+estimate the censoring probabilities. The Cox model for the censoring
+distribution is correctly specified in both simulation settings while
+the Kaplan Meier estimator only estimates the censoring model
+correctly in the simulation setting where censoring is
+independent. Both IPCW super learners are fitted using the
+\texttt{R}-package \texttt{riskRegression}
+\citep{Gerds_Ohlendorff_Ozenne_2023}.
+% ANDERS: det er uklar for mig hvordan
+% de super learners valger/kombinerer de learners der ingaar i library: er det Brier score? over time?
+Each super learner provides a learner for the cumulative hazard
+function for the outcome of interest. From the cumulative hazard
+function a risk prediction model can be obtained (c.f.,
+equation~(\ref{eq:surv-def}) with $\Lambda_2 = 0$). We measure the
+performance of each super learner by calculating the index of
+prediction accuracy (IPA) \citep{kattan2018index} at a fixed time
+horizon (36 months) for the risk prediction model provided by the
+super learner. The IPA is 1 minus the ratio between the model's Brier
+score and the null model's Brier score, where the null model is the
+model that does not use any covariate information. The IPA is
+approximated using a large (\( n = 20,000 \)) independent data set of
+uncensored data. As a benchmark we calculate the performance of the
+risk prediction model chosen by the oracle selector, which uses the
+large data set of uncensored event times to select the learner with
+the highest IPA.
 
-The results are shown in Figure~\ref{fig:ipcw-fail}. We see that when censoring
-is not independent, using the Kaplan-Meier estimator to estimate the censoring
-probabilities provides a risk prediction model with an IPA that is lower than
-the risk prediction model provided by the state learner. The performance of the
-risk prediction model selected by the state learner is similar to the risk
-prediction model selected by the IPCW(Cox) super learner which a priori uses a
-correctly specified model for the censoring distribution. Both these risk
-prediction models are close to the performance of the oracle, except for small
-sample sizes.
+The results are shown in Figure~\ref{fig:ipcw-fail}. We see that in
+the scenario where censoring depends on the covariates, using the
+Kaplan-Meier estimator to estimate the censoring probabilities
+provides a risk prediction model with an IPA that is lower than the
+risk prediction model provided by the state learner. The performance
+of the risk prediction model selected by the state learner is similar
+to the risk prediction model selected by the IPCW(Cox) super learner
+which a priori uses a correctly specified model for the censoring
+distribution. Both these risk prediction models are close to the
+performance of the oracle, except for small sample sizes.
 
 \begin{figure}
   \centering %
   \includeFigCond[width=1\linewidth]{experiment-fig-sl-ipcw.pdf}
   \caption[]{For the risk prediction models provided by each of the super
-    learners, the IPA is plotted against sample size. The results are based on
-    1000 repetitions and the error bars are used to quantify the Monte Carlo
-    uncertainty.}
+    learners, the IPA is plotted against sample size. The results are averages across 
+    1000 simulated data sets and the error bars are used to quantify the Monte Carlo
+    uncertainty.
+    % ANDERS: er det korrekt at det er averages across 1000 data sets? 
+  }
   \label{fig:ipcw-fail}
 \end{figure}
 
 We next compare the state learner to the super learner \texttt{survSL}
-\citep{westling2021inference}, as this is the only existing super learner we
-know which works without a pre-specified censoring model. As both the state
-learner and \texttt{survSL} also provides a prediction model for the probability
-of being censored, we compare the performance of both the outcome and the
-censoring modeling using the IPA.
+\citep{westling2021inference}. This is another super learner which
+like the state learner works without a pre-specified censoring
+model. Note that both the state learner and \texttt{survSL} provide a
+prediction model for the event time outcome and also for the
+probability of being censored. Hence, we compare the performance of
+these methods with respect to both the outcome and the censoring
+distribution. Again we use the IPA to quantify the predictive
+performance.
 
-The results are shown in Figure~\ref{fig:zelefski}. We see that the prediction
-models selected for both censoring and outcome have similar or higher API
-compared to the prediction models selected by \texttt{survSL} for most sample
-sizes.
+The results are shown in Figure~\ref{fig:zelefski}. We see that for
+most sample sizes, the state learner selected prediction models for
+both censoring and outcome which have similar or higher IPA compared
+to the prediction models selected by \texttt{survSL}.
+% ANDERS: it is a bit lazy to write "for most sample sizes" :) it is
+% slightly annoying that the y-axis scale changes in the 4
+% figures. would that be better with Brier instead of IPA?
 
 \begin{figure}
   \centering %
   \includeFigCond[width=1\linewidth]{experiment-fig-sl-survSL.pdf}
   \caption[]{For the risk prediction models of both the outcome and the
     censoring probability provided by each of the super learners, the IPA is
-    plotted against sample size. The results are based on 1000 repetitions and
+    plotted against sample size. The results are averages across 1000 repetitions and
     the error bars are used to quantify the Monte Carlo uncertainty.}
+  % ANDERS: would be good to know how how many trainings set individuals were right censored before
+  % the evaluation time point of the IPA. maybe of interest how you chose the evaluation time point.
   \label{fig:zelefski}
 \end{figure}
 
 
-\section{Example with prostate cancer study}
+\section{Prostate cancer study}
 \label{sec:real-data-appl}
 
-The prostate cancer data analyzed by \cite{kattan2000pretreatment}, which we
-introduced in Section~\ref{sec:numer-exper}, include a competing event in the
-form of death without tumor recurrence. For illustration, we fit the state
-learner to the original data set consisting of 1,042 patients. We consider death
-without tumor recurrence and recurrence of tumor as two competing events of
-interest. We include the fives learner \texttt{KM}, \texttt{Cox strata CS},
-\texttt{Lasso}, \texttt{Elastic}, and \texttt{RF} which are described in
-Table~\ref{tab:zel-library}. We use the same library of learners to learn
-\( \Lambda_1 \), \( \Lambda_2 \), and $\Gamma$. In this case, \( \Lambda_1 \)
-denotes the cause-specific cumulative hazard function of tumor recurrence, and
-\( \Lambda_2 \) denotes the cause-specific cumulative hazard function of death
-without tumor recurrence.
+% ANDERS: har brug for en gentle intro saetning som fortaeller hvad der kommer: in this section we re-analyse the ...
+%         Det skal ogsaa vaere klart i starten af sektion af der kommer noget om average treatment effect.
+The prostate cancer data analyzed by \cite{kattan2000pretreatment},
+which we introduced in Section~\ref{sec:numer-exper}, include a
+competing event in the form of death without tumor recurrence. For
+illustration, we fit the state learner to the original data set
+consisting of 1,042 patients. We consider death without tumor
+recurrence and recurrence of tumor as competing risks. We include the
+fives learner \texttt{KM}, \texttt{Cox strata CS}, \texttt{Lasso},
+\texttt{Elastic}, and \texttt{RF} which are described in
+Table~\ref{tab:zel-library}. We use the same library of learners to
+learn \( \Lambda_1 \), \( \Lambda_2 \), and $\Gamma$. In this case,
+\( \Lambda_1 \) denotes the cause-specific cumulative hazard function
+of tumor recurrence, and \( \Lambda_2 \) denotes the cause-specific
+cumulative hazard function of death without tumor recurrence.
 
 \begin{table}
   \caption{\label{tab:zel-library}Overview of the five learners used by the
@@ -1411,31 +1315,39 @@ significant from zero.
 \section{Discussion}
 \label{sec:discussion}
 
-We have proposed a new super learner that can be used with right-censored data
-and competing events. Compared to existing methods, the advantage of the state
-learner is that it does not depend on a pre-specified estimator of the censoring
-distribution, but selects one automatically based on the provided library
-\( \mathcal{B} \). Furthermore, the state learner neither requires evaluation of
-the density of \( \Lambda_j \) nor assumes a particular semi-parametric
-structure for $\Lambda_j$. In the remainder of this section we point to some
-limitations of our proposal and discuss avenues for further research.
+We have proposed a new super learner that can be used with
+right-censored data and competing events. Compared to existing
+IPCW-based methods, the advantage of the state learner is that it does
+not depend on a pre-specified estimator of the censoring distribution,
+but selects one automatically based on a library of learners for the
+censoring distribution. Furthermore, the state learner neither
+requires evaluation of the density of \( \Lambda_j \) nor assumes a
+% ANDERS: "density of \Lambda_j" er uklar hvordan er denne density defineret?
+(semi-)parametric form for $\Lambda_j$. In the remainder of this
+section we point to some limitations of our proposal and discuss
+avenues for further research.
 
-A major advantage of the state learner is that performance of each combination
-of learners is measured in terms of observable quantities. This means that no
-additional nuisance parameters need to be estimated to evaluate the loss. The
-drawback with this approach is that we are rarely interested in features of the
-observed data distribution when the data are right-censored. The finite sample
-oracle inequality in Corollary~\ref{cor:oracle-prop} concerns the function
-\( F \), which is a feature of \( P \in \mathcal{P} \), while what we are
-typically interested in is \( \Lambda_j \) or \( S \), which are features of
-\( Q \in \mathcal{Q} \). We emphasise that while the state learner provides us
-with estimates of \( \Lambda_j \) and $\Gamma$ based on libraries
-\( \mathcal{A}_j \) and \( \mathcal{B} \), performance are not assessed directly
-for these parameters, but only jointly for estimation of the parameter \( F \).
-For settings without a competing risk, our numerical studies suggest that
-measuring performance with respect to estimation of \( F \) also leads to good
-performance for estimation of \( S \). Further research on this topic, both
-numerical and theoretical, is warranted.
+A major advantage of the state learner is that the performance of each
+combination of learners can be estimated without (semi)parametric
+assumptions or additional nuisance parameters. The drawback with this
+approach is that we are rarely interested in features of the observed
+data distribution when the data are right-censored: we are only
+interested in the uncensored event time distribution. The finite
+sample oracle inequality in Corollary~\ref{cor:oracle-prop} concerns
+the function \( F \), which is a feature of \( P \in \mathcal{P} \),
+while what we are typically interested in is \( \Lambda_j \) or
+\( S \), which are features of \( Q \in \mathcal{Q} \). We emphasise
+that while the state learner provides us with estimates of
+\( \Lambda_j \) and $\Gamma$ based on libraries \( \mathcal{A}_j \)
+and \( \mathcal{B} \), the performance of these learners is not
+assessed directly for their respective target parameters, but only
+indirectly via the performance of \( F \).
+% ANDERS: er du enig med min omformulering af den sidste saetning?
+For settings without competing risks, our numerical studies suggest
+that measuring the performance of \( F \) also leads to good
+performance for estimation of \( S \). However, further research on
+this issue, both numerical and theoretical, is warranted.
+% ANDERS: ved ikke helt hvad du taenker man kan goer i fremtiden men synes egentig at den sidste saetning kunne godt slettes. :)
 
 % In the context of targeted learning, a drawback of the state learner is that the
 % doubly robustness property defined in equation~(\ref{eq:dr-property}) seem to be
@@ -1445,22 +1357,24 @@ numerical and theoretical, is warranted.
 % preserved.
 
 Our proposed super learner can be implemented with a broad library of learners
-using existing software, for instance the \texttt{R}-package
-\texttt{riskRegression} \citep{Gerds_Ohlendorff_Ozenne_2023}. Furthermore, while
+and using existing software.
+% For instance the \texttt{R}-package
+% \texttt{riskRegression} \citep{Gerds_Ohlendorff_Ozenne_2023} and the \texttt{R}-package by westling
+Furthermore, while
 the library \( \mathcal{F}(\mathcal{A}_1,\mathcal{A}_2,\mathcal{B}) \) consists
-of \( |\mathcal{A}_1||\mathcal{A}_2||\mathcal{B}| \) learners, as long as we
-have sufficient memory we need only fit
-\( |\mathcal{A}_1| +|\mathcal{A}_2| + |\mathcal{B}| \) learners in each fold. To
+of \( |\mathcal{A}_1||\mathcal{A}_2||\mathcal{B}| \) many learners, we only need to fit
+\( |\mathcal{A}_1| +|\mathcal{A}_2| + |\mathcal{B}| \) many learners in each fold. To
 evaluate the performance of each learner we need to perform
-\( |\mathcal{A}_1||\mathcal{A}_2||\mathcal{B}| \) operations to calculate the
+\( |\mathcal{A}_1||\mathcal{A}_2||\mathcal{B}| \) many operations to calculate the
 integrated Brier score in each hold-out sample, one for each combination of the
 fitted models, but these operations are often negligible compared to fitting the
-models. Hence the state learner is essentially no more computationally demanding
+models. Hence the state learner is essentially not more computationally demanding
 than any procedure that uses super learning to learn $\Lambda_1$, $\Lambda_2$,
 and $\Gamma$ separately. While our proposal is based on constructing the library
 \( \mathcal{F} \) from libraries for learning \( \Lambda_1 \), $\Lambda_2$, and
 $\Gamma$, it would also be of interest to consider learners that estimate
 \( F \) directly.
+% ANDERS: how would one estimate F? using HAL? or RF? but such a learner would not provide risk prediction models or would it? if yes you could say it 
 
 In our numerical studies, we only considered learners of $\Lambda_j$ and
 $\Gamma$ that provide cumulative hazard functions which are piece-wise constant
