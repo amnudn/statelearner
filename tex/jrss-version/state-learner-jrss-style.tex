@@ -930,7 +930,7 @@ conditional probability of treatment,
 \end{equation*}
 We assume throughout that $\pi$ is uniformly bounded away from \( 0 \)
 and \( 1 \) on \( \mathcal{W} \) and that both \( A \) and \( W \) are
-fully observed for all individuals. We use an super learner to
+fully observed for all individuals. We use a super learner to
 estimate $\pi$ \citep{Polley_Ledell_Kennedy_Laan_2023_Superlearn}, and
 we denote this estimator by $\hat{\pi}_n$. We use the empirical
 measure of \( \{W_1, \dots, W_n\} \) to estimate $\mu$, and denote
@@ -953,14 +953,14 @@ positivity, no unmeasured confounding) \( \theta_{{\tau}} \) can be
 given the causal interpretation
 \begin{equation*}
   \theta_{{\tau}}(Q) =
-  P{(T^{A=1} \leq \tau, D^{A=1}=1)}-
-  P{(T^{A=0} \leq \tau, D^{A=0}=1)},
+  P{(T^{1} \leq \tau, D^{1}=1)}-
+  P{(T^{0} \leq \tau, D^{0}=1)},
 \end{equation*}
-where \( (T^A, D^A) \) denotes potential outcomes \citep{hernanRobinsWhatIf}. In
-this case, the interpretation of $\theta_{\tau}$ is the difference in the
-average risk of cause \( 1 \) occurring before time \( \tau \) in the population
-if everyone had been given treatment (\( A=1 \)) compared to if no one had been
-given treatment \( (A=0) \).
+where \( (T^a, D^a) \), \( a \in \{0,1\} \), denotes potential outcomes
+\citep{hernanRobinsWhatIf}. In this case, the interpretation of $\theta_{\tau}$
+is the difference in the average risk of cause \( 1 \) occurring before time
+\( \tau \) in the population if everyone had been given treatment (\( A=1 \))
+compared to if no one had been given treatment \( (A=0) \).
 
 Using equation~(\ref{eq:surv-def}) we may write
 \( \theta_{{\tau}}(Q) = \tilde{\Psi}_{t}^0(\Lambda_1, \Lambda_2, \mu) \), where
