@@ -167,7 +167,7 @@ censoring weighted loss estimators is that they require a
 pre-specified model for the censoring distribution. Recently
 \cite{westling2021inference} proposed a procedure which iterates
 between super learning of the censoring distribution and super
-learning of the event time distribution. In this article we pursue a
+learning of the event time distribution. We pursue a
 different route.
 
 In this article we define the state learner, a new super learner for
@@ -405,8 +405,8 @@ contains event times that were not also seen in the learning data set,
 as it would naturally happen when the events are observed in
 continuous time. The problem is that these methods assign zero
 probability to the test set event times that were not also in the
-training data set, and hence (the logarithm of zero is infitity) the
-partial likelihood loss in the test set would be infitity.
+training data set, and hence (the logarithm of zero is infinity) the
+partial log-likelihood loss in the test set would be infinity.
 
 When a proportional hazards model is assumed, the baseline hazard
 function can be profiled out of the likelihood \citep{cox1972regression}.
@@ -610,13 +610,13 @@ equation~(\ref{eq:F-def}) using the measure \( P \in \mathcal{P} \).
 
 \begin{proposition}
   \label{prop:stric-prop}
-  For \(P_0\in\mathcal{P}\) define
+  If \(P_0\in\mathcal{P}\) then
   \begin{equation*}
-    F^* = \argmin_{F \in \mathcal{H}_{\mathcal{P}}} P_0{[\bar{B}_\tau(F, \blank)]}.
+    F_0 = \argmin_{F \in \mathcal{H}_{\mathcal{P}}} P_0{[\bar{B}_\tau(F, \blank)]},
   % F^* = \argmin_{(\Lambda_1,\Lambda_2,\Gamma) \in \mathcal{M}_{\tau}\otimes\mathcal{M}_{\tau}\otimes\mathcal{M}_{\tau}} P_0{[\bar B_\tau(\phi_{(\Lambda_1,\Lambda_2,\Gamma)}, \blank)]},
   \end{equation*}
-Then \( F^*(t,j,\blank) = F_0(t,j,\blank) \) \( H \)-almost surely for
-any \( j\in \{-1,0,1,2\} \) and almost any \( t \in [0, \tau]\).
+  \( H \)-almost surely for any \( j\in \{-1,0,1,2\} \) and almost any
+  \( t \in [0, \tau]\).
 \end{proposition}
 \begin{proof}
   See Appendix~\ref{sec:proof-proposition}.
@@ -627,7 +627,7 @@ any \( j\in \{-1,0,1,2\} \) and almost any \( t \in [0, \tau]\).
 
 We establish a finite sample oracle result for the state learner. Our
 Corollary~\ref{cor:oracle-prop} is in essence a special case of
-Theorem 2.3 in \cite{vaart2006oracle}.  We assume that we split the
+Theorem 2.3 in \citep{vaart2006oracle}.  We assume that we split the
 data into equally sized folds, and for simplicity of presentation we
 take \( n \) to be such that \( |\data_n^{-k}| = n/K \) with \( K \)
 fixed. We will allow the number of learners to grow with \( n \) and
@@ -639,7 +639,7 @@ dependence on \( n \).
 % oracle $\tilde{\phi}_n$ are defined as in Section~\ref{sec:framework}
 % but now with respect to the library \( \mathcal{F}_n \) and the loss
 % \( B \).
-In the following we let the space \( \mathcal{H} \) be equipped with the norm
+In the following we let the space \( \mathcal{H}_{\mathcal{P}} \) be equipped with the norm
 \( \| \blank \|_{P_0} \) defined as
 \begin{equation}
   \label{eq:norm}
@@ -696,11 +696,14 @@ Corollary~\ref{cor:oracle-prop} has the following asymptotic consequences.
 \subsection{Transience of the second order remainder structure}
 
 % ANDERS / THOMAS
-We consider 
-anestimator which is obtained from
-estimators of the nuisance parameters $\Lambda_1$, $\Lambda_2$, and $\Gamma$. By
-equations~(\ref{eq:lambdaj}) and~(\ref{eq:gamma}) and the definition of \( F \),
-we have
+We here consider the situation where $\Lambda_1$, $\Lambda_2$, and $\Gamma$ are
+nuisance parameters and an the estimator of interest is obtained from estimators
+of these nuisance parameters. An example is an estimator of the cumulative
+incidence curve, which can be obtained from estimators of $\Lambda_1$ and
+$\Lambda_2$.
+% THOMAS: Jeg ville så også tilføje: We give another example in Section 7.
+By equations~(\ref{eq:lambdaj}) and~(\ref{eq:gamma}) and the definition of
+\( F \), we have
 \begin{equation}
   \label{eq:7}
   \Gamma(t , x) 
@@ -710,12 +713,12 @@ we have
   = \int_0^t  \frac{F(\diff s, j, x )}{F(s-, 0, x )},
   \quad j \in \{1,2\},
 \end{equation}
-and thus a targeted estimator can also be obtained from an estimator of $F$
-using equation~(\ref{eq:7}). The key feature of a targeted estimator
-is that it is asymptotically equivalent to a sum of i.i.d.\ random variables
-plus a second order remainder term
-
-\citep{bickel1993efficient,fisher2021visually}. For the setting with competing
+and thus an estimator based on \( \hat{\Lambda}_{1,n} \),
+\( \hat{\Lambda}_{2,n} \), and \( \hat{\Gamma}_{n} \) can also be obtained from
+an estimator of $F$ using equation~(\ref{eq:7}). A so-called targeted estimator
+has the key feature that it is asymptotically equivalent to a sum of i.i.d.\
+random variables plus a second order remainder term
+\citep{van2011targeted,hines2022demystifying}. For the setting with competing
 risks, the remainder term is dominated by terms of the form
 \begin{equation}
   \label{eq:dr-term}
@@ -735,12 +738,12 @@ some data-dependent function with domain \([0,\tau]\times\mathcal X \)
 asymptotically linear if the `products' of the estimation errors
 \( \hat{M}_{1,n} \) and \( \hat{M}_{2,n} \) in equation~(\ref{eq:dr-term}) are
 \( \smallO_P{(n^{-1/2})}\). Proposition~\ref{prop:dr-structure} states that if
-equation~(\ref{eq:dr-term}) holds for the a targeted estimator based on
-estimators $\hat{\Lambda}_{1,n}$, $\hat{\Lambda}_{2,n}$, and $\hat{\Gamma}_{n}$,
-then a similar product structure holds for a targeted estimator based on
+equation~(\ref{eq:dr-term}) holds for a targeted estimator based on estimators
+$\hat{\Lambda}_{1,n}$, $\hat{\Lambda}_{2,n}$, and $\hat{\Gamma}_{n}$, then a
+similar product structure holds for a targeted estimator based on
 \( \hat{F}_n \). We state the result for the special case that
 \(\hat{M}_{1,n}= \Gamma-\hat{\Gamma}_n \) and
-\(\hat{M}_{2,n} =\Lambda_1-\hat{\Lambda}_{1,n} \), but similar results holds for
+\(\hat{M}_{2,n} =\Lambda_1-\hat{\Lambda}_{1,n} \), but similar results hold for
 any combinations of \( \Gamma-\hat{\Gamma}_n\),
 \( \Lambda_1-\hat{\Lambda}_{1,n} \), and \( \Lambda_2-\hat{\Lambda}_{2,n} \).
 \begin{proposition}
