@@ -3,7 +3,7 @@
 #+Date: \today
 
 #+LANGUAGE:  en
-n#+OPTIONS:   num:t toc:nil ':t ^:t
+#+OPTIONS:   num:t toc:nil ':t ^:t
 
 * Setting :noexport:
 Remember to exceture (C-c C-c) the following line:
@@ -117,11 +117,11 @@ summ_zel_sim2_1[,sim_set:=factor(sim_set,levels=c("indep_cens","original"),label
 		  aes(ymin = IPA-1.96*se, ymax = IPA+1.96*se),
 		  width = .1,
 		  alpha = .5,
-		  size = 1) + 
+		  linewidth = 1) + 
     geom_line(position=position_dodge(width = dd_ww), linewidth = 1.5) +
     geom_point(position=position_dodge(width = dd_ww), size = 2) +
     scale_x_continuous(trans='log2') +
-    facet_wrap(~sim_set, ncol = 2, scales = "free_y") +
+    facet_wrap(~sim_set, ncol = 2) +
     ylab("IPA") + theme(legend.position="top")  +
     xlab("") +
     scale_color_manual("Super learner", values=c("gray","#E69F00", "darkgreen")) +
@@ -134,25 +134,33 @@ summ_zel_sim2_1[,sim_set:=factor(sim_set,levels=c("indep_cens","original"),label
 		  aes(ymin = IPA-1.96*se, ymax = IPA+1.96*se),
 		  width = .1,
 		  alpha = .5,
-		  size = 1) + 
+		  linewidth = 1) + 
     geom_line(position=position_dodge(width = dd_ww), linewidth = 1.5) +
     geom_point(position=position_dodge(width = dd_ww), size = 2) +
     scale_x_continuous(trans='log2') +
-    facet_wrap(~sim_set, ncol = 2, scales = "free_y") +
+    facet_wrap(~sim_set, ncol = 2) +
     ylab("IPA") + theme(legend.position="none")  +
     xlab("Number of observations") +
     scale_color_manual("Super learner", values=c("gray","#E69F00", "darkgreen")) +
     scale_y_continuous(labels = scales::percent)  +
     ggtitle("Censoring model")
-  grid.arrange(type_out_plot,
+  exp_fig_sl_survSL_plot <- grid.arrange(type_out_plot,
 	       type_cens_plot,
 	       nrow = 2,
 	       heights=c(0.53, 0.47))
+  exp_fig_sl_survSL_plot
 #+END_SRC
 
-#+RESULTS[(2024-01-22 11:49:19) 1f88489151a294fe64518ea6c583e704c45f93b0]:
+#+RESULTS[(2024-05-03 08:23:53) f2a4e922c021d60e93f134d0bd5d63dd8d0202dc]:
 [[file:experiment-fig-sl-survSL.pdf]]
 
+Copy to other location too
+
+#+BEGIN_SRC sh
+  cp experiment-fig-sl-survSL.pdf ../tex/jrss-version/
+#+END_SRC
+
+#+RESULTS:
 
 * Real Zelefski data with competing event new version
 

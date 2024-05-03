@@ -1041,7 +1041,6 @@ where
     & \quad + g(\tau, a, W; \Lambda_1, \Lambda_2).
   \end{split}
 \end{equation}
-
 Equations~(\ref{eq:1}) and~(\ref{eq:5}) allow us to construct a one-step
 estimator by using the definition given in equation~(\ref{eq:one-step-def}),
 which gives the estimator
@@ -1073,14 +1072,22 @@ which gives the estimator
 \label{sec:numer-exper}
 
 
-In this section we report results from two settings of our simulation
-studies, both settings are without competing risks. In the next
-section, we consider a setting with competing risks.
+In this section we report results from a simulation study without competing
+risks. In the next section, we consider a setting with competing risks. Here we
+first compare the state learner to an IPCW based discrete super learner that
+uses either the Kaplan-Meier estimator or a Cox model to estimate the censoring
+probability. We next compare the state learner to the super learner proposed by
+\cite{westling2021inference}.
 % ANDERS: kan du skrive her hvad forskellen er mellem og formaalet er
 % med de to simulationsstudierscenarier?
 % i den ene sammenligner vi med IPCW i den anden med westling, ik?
 % Maaske en figur (flowchart) eller tabel kunne hjaelpe laeseren at faa overblik.
 % Maaske separation i to subsections kunne hjaelpe yderliger
+%
+% THOMAS: Jeg ved ikke, om jeg ville sige at der er to simulationstudier, der er
+% bare to ting vi undersøge med det samme studie. Data er genereret på samme
+% måde til at undersøge de to spørgsmål. Har opdateret introen til afsnittet, er
+% det bedre?
 
 We generate data according to a distribution motivated from a real
 dataset in which censoring depends on the baseline covariates. We
@@ -1132,7 +1139,11 @@ independent. Both IPCW super learners are fitted using the
 \texttt{R}-package \texttt{riskRegression}
 \citep{Gerds_Ohlendorff_Ozenne_2023}.
 % ANDERS: det er uklar for mig hvordan
-% de super learners valger/kombinerer de learners der ingaar i library: er det Brier score? over time?
+% de super learners valger/kombinerer de learners der ingaar i library: er det
+% Brier score? over time?
+% 
+% THOMAS: De er diskrete super learner baseret på Score function med summary
+% measure 'ibs', så det er integrated brier score.
 Each super learner provides a learner for the cumulative hazard
 function for the outcome of interest. From the cumulative hazard
 function a risk prediction model can be obtained (c.f.,
@@ -1167,7 +1178,9 @@ performance of the oracle, except for small sample sizes.
     learners, the IPA is plotted against sample size. The results are averages across 
     1000 simulated data sets and the error bars are used to quantify the Monte Carlo
     uncertainty.
-    % ANDERS: er det korrekt at det er averages across 1000 data sets? 
+    % ANDERS: er det korrekt at det er averages across 1000 data sets?
+    %
+    % THOMAS: Ja. ...?
   }
   \label{fig:ipcw-fail}
 \end{figure}
@@ -1189,6 +1202,10 @@ to the prediction models selected by \texttt{survSL}.
 % ANDERS: it is a bit lazy to write "for most sample sizes" :) it is
 % slightly annoying that the y-axis scale changes in the 4
 % figures. would that be better with Brier instead of IPA?
+%
+% THOMAS: No, it is worse with Brier score I seem to recall. I have fixed to
+% y-axis horizontally now, it works well for the outcome model but poorly for
+% the censoring. Let me know what you like the best. 
 
 \begin{figure}
   \centering %
@@ -1197,8 +1214,13 @@ to the prediction models selected by \texttt{survSL}.
     censoring probability provided by each of the super learners, the IPA is
     plotted against sample size. The results are averages across 1000 repetitions and
     the error bars are used to quantify the Monte Carlo uncertainty.}
-  % ANDERS: would be good to know how how many trainings set individuals were right censored before
-  % the evaluation time point of the IPA. maybe of interest how you chose the evaluation time point.
+  % ANDERS: would be good to know how how many trainings set individuals were
+  % right censored before the evaluation time point of the IPA. maybe of
+  % interest how you chose the evaluation time point.
+  %
+  % THOMAS: Good point, but I think that the time of evaluation did not matter
+  % too much. Of course, if you pick a very early time point where nothing has
+  % happened, there is almost no difference in performance.
   \label{fig:zelefski}
 \end{figure}
 
@@ -1206,21 +1228,28 @@ to the prediction models selected by \texttt{survSL}.
 \section{Prostate cancer study}
 \label{sec:real-data-appl}
 
-% ANDERS: har brug for en gentle intro saetning som fortaeller hvad der kommer: in this section we re-analyse the ...
-%         Det skal ogsaa vaere klart i starten af sektion af der kommer noget om average treatment effect.
-The prostate cancer data analyzed by \cite{kattan2000pretreatment},
-which we introduced in Section~\ref{sec:numer-exper}, include a
-competing event in the form of death without tumor recurrence. For
-illustration, we fit the state learner to the original data set
-consisting of 1,042 patients. We consider death without tumor
-recurrence and recurrence of tumor as competing risks. We include the
-fives learner \texttt{KM}, \texttt{Cox strata CS}, \texttt{Lasso},
-\texttt{Elastic}, and \texttt{RF} which are described in
-Table~\ref{tab:zel-library}. We use the same library of learners to
-learn \( \Lambda_1 \), \( \Lambda_2 \), and $\Gamma$. In this case,
-\( \Lambda_1 \) denotes the cause-specific cumulative hazard function
-of tumor recurrence, and \( \Lambda_2 \) denotes the cause-specific
-cumulative hazard function of death without tumor recurrence.
+% ANDERS: har brug for en gentle intro saetning som fortaeller hvad der kommer:
+% in this section we re-analyse the ... Det skal ogsaa vaere klart i starten af
+% sektion af der kommer noget om average treatment effect.
+%
+% THOMAS: Yes, klart. Fungerer det her:
+In this section we re-analyze the prostate cancer data analyzed by
+\cite{kattan2000pretreatment}, which we introduced in
+Section~\ref{sec:numer-exper}. The data consists of 1,042 patients and includes
+a competing event in the form of death without tumor recurrence. We use the
+state learner to rank learners of the cause-specific cumulative hazard
+functions. We then use the highest ranked combination of learners and the
+estimation strategy outlined in Section~\ref{sec:targeted-learning} to estimate
+the average treatment effect of hormone therapy on death and tumor recurrence.
+
+We consider death without tumor recurrence and recurrence of tumor as competing
+risks. We include the fives learner \texttt{KM}, \texttt{Cox strata CS},
+\texttt{Lasso}, \texttt{Elastic}, and \texttt{RF} which are described in
+Table~\ref{tab:zel-library}. We use the same library of learners to learn
+\( \Lambda_1 \), \( \Lambda_2 \), and $\Gamma$. In this case, \( \Lambda_1 \)
+denotes the cause-specific cumulative hazard function of tumor recurrence, and
+\( \Lambda_2 \) denotes the cause-specific cumulative hazard function of death
+without tumor recurrence.
 
 \begin{table}
   \caption{\label{tab:zel-library}Overview of the five learners used by the
@@ -1288,7 +1317,7 @@ forest is used to model the censoring distribution.
 
 
 
-As an illustration, we use the learners of the three cumulative hazard functions
+We use the learners of the three cumulative hazard functions
 selected by the state learner and the estimator defined in
 Section~\ref{sec:cause-spec-aver}, equation~(\ref{eq:one-step-comp-ate}), to
 estimate the average treatment effect of hormone therapy on risk of tumor
@@ -1324,8 +1353,11 @@ IPCW-based methods, the advantage of the state learner is that it does
 not depend on a pre-specified estimator of the censoring distribution,
 but selects one automatically based on a library of learners for the
 censoring distribution. Furthermore, the state learner neither
-requires evaluation of the density of \( \Lambda_j \) nor assumes a
+requires that \( \Lambda_j \) can be written as an integral with respect to
+Lebesgue measure nor assumes a
 % ANDERS: "density of \Lambda_j" er uklar hvordan er denne density defineret?
+%
+% THOMAS: Better now?
 (semi-)parametric form for $\Lambda_j$. In the remainder of this
 section we point to some limitations of our proposal and discuss
 avenues for further research.
@@ -1346,11 +1378,17 @@ and \( \mathcal{B} \), the performance of these learners is not
 assessed directly for their respective target parameters, but only
 indirectly via the performance of \( F \).
 % ANDERS: er du enig med min omformulering af den sidste saetning?
+%
+% THOMAS: Yes, super godt. 
 For settings without competing risks, our numerical studies suggest
 that measuring the performance of \( F \) also leads to good
 performance for estimation of \( S \). However, further research on
 this issue, both numerical and theoretical, is warranted.
-% ANDERS: ved ikke helt hvad du taenker man kan goer i fremtiden men synes egentig at den sidste saetning kunne godt slettes. :)
+% ANDERS: ved ikke helt hvad du taenker man kan goer i fremtiden men synes
+% egentig at den sidste saetning kunne godt slettes. :)
+%
+% THOMAS: Forstår ikke helt din kommentar. Hvilken sætning, den ovenover din
+% kommentar eller den nedenunder? :)
 
 % In the context of targeted learning, a drawback of the state learner is that the
 % doubly robustness property defined in equation~(\ref{eq:dr-property}) seem to be
@@ -1377,7 +1415,12 @@ and $\Gamma$ separately. While our proposal is based on constructing the library
 \( \mathcal{F} \) from libraries for learning \( \Lambda_1 \), $\Lambda_2$, and
 $\Gamma$, it would also be of interest to consider learners that estimate
 \( F \) directly.
-% ANDERS: how would one estimate F? using HAL? or RF? but such a learner would not provide risk prediction models or would it? if yes you could say it 
+% ANDERS: how would one estimate F? using HAL? or RF? but such a learner would
+% not provide risk prediction models or would it? if yes you could say it
+%
+% THOMAS: I don't think that estimators for F exists -- that is what Vi is
+% working on, right? Given F we can always obtain \Lambda_1 and \Lambda_2
+% (equation 8 or eq:7 in tex) and then we can get predictions from these.
 
 In our numerical studies, we only considered learners of $\Lambda_j$ and
 $\Gamma$ that provide cumulative hazard functions which are piece-wise constant
