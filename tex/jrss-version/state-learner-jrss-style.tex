@@ -695,13 +695,14 @@ Corollary~\ref{cor:oracle-prop} has the following asymptotic consequences.
 
 \subsection{Transience of the second order remainder structure}
 
-% ANDERS / THOMAS
-We here consider the situation where $\Lambda_1$, $\Lambda_2$, and $\Gamma$ are
-nuisance parameters and an the estimator of interest is obtained from estimators
-of these nuisance parameters. An example is an estimator of the cumulative
-incidence curve, which can be obtained from estimators of $\Lambda_1$ and
-$\Lambda_2$.
-% THOMAS: Jeg ville så også tilføje: We give another example in Section 7.
+In this section we demonstrate a theoretical property of the state
+learner which is useful for targeted learning (c.f., Section
+\ref{sec:targeted-learning}). Specifically we consider an estimator of
+a target parameter which is obtained by substituting the state learner
+estimates of the nuisance parameters $\Lambda_1$, $\Lambda_2$, and
+$\Gamma$. An example is an estimator of the cumulative incidence
+curve, which can be obtained from estimators of $\Lambda_1$ and
+$\Lambda_2$. Another example is provided in Section \ref{sec:targeted-learning}.
 By equations~(\ref{eq:lambdaj}) and~(\ref{eq:gamma}) and the definition of
 \( F \), we have
 \begin{equation}
@@ -1072,26 +1073,18 @@ which gives the estimator
 \label{sec:numer-exper}
 
 
-In this section we report results from a simulation study without competing
-risks. In the next section, we consider a setting with competing risks. Here we
-first compare the state learner to an IPCW based discrete super learner that
-uses either the Kaplan-Meier estimator or a Cox model to estimate the censoring
-probability. We next compare the state learner to the super learner proposed by
-\cite{westling2021inference}.
-% ANDERS: kan du skrive her hvad forskellen er mellem og formaalet er
-% med de to simulationsstudierscenarier?
-% i den ene sammenligner vi med IPCW i den anden med westling, ik?
-% Maaske en figur (flowchart) eller tabel kunne hjaelpe laeseren at faa overblik.
-% Maaske separation i to subsections kunne hjaelpe yderliger
-%
-% THOMAS: Jeg ved ikke, om jeg ville sige at der er to simulationstudier, der er
-% bare to ting vi undersøge med det samme studie. Data er genereret på samme
-% måde til at undersøge de to spørgsmål. Har opdateret introen til afsnittet, er
-% det bedre?
+In this section we report results from a simulation study. In the
+first part we consider estimation of the conditional survival
+function. Here we compare the state learner to two IPCW based discrete
+super learners that use either the Kaplan-Meier estimator or a Cox
+model to estimate the censoring probability
+\cite{gonzalez2021stacked}.  In the second part we compare the state
+learner to the super learner proposed by \cite{westling2021inference}.
 
-We generate data according to a distribution motivated from a real
-dataset in which censoring depends on the baseline covariates. We
-simulate data based on a prostate cancer study described in
+In both parts we use the same data generating mechanism. We generate
+data according to a distribution motivated from a real dataset in
+which censoring depends on the baseline covariates. We simulate data
+based on a prostate cancer study described in
 \citep{kattan2000pretreatment}. The outcome of interest was the time
 to tumor recurrence, and five baseline covariates were used to predict
 outcome: prostate-specific antigen (PSA, ng/mL), Gleason score sum
@@ -1138,12 +1131,7 @@ correctly in the simulation setting where censoring is
 independent. Both IPCW super learners are fitted using the
 \texttt{R}-package \texttt{riskRegression}
 \citep{Gerds_Ohlendorff_Ozenne_2023}.
-% ANDERS: det er uklar for mig hvordan
-% de super learners valger/kombinerer de learners der ingaar i library: er det
-% Brier score? over time?
-% 
-% THOMAS: De er diskrete super learner baseret på Score function med summary
-% measure 'ibs', så det er integrated brier score.
+% ANDERS: describe that you use a single evaluation time point and say how many censored, event happen before it.
 Each super learner provides a learner for the cumulative hazard
 function for the outcome of interest. From the cumulative hazard
 function a risk prediction model can be obtained (c.f.,
@@ -1178,9 +1166,6 @@ performance of the oracle, except for small sample sizes.
     learners, the IPA is plotted against sample size. The results are averages across 
     1000 simulated data sets and the error bars are used to quantify the Monte Carlo
     uncertainty.
-    % ANDERS: er det korrekt at det er averages across 1000 data sets?
-    %
-    % THOMAS: Ja. ...?
   }
   \label{fig:ipcw-fail}
 \end{figure}
