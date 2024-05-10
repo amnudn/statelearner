@@ -10,78 +10,106 @@ Remember to exceture (C-c C-c) the following line:
 #+PROPERTY: header-args:R :async :results output verbatim  :exports results  :session *R* :cache yes
 
 #+BEGIN_SRC R
-  try(setwd("~/research/SuperVision/Anders/survival-loss/statelearner/experiments/"))
+  ## try(setwd("~/research/SuperVision/Anders/survival-loss/statelearner/experiments/"))
   library(here)
-  try(setwd(here("experiments")))
   library(targets)
+  ## Set wd to where we want to place figures
+  try(setwd(here("figures")))
+  ## Load targets
   tar_load(names = c("zel_sim2_1",
+                     "zel_sim2_1_n_events",
 		     ## "ipcw_fail",
 		     ## "sim_zel_learners",
 		     ## "sim_zel_learners2",
 		     ## "sim_zel_learners2_dgm_cens",
 		     ## "zelefsky_statelearner_real_data_comp"
-		     ))
-
-  try(setwd("~/research/SuperVision/Anders/survival-loss/statelearner/zelefsky-study/"))
-  try(setwd(here("zelefsky-study")))
-  tar_load("zelefsky_statelearner_real_data_comp")
-  try(setwd(here("zelefsky-case-study")))
-  tar_load(c("zelefsky_statelearner", "ate_est_main_eff","ate_est_inter_eff"))
-  ## Load targets, then move to where we want to place figures
-  try(setwd("~/research/SuperVision/Anders/survival-loss/statelearner/figures/"))
-  try(setwd(here("figures")))
+		     ),
+           store = here("experiments/_targets/"))
+  tar_load(c("zelefsky_statelearner", "ate_est_main_eff","ate_est_inter_eff"), store = here("zelefsky-case-study/_targets/"))
   library(data.table)
   library(ggplot2)
   library(gridExtra)
   library(MetBrewer)
 #+END_SRC
 
-#+RESULTS[(2024-01-22 13:48:25) b21c5b982f839246fd6588d360a43579df4619ff]:
-: Error in setwd("~/research/SuperVision/Anders/survival-loss/statelearner/experiments/") : 
-:   cannot change working directory
-: Error in setwd("~/research/SuperVision/Anders/survival-loss/statelearner/zelefsky-study/") : 
-:   cannot change working directory
-: Error in setwd(here("zelefsky-study")) : cannot change working directory
-: ✖ Identified no targets to load.
-: Error in setwd("~/research/SuperVision/Anders/survival-loss/statelearner/figures/") : 
-:   cannot change working directory
+#+RESULTS[(2024-05-10 10:29:32) 37eb9f869f57b61caaa6ebaf9b36cf716dee5bba]:
 
 * IPCW super learners
-
+Get number of events:
 #+BEGIN_SRC R
-summ_zel_sim2_1 <- zel_sim2_1[, .(IPA = mean(IPA, na.rm = TRUE), se = sd(IPA, na.rm = TRUE)/sqrt(.N)), .(n_obs, sim_set, type, SL, time, type)]
-summ_zel_sim2_1[,SL:=factor(SL,
-                            levels=c("ipcw_cox","ipcw_km","oracle","statelearner","survSL"),
-                            labels=c("IPCW(Cox)","IPCW(KM)","Oracle","State learner", "survSL"))]
-summ_zel_sim2_1[,sim_set:=factor(sim_set,levels=c("indep_cens","original"),labels=c("Independent censoring","Dependent censoring"))]
+  event_cens_prob_table <- zel_sim2_1_n_events[,lapply(.SD, function(x) 100*x/100000) , .(time, sim_setting)]
+  Publish::org(event_cens_prob_table)
 #+END_SRC
 
-#+RESULTS:
+#+RESULTS[(2024-05-10 10:33:13) d85110e0ce822f20b5afaaee71cb0009fa6acbba]:
 #+begin_example
-     n_obs    sim_set  type            SL time type.1       IPA           se
-  1:   300   original  cens        survSL    6   cens 0.6978450 0.0008305614
-  2:   300   original  cens State learner    6   cens 0.6989384 0.0008192387
-  3:   300   original  cens        Oracle    6   cens 0.6992857 0.0008149009
-  4:   300   original event        survSL    6  event 0.3488385 0.0019823097
-  5:   300   original event State learner    6  event 0.3468667 0.0019972122
- ---                                                                        
-380:  2400 indep_cens event        survSL   36  event 0.1922440 0.0003727166
-381:  2400 indep_cens event State learner   36  event 0.2005905 0.0002755740
-382:  2400 indep_cens event      IPCW(KM)   36  event 0.2005905 0.0002755740
-383:  2400 indep_cens event     IPCW(Cox)   36  event 0.2005905 0.0002755740
-384:  2400 indep_cens event        Oracle   36  event 0.2005905 0.0002755740
-     n_obs               sim_set  type            SL time type.1       IPA           se
-  1:   300   Dependent censoring  cens        survSL    6   cens 0.6978450 0.0008305614
-  2:   300   Dependent censoring  cens State learner    6   cens 0.6989384 0.0008192387
-  3:   300   Dependent censoring  cens        Oracle    6   cens 0.6992857 0.0008149009
-  4:   300   Dependent censoring event        survSL    6  event 0.3488385 0.0019823097
-  5:   300   Dependent censoring event State learner    6  event 0.3468667 0.0019972122
- ---                                                                                   
-380:  2400 Independent censoring event        survSL   36  event 0.1922440 0.0003727166
-381:  2400 Independent censoring event State learner   36  event 0.2005905 0.0002755740
-382:  2400 Independent censoring event      IPCW(KM)   36  event 0.2005905 0.0002755740
-383:  2400 Independent censoring event     IPCW(Cox)   36  event 0.2005905 0.0002755740
-384:  2400 Independent censoring event        Oracle   36  event 0.2005905 0.0002755740
+|  time | sim_setting | true_events | true_cens | at_risk |
+|-------+-------------+-------------+-----------+---------|
+|     6 |    original |       4.386 |     6.644 |  89.123 |
+|    12 |    original |       8.822 |    19.045 |  73.214 |
+|    18 |    original |      13.171 |    31.978 |  57.691 |
+|    24 |    original |      17.191 |    43.595 |  44.636 |
+|    30 |    original |      20.934 |    53.584 |  34.103 |
+|    36 |    original |      24.619 |    61.853 |  25.774 |
+|     6 |  indep_cens |       4.381 |     2.373 |  93.351 |
+|    12 |  indep_cens |       8.966 |     7.279 |  84.401 |
+|    18 |  indep_cens |      13.199 |    13.929 |  74.702 |
+|    24 |  indep_cens |      17.266 |    21.674 |  64.755 |
+|    30 |  indep_cens |      21.059 |    30.143 |  55.141 |
+|    36 |  indep_cens |      24.674 |    38.740 |  46.141 |
+#+end_example
+
+
+#+BEGIN_SRC R :results output drawer
+  Publish::org(event_cens_prob_table[time == 36])
+#+END_SRC
+
+#+RESULTS[(2024-05-10 10:33:27) 4fef844694f029b39f62f07fe2212e200734bcff]:
+:results:
+| time | sim_setting | true_events | true_cens | at_risk |
+|------+-------------+-------------+-----------+---------|
+|   36 | original    |      24.619 |    61.853 |  25.774 |
+|   36 | indep_cens  |      24.674 |    38.740 |  46.141 |
+:end:
+
+
+
+#+BEGIN_SRC R
+  summ_zel_sim2_1 <- zel_sim2_1[, .(IPA = mean(IPA, na.rm = TRUE), se = sd(IPA, na.rm = TRUE)/sqrt(.N)), .(n_obs, sim_set, type, SL, time, type)]
+  summ_zel_sim2_1[,SL:=factor(SL,
+                              levels=c("ipcw_cox","ipcw_km","oracle","statelearner","survSL"),
+                              labels=c("IPCW(Cox)","IPCW(KM)","Oracle","State learner", "survSL"))]
+  summ_zel_sim2_1[,sim_set:=factor(sim_set,levels=c("indep_cens","original"),labels=c("Independent censoring","Dependent censoring"))]
+#+END_SRC
+
+#+RESULTS[(2024-05-10 09:41:28) 62efccdfbc99bd26f20c677b915998700827a829]:
+#+begin_example
+     n_obs    sim_set   type            SL  time type.1       IPA           se
+     <int>     <char> <char>        <fctr> <int> <char>     <num>        <num>
+  1:   300   original   cens        survSL     6   cens 0.6978450 0.0008305614
+  2:   300   original   cens State learner     6   cens 0.6989384 0.0008192387
+  3:   300   original   cens        Oracle     6   cens 0.6992857 0.0008149009
+  4:   300   original  event        survSL     6  event 0.3488385 0.0019823097
+  5:   300   original  event State learner     6  event 0.3468667 0.0019972122
+ ---                                                                          
+380:  2400 indep_cens  event        survSL    36  event 0.1922440 0.0003727166
+381:  2400 indep_cens  event State learner    36  event 0.2005905 0.0002755740
+382:  2400 indep_cens  event      IPCW(KM)    36  event 0.2005905 0.0002755740
+383:  2400 indep_cens  event     IPCW(Cox)    36  event 0.2005905 0.0002755740
+384:  2400 indep_cens  event        Oracle    36  event 0.2005905 0.0002755740
+     n_obs               sim_set   type            SL  time type.1       IPA           se
+     <int>                <fctr> <char>        <fctr> <int> <char>     <num>        <num>
+  1:   300   Dependent censoring   cens        survSL     6   cens 0.6978450 0.0008305614
+  2:   300   Dependent censoring   cens State learner     6   cens 0.6989384 0.0008192387
+  3:   300   Dependent censoring   cens        Oracle     6   cens 0.6992857 0.0008149009
+  4:   300   Dependent censoring  event        survSL     6  event 0.3488385 0.0019823097
+  5:   300   Dependent censoring  event State learner     6  event 0.3468667 0.0019972122
+ ---                                                                                     
+380:  2400 Independent censoring  event        survSL    36  event 0.1922440 0.0003727166
+381:  2400 Independent censoring  event State learner    36  event 0.2005905 0.0002755740
+382:  2400 Independent censoring  event      IPCW(KM)    36  event 0.2005905 0.0002755740
+383:  2400 Independent censoring  event     IPCW(Cox)    36  event 0.2005905 0.0002755740
+384:  2400 Independent censoring  event        Oracle    36  event 0.2005905 0.0002755740
 #+end_example
 
 #+BEGIN_SRC R  :results graphics file :exports results :file experiment-fig-sl-ipcw.pdf :width 8 :height 3.5
@@ -97,15 +125,22 @@ summ_zel_sim2_1[,sim_set:=factor(sim_set,levels=c("indep_cens","original"),label
     geom_line(position=position_dodge(width = dd_ww), linewidth = 1.5) +
     geom_point(position=position_dodge(width = dd_ww), size = 2) +
     scale_x_continuous(trans='log2') +
-    facet_wrap(~sim_set, ncol = 2, scales="free_y") +
+    facet_wrap(~sim_set, ncol = 2## , scales="free_y"
+               ) +
     ylab("IPA") + theme(legend.position="top")  +
     xlab("Number of observations") +
     scale_y_continuous(labels = scales::percent) +
     scale_color_manual("Super learner", values=c("#0072B2", "darkred", "gray","#E69F00"))
 #+END_SRC
 
-#+RESULTS[(2024-01-22 11:22:20) 6088bed9f75d4fe31fb981b11639c203efc18f18]:
+#+RESULTS[(2024-05-10 09:42:20) 801aabb4936772cb68a7f42b7878382303a46a2c]:
 [[file:experiment-fig-sl-ipcw.pdf]]
+
+#+BEGIN_SRC sh
+  cp experiment-fig-sl-ipcw.pdf ../tex/jrss-version/
+#+END_SRC
+
+#+RESULTS:
 
 * survSL
 #+BEGIN_SRC R :results graphics file :exports results :file experiment-fig-sl-survSL.pdf :width 8 :height 6

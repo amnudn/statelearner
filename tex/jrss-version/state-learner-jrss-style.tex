@@ -1073,13 +1073,12 @@ which gives the estimator
 \label{sec:numer-exper}
 
 
-In this section we report results from a simulation study. In the
-first part we consider estimation of the conditional survival
-function. Here we compare the state learner to two IPCW based discrete
-super learners that use either the Kaplan-Meier estimator or a Cox
-model to estimate the censoring probability
-\cite{gonzalez2021stacked}.  In the second part we compare the state
-learner to the super learner proposed by \cite{westling2021inference}.
+In this section we report results from a simulation study. In the first part we
+consider estimation of the conditional survival function. Here we compare the
+state learner to two IPCW based discrete super learners that use either the
+Kaplan-Meier estimator or a Cox model to estimate the censoring probability
+\citep{gonzalez2021stacked}. In the second part we compare the state learner to
+the super learner proposed by \cite{westling2021inference}.
 
 In both parts we use the same data generating mechanism. We generate
 data according to a distribution motivated from a real dataset in
@@ -1131,22 +1130,36 @@ correctly in the simulation setting where censoring is
 independent. Both IPCW super learners are fitted using the
 \texttt{R}-package \texttt{riskRegression}
 \citep{Gerds_Ohlendorff_Ozenne_2023}.
-% ANDERS: describe that you use a single evaluation time point and say how many censored, event happen before it.
-Each super learner provides a learner for the cumulative hazard
-function for the outcome of interest. From the cumulative hazard
-function a risk prediction model can be obtained (c.f.,
-equation~(\ref{eq:surv-def}) with $\Lambda_2 = 0$). We measure the
-performance of each super learner by calculating the index of
-prediction accuracy (IPA) \citep{kattan2018index} at a fixed time
-horizon (36 months) for the risk prediction model provided by the
-super learner. The IPA is 1 minus the ratio between the model's Brier
-score and the null model's Brier score, where the null model is the
-model that does not use any covariate information. The IPA is
-approximated using a large (\( n = 20,000 \)) independent data set of
-uncensored data. As a benchmark we calculate the performance of the
-risk prediction model chosen by the oracle selector, which uses the
-large data set of uncensored event times to select the learner with
-the highest IPA.
+% ANDERS: describe that you use a single evaluation time point and say how many
+% censored, event happen before it.
+%
+% THOMAS: Done below now, OK?
+%
+% | time | sim_setting | true_events | true_cens | at_risk |
+% |------+-------------+-------------+-----------+---------|
+% |   36 | original    |      24.619 |    61.853 |  25.774 |
+% |   36 | indep_cens  |      24.674 |    38.740 |  46.141 |
+%
+The IPCW super learners use the integrated Brier score up to a fixed time
+horizon (36 months). The marginal risk of the event before this time horizon is
+25\%. Under the ``dependent censoring'', setting the marginal censoring
+probability before this time horizon is 62\%; under the ``independent
+censoring'' setting, the marginal censoring probability before this time horizon
+is 39\%.
+
+Each super learner provides a learner for the cumulative hazard function for the
+outcome of interest. From the cumulative hazard function a risk prediction model
+can be obtained (c.f., equation~(\ref{eq:surv-def}) with $\Lambda_2 = 0$). We
+measure the performance of each super learner by calculating the index of
+prediction accuracy (IPA) \citep{kattan2018index} at a fixed time horizon (36
+months) for the risk prediction model provided by the super learner. The IPA is
+1 minus the ratio between the model's Brier score and the null model's Brier
+score, where the null model is the model that does not use any covariate
+information. The IPA is approximated using a large (\( n = 20,000 \))
+independent data set of uncensored data. As a benchmark we calculate the
+performance of the risk prediction model chosen by the oracle selector, which
+uses the large data set of uncensored event times to select the learner with the
+highest IPA.
 
 The results are shown in Figure~\ref{fig:ipcw-fail}. We see that in
 the scenario where censoring depends on the covariates, using the

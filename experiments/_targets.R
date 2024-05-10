@@ -3,9 +3,9 @@
 ## Author: Anders Munch
 ## Created: Nov 14 2023 (09:52) 
 ## Version: 
-## Last-Updated: Jan  5 2024 (14:13) 
+## Last-Updated: May 10 2024 (10:03) 
 ##           By: Anders Munch
-##     Update #: 40
+##     Update #: 44
 #----------------------------------------------------------------------
 ## 
 ### Commentary: 
@@ -16,6 +16,9 @@
 ### Code:
 library(targets)
 library(data.table)
+library(here)
+tar_source(here("R-code/functions"))
+tar_source(here("experiments/zel-sim2-1-n-events-mc-fun.R"))
 
 combine_results <- function(job_name, results_dir){
     fls = list.files(results_dir)
@@ -33,6 +36,7 @@ list(
     tar_target(zel_all0_results, combine_results("zel-all-settings0", results_dir = results_dir)),
     tar_target(zel_all2_results, combine_results("zel-all-settings2", results_dir = results_dir)),
     tar_target(zel_sim2_1, combine_results("zel-sim2-1", results_dir = results_dir)),
+    tar_target(zel_sim2_1_n_events, zel_sim2_1_n_events_mc_fun()),
     tar_target(ipcw_fail_sim, {
         run0 = combine_results("ipcw-fail-sim", results_dir = results_dir)
         state_more = combine_results("ipcw-fail-sim-more-state-learners", results_dir = results_dir)
