@@ -1130,10 +1130,6 @@ correctly in the simulation setting where censoring is
 independent. Both IPCW super learners are fitted using the
 \texttt{R}-package \texttt{riskRegression}
 \citep{Gerds_Ohlendorff_Ozenne_2023}.
-% ANDERS: describe that you use a single evaluation time point and say how many
-% censored, event happen before it.
-%
-% THOMAS: Done below now, OK?
 %
 % | time | sim_setting | true_events | true_cens | at_risk |
 % |------+-------------+-------------+-----------+---------|
@@ -1142,10 +1138,10 @@ independent. Both IPCW super learners are fitted using the
 %
 The IPCW super learners use the integrated Brier score up to a fixed time
 horizon (36 months). The marginal risk of the event before this time horizon is
-25\%. Under the ``dependent censoring'', setting the marginal censoring
-probability before this time horizon is 62\%; under the ``independent
-censoring'' setting, the marginal censoring probability before this time horizon
-is 39\%.
+\(\sim 24.6\)\%. Under the ``dependent censoring'' setting the marginal censoring
+probability before the time horizon is \(\sim 61.9\)\%. Under the ``independent
+censoring'' setting the marginal censoring probability before this time horizon
+is \(\sim 38.7\)\%.
 
 Each super learner provides a learner for the cumulative hazard function for the
 outcome of interest. From the cumulative hazard function a risk prediction model
@@ -1197,28 +1193,15 @@ The results are shown in Figure~\ref{fig:zelefski}. We see that for
 most sample sizes, the state learner selected prediction models for
 both censoring and outcome which have similar or higher IPA compared
 to the prediction models selected by \texttt{survSL}.
-% ANDERS: it is a bit lazy to write "for most sample sizes" :) it is
-% slightly annoying that the y-axis scale changes in the 4
-% figures. would that be better with Brier instead of IPA?
-%
-% THOMAS: No, it is worse with Brier score I seem to recall. I have fixed to
-% y-axis horizontally now, it works well for the outcome model but poorly for
-% the censoring. Let me know what you like the best. 
-
+% ANDERS: Divide Fig 3 into two figures. keep y-axis fix for Outcome model panels but use different y-axes for  Censoring model.
 \begin{figure}
   \centering %
   \includeFigCond[width=1\linewidth]{experiment-fig-sl-survSL.pdf}
   \caption[]{For the risk prediction models of both the outcome and the
-    censoring probability provided by each of the super learners, the IPA is
+    censoring probability provided by each of the super learners, the IPA at the fixed time horizon is
     plotted against sample size. The results are averages across 1000 repetitions and
     the error bars are used to quantify the Monte Carlo uncertainty.}
-  % ANDERS: would be good to know how how many trainings set individuals were
-  % right censored before the evaluation time point of the IPA. maybe of
-  % interest how you chose the evaluation time point.
-  %
-  % THOMAS: Good point, but I think that the time of evaluation did not matter
-  % too much. Of course, if you pick a very early time point where nothing has
-  % happened, there is almost no difference in performance.
+  % ANDERS: add marginal censoring probability to panel titles
   \label{fig:zelefski}
 \end{figure}
 
@@ -1231,23 +1214,27 @@ to the prediction models selected by \texttt{survSL}.
 % sektion af der kommer noget om average treatment effect.
 %
 % THOMAS: Yes, klart. Fungerer det her:
-In this section we re-analyze the prostate cancer data analyzed by
-\cite{kattan2000pretreatment}, which we introduced in
-Section~\ref{sec:numer-exper}. The data consists of 1,042 patients and includes
-a competing event in the form of death without tumor recurrence. We use the
-state learner to rank learners of the cause-specific cumulative hazard
-functions. We then use the highest ranked combination of learners and the
-estimation strategy outlined in Section~\ref{sec:targeted-learning} to estimate
-the average treatment effect of hormone therapy on death and tumor recurrence.
+In this section we use the prostate cancer data of
+\cite{kattan2000pretreatment} to illustrate the use of the state
+learner in the presence of competing risks. We have introduced the
+data in Section~\ref{sec:numer-exper}. The data consists of 1,042
+patients who are followed from start of followup until tumor
+recurrence, death without tumor recurrence or end of followup
+(censored) whatever came first. For the sole purpose of illustration,
+we estimate the average treatment effect of hormone therapy on death
+and tumor recurrence. To do this we adapt the estimation strategy of
+Section~\ref{sec:targeted-learning} as follows.  We use the state
+learner to rank libraries of learners for the cause-specific
+cumulative hazard functions of tumor recurrence, death without tumor
+recurrence, and censoring.  The libraries of learners include the five
+learners described in Table~\ref{tab:zel-library}.  We use the same
+set of learners to learn the cumulative hazard function of tumor
+recurrence \( \Lambda_1 \), the cumulative hazard function of death
+without tumor recurrence \( \Lambda_2 \), and the cumulative hazard
+function of the conditional censoring distribution $\Gamma$. 
+We then use the highest ranked combination
+of learners and apply formula \ref{eq:one-step-comp-ate}.
 
-We consider death without tumor recurrence and recurrence of tumor as competing
-risks. We include the fives learner \texttt{KM}, \texttt{Cox strata CS},
-\texttt{Lasso}, \texttt{Elastic}, and \texttt{RF} which are described in
-Table~\ref{tab:zel-library}. We use the same library of learners to learn
-\( \Lambda_1 \), \( \Lambda_2 \), and $\Gamma$. In this case, \( \Lambda_1 \)
-denotes the cause-specific cumulative hazard function of tumor recurrence, and
-\( \Lambda_2 \) denotes the cause-specific cumulative hazard function of death
-without tumor recurrence.
 
 \begin{table}
   \caption{\label{tab:zel-library}Overview of the five learners used by the
@@ -1351,14 +1338,10 @@ IPCW-based methods, the advantage of the state learner is that it does
 not depend on a pre-specified estimator of the censoring distribution,
 but selects one automatically based on a library of learners for the
 censoring distribution. Furthermore, the state learner neither
-requires that \( \Lambda_j \) can be written as an integral with respect to
-Lebesgue measure nor assumes a
-% ANDERS: "density of \Lambda_j" er uklar hvordan er denne density defineret?
-%
-% THOMAS: Better now?
-(semi-)parametric form for $\Lambda_j$. In the remainder of this
-section we point to some limitations of our proposal and discuss
-avenues for further research.
+requires that \( \Lambda_j \) can be written as an integral with
+respect to Lebesgue measure, nor assumes a (semi-)parametric form for
+$\Lambda_j$. In the remainder of this section we point to some
+limitations of our proposal and discuss avenues for further research.
 
 A major advantage of the state learner is that the performance of each
 combination of learners can be estimated without (semi)parametric
@@ -1375,19 +1358,9 @@ that while the state learner provides us with estimates of
 and \( \mathcal{B} \), the performance of these learners is not
 assessed directly for their respective target parameters, but only
 indirectly via the performance of \( F \).
-% ANDERS: er du enig med min omformulering af den sidste saetning?
-%
-% THOMAS: Yes, super godt. 
 For settings without competing risks, our numerical studies suggest
 that measuring the performance of \( F \) also leads to good
-performance for estimation of \( S \). However, further research on
-this issue, both numerical and theoretical, is warranted.
-% ANDERS: ved ikke helt hvad du taenker man kan goer i fremtiden men synes
-% egentig at den sidste saetning kunne godt slettes. :)
-%
-% THOMAS: Forstår ikke helt din kommentar. Hvilken sætning, den ovenover din
-% kommentar eller den nedenunder? :)
-
+performance for estimation of \( S \).
 % In the context of targeted learning, a drawback of the state learner is that the
 % doubly robustness property defined in equation~(\ref{eq:dr-property}) seem to be
 % lost because we only use a single nuisance parameter estimator. As defined here,
@@ -1411,7 +1384,7 @@ models. Hence the state learner is essentially not more computationally demandin
 than any procedure that uses super learning to learn $\Lambda_1$, $\Lambda_2$,
 and $\Gamma$ separately. While our proposal is based on constructing the library
 \( \mathcal{F} \) from libraries for learning \( \Lambda_1 \), $\Lambda_2$, and
-$\Gamma$, it would also be of interest to consider learners that estimate
+$\Gamma$, it could also be of interest to consider learners that estimate
 \( F \) directly.
 % ANDERS: how would one estimate F? using HAL? or RF? but such a learner would
 % not provide risk prediction models or would it? if yes you could say it
