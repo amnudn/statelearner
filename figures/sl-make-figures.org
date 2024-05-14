@@ -266,7 +266,7 @@ Get number of events:
 * Real Zelefski data with competing event new version
 
 ** State learner
-#+BEGIN_SRC R  :results graphics file :exports results :file zelefski-real-data.pdf :width 7 :height 4
+#+BEGIN_SRC R  :results graphics file :exports results :file real-data-state-learner.pdf :width 8 :height 4
   zel_real_plot_dt <- copy(zelefsky_statelearner$cv_fit)
   zel_real_plot_dt[,cause1:=factor(cause1,levels=c("cox_lasso","cox_elastic","cox_strata_stage","km","rf"),labels=c("lasso","elastic","strata","KM","RF"))]
   zel_real_plot_dt[,cause2:=factor(cause2,levels=c("cox_lasso","cox_elastic","cox_strata_stage","km","rf"),labels=c("lasso","elastic","strata","KM","RF"))]
@@ -285,8 +285,14 @@ Get number of events:
     scale_colour_grey("Death learner", start = 0, end = 0.7)
 #+END_SRC
 
-#+RESULTS[(2024-03-14 10:19:58) fbeff2e6fdd5f146cbc3aa28f47ee847b8042d52]:
-[[file:zelefski-real-data.pdf]]
+#+RESULTS[(2024-05-14 13:39:50) a7187299c761ad53ab2d4d791c9f02e3c102a793]:
+[[file:real-data-state-learner.pdf]]
+
+#+BEGIN_SRC sh
+  cp real-data-state-learner.pdf ../tex/jrss-version/
+#+END_SRC
+
+#+RESULTS:
 
 Table
 
@@ -305,12 +311,14 @@ Table
 	       floating=FALSE,
 	       sanitize.text.function = force,
 	       booktabs=TRUE,
-	       file = "zel-tab.tex")
+	       file = "real-data-tab.tex")
 #+END_SRC
 
-#+RESULTS[(2024-03-21 11:25:25) b123138d1f9c78238575ab485661ff859c3da9a4]:
+#+RESULTS[(2024-05-14 13:37:03) 6b53c96ca90349cc41746271fe268eafd2abda3d]:
 #+begin_example
+Key: <loss>
                       cause1           cause2 censor      loss          sd
+                      <fctr>           <fctr> <fctr>     <num>       <num>
   1:            \\texttt{RF}               km     rf  7.022057 0.046024265
   2: \\texttt{Cox strata CT}      cox_elastic     rf  7.025097 0.032110343
   3:            \\texttt{RF}      cox_elastic     rf  7.025267 0.046638952
@@ -322,7 +330,9 @@ Table
 123:            \\texttt{KM}      cox_elastic     km 10.310062 0.005185197
 124:            \\texttt{KM} cox_strata_stage     km 10.310763 0.003174509
 125:            \\texttt{KM}               km     km 10.328653 0.004108411
+Key: <loss>
                       cause1                  cause2 censor      loss          sd
+                      <fctr>                  <fctr> <fctr>     <num>       <num>
   1:            \\texttt{RF}            \\texttt{KM}     rf  7.022057 0.046024265
   2: \\texttt{Cox strata CT}       \\texttt{Elastic}     rf  7.025097 0.032110343
   3:            \\texttt{RF}       \\texttt{Elastic}     rf  7.025267 0.046638952
@@ -334,7 +344,9 @@ Table
 123:            \\texttt{KM}       \\texttt{Elastic}     km 10.310062 0.005185197
 124:            \\texttt{KM} \\texttt{Cox strata CT}     km 10.310763 0.003174509
 125:            \\texttt{KM}            \\texttt{KM}     km 10.328653 0.004108411
+Key: <loss>
                       cause1                  cause2       censor      loss          sd
+                      <fctr>                  <fctr>       <fctr>     <num>       <num>
   1:            \\texttt{RF}            \\texttt{KM} \\texttt{RF}  7.022057 0.046024265
   2: \\texttt{Cox strata CT}       \\texttt{Elastic} \\texttt{RF}  7.025097 0.032110343
   3:            \\texttt{RF}       \\texttt{Elastic} \\texttt{RF}  7.025267 0.046638952
@@ -348,30 +360,34 @@ Table
 125:            \\texttt{KM}            \\texttt{KM} \\texttt{KM} 10.328653 0.004108411
 #+end_example
 
+#+BEGIN_SRC sh
+  cp real-data-tab.tex ../tex/jrss-version/
+#+END_SRC
 
+#+RESULTS:
 
 ** Target parameter
 
-#+BEGIN_SRC R
-  ggplot(rbind(ate_est_main_eff[, prop := "main"], ate_est_inter_eff[, prop := "inter"])[effect == "ATE" & est_type == "one-step"],
-	 aes(x = time, y = est, col = prop)) +
-    geom_errorbar(aes(ymin = lower, ymax = upper), width = 1, position = position_dodge(width = 1)) + 
-    ## geom_line() +
-    geom_point(position = position_dodge(width = 1)) +
-    geom_hline(yintercept = 0, linetype = 2) +
-    theme_bw() +
-    facet_wrap( ~ cause)
+# #+BEGIN_SRC R
+#   ggplot(rbind(ate_est_main_eff[, prop := "main"], ate_est_inter_eff[, prop := "inter"])[effect == "ATE" & est_type == "one-step"],
+# 	 aes(x = time, y = est, col = prop)) +
+#     geom_errorbar(aes(ymin = lower, ymax = upper), width = 1, position = position_dodge(width = 1)) + 
+#     ## geom_line() +
+#     geom_point(position = position_dodge(width = 1)) +
+#     geom_hline(yintercept = 0, linetype = 2) +
+#     theme_bw() +
+#     facet_wrap( ~ cause)
 
-  ggplot(ate_est[effect != "ATE" & est_type == "one-step"], aes(x = time, y = est, col = effect)) +
-    geom_errorbar(aes(ymin = lower, ymax = upper), width = 1, position = position_dodge(width = 1)) + 
-    ## geom_line() +
-    geom_point(position = position_dodge(width = 1)) +
-    geom_hline(yintercept = 0, linetype = 2) +
-    theme_bw() +
-    facet_wrap( ~ cause)
-#+END_SRC
+#   ggplot(ate_est[effect != "ATE" & est_type == "one-step"], aes(x = time, y = est, col = effect)) +
+#     geom_errorbar(aes(ymin = lower, ymax = upper), width = 1, position = position_dodge(width = 1)) + 
+#     ## geom_line() +
+#     geom_point(position = position_dodge(width = 1)) +
+#     geom_hline(yintercept = 0, linetype = 2) +
+#     theme_bw() +
+#     facet_wrap( ~ cause)
+# #+END_SRC
 
-#+BEGIN_SRC R :results graphics file :exports results :file zelefsky-data-target-par.pdf  :width 8 :height 3.5
+#+BEGIN_SRC R :results graphics file :exports results :file real-data-target.pdf  :width 8 :height 3.5
   ate_est_inter_eff[effect == "ATE" & est_type == "one-step"] |>
     (\(plot_data)
       {
@@ -388,8 +404,14 @@ Table
       })()
 #+END_SRC
 
-#+RESULTS[(2024-03-20 15:46:47) b031e78e7a48626ad48e4a37769c5256fac8b73f]:
-[[file:zelefsky-data-target-par.pdf]]
+#+RESULTS[(2024-05-14 13:40:42) 912533a8d75a50eb169821cabbd8412f7dc3da73]:
+[[file:real-data-target.pdf]]
+
+#+BEGIN_SRC sh
+  cp real-data-target.pdf ../tex/jrss-version/
+#+END_SRC
+
+#+RESULTS:
 
 * Real Zelefski data with competing event -- old :noexport:
 
