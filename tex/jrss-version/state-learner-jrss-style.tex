@@ -20,7 +20,7 @@
 
 %%%CONTEMPORARY%%%
 % \documentclass[unnumsec,webpdf,contemporary,large]{oup-authoring-template}%
-\documentclass[unnumsec,webpdf,contemporary,large,namedate]{oup-authoring-template}% uncomment this line for author year citations and comment the above
+\documentclass[numsec,webpdf,contemporary,medium,namedate]{oup-authoring-template}% uncomment this line for author year citations and comment the above
 %\documentclass[unnumsec,webpdf,contemporary,medium]{oup-authoring-template}
 %\documentclass[unnumsec,webpdf,contemporary,small]{oup-authoring-template}
 
@@ -70,7 +70,7 @@
 
 \usepackage{dsfont, booktabs}
 
-% \usepackage[tablesonly,heads,nolists]{endfloat}
+\usepackage[tablesonly,heads,nolists]{endfloat}
 
 
 %% Only for comments:
@@ -83,7 +83,7 @@
 % \bibliographystyle{rss}
 
 %% Toggle with or without figures
-% \def\nofig{1}
+\def\nofig{1}
 
 \newcommand{\includeFigCond}[2][]{
   \ifx\nofig\undefined %
