@@ -167,16 +167,12 @@
   tools and in applications of causal inference to estimate nuisance parameters.
   The super learner is a machine learning algorithm which combines a library of
   prediction models into a meta learner based on cross-validated loss. In right
-  censored data, loss needs to be estimated somehow.
-  % based on a model for the censoring distribution. Unfortunately, the commonly
-  % used partial likelihood loss is not suited for super learning, and inverse
-  % probability of censoring weighted loss functions require a pre-specified
-  % estimator of the censoring distribution. To relax this,
-  We introduce the state learner, a new super learner for survival analysis,
-  which simultaneously evaluates libraries of prediction models for the event of
-  interest and the censoring distribution. The state learner can be applied to
-  all types of survival models, works in the presence of competing risks, and
-  does not require a single pre-specified estimator of the conditional censoring
+  censored data, loss needs to be estimated somehow. We introduce the state
+  learner, a new super learner for survival analysis, which simultaneously
+  evaluates libraries of prediction models for the event of interest and the
+  censoring distribution. The state learner can be applied to all types of
+  survival models, works in the presence of competing risks, and does not
+  require a single pre-specified estimator of the conditional censoring
   distribution. We establish an oracle inequality for the state learner and
   investigate its performance through numerical experiments. We illustrate how
   the state learner allows us to estimate causal effects in a competing risks
@@ -347,7 +343,7 @@ function for censoring. For ease of presentation we now also assume
 that \( \Gamma(\blank \mid x) \) is continuous for all \( x \). We let
 \(G(t \mid x)=\exp\left\{-\Gamma(t \mid x)\right\}\) denote the
 survival function of the conditional censoring distribution. The
-distribution is characterized by
+distribution is characterised by
 \begin{equation}\label{eq:parametrizeP}
   \begin{split}
     P(\diff t, j, \diff x) &= \left\{G(t- \mid x)S(t- \mid x)\Lambda_1(\diff t \mid x)H(\diff x)\right\}^{\1{{\{j=1\}}}}\\
@@ -556,7 +552,7 @@ super learner for \( F \). The target of this super learner is the
 function-valued parameter $\Psi(P) = F$ which is identified through
 equation~(\ref{eq:F-def}).
 Under conditional independent censoring each quadruple
-$(\Lambda_{1}, \Lambda_{2}, \Gamma, H)$ characterizes a distribution
+$(\Lambda_{1}, \Lambda_{2}, \Gamma, H)$ characterises a distribution
 \(P\in\mathcal P\), c.f.\ equation~\eqref{eq:parametrizeP}, which in turn
 determines \( (F, H) \),
 and so a learner for \( F \) can be constructed from learners of
@@ -604,7 +600,7 @@ for \( F \):
 \begin{align*}
   \mathcal{F}(\mathcal{A}_1, \mathcal{A}_2, \mathcal{B})
   &= \{ \phi_{a_1,a_2, b} : a_1 \in \mathcal{A}_1, a_2 \in \mathcal{A}_2, b \in \mathcal{B}\},
-    \intertext{where in correspondance with  the relations in equation \eqref{eq:transition},} 
+    \intertext{where in correspondence with  the relations in equation \eqref{eq:transition},} 
     \phi_{a_1,a_2, b}(\data_n)(t,1,x) &= \int_0^t e^{\{-a_1(\data_n)(s \mid x)-a_2(\data_n)(s \mid x) - b(\data_n)(s \mid x)\} }  a_1(\data_n)(\diff s \mid x),\\
   \phi_{a_1,a_2, b}(\data_n)(t,2,x) &= \int_0^t e^{\{-a_1(\data_n)(s \mid x)-a_2(\data_n)(s \mid x) - b(\data_n)(s \mid x)\} }  a_2(\data_n)(\diff s \mid x),\\
   \phi_{a_1,a_2, b}(\data_n)(t,-1,x) &= \int_0^t e^{\{-a_1(\data_n)(s \mid x)-a_2(\data_n)(s \mid x) - b(\data_n)(s \mid x)\} }  b(\data_n)(\diff s \mid x),\\
