@@ -1189,31 +1189,35 @@ these methods with respect to both the outcome and the censoring
 distribution. Again we use the IPA to quantify the predictive
 performance.
 
-The results are shown in Figure~\ref{fig:zelefski}. We see that for
-most sample sizes, the state learner selected prediction models for
-both censoring and outcome which have similar or higher IPA compared
-to the prediction models selected by \texttt{survSL}.
-% ANDERS: Divide Fig 3 into two figures. keep y-axis fix for Outcome model panels but use different y-axes for  Censoring model.
+The results are shown in Figures~\ref{fig:zelefski-out}
+and~\ref{fig:zelefski-cens}. We see that for most sample sizes, the state
+learner selected prediction models for both censoring and outcome which have
+similar or higher IPA compared to the prediction models selected by
+\texttt{survSL}.
 \begin{figure}
   \centering %
-  \includeFigCond[width=1\linewidth]{experiment-fig-sl-survSL.pdf}
-  \caption[]{For the risk prediction models of both the outcome and the
-    censoring probability provided by each of the super learners, the IPA at the fixed time horizon is
-    plotted against sample size. The results are averages across 1000 repetitions and
+  \includeFigCond[width=1\linewidth]{experiment-fig-sl-survSL-out.pdf}
+  \caption[]{For the risk prediction models of the outcome provided by each
+    of the super learners, the IPA at the fixed time horizon is plotted against
+    sample size. The results are averages across 1000 repetitions and the error
+    bars are used to quantify the Monte Carlo uncertainty.}
+  \label{fig:zelefski-out}
+\end{figure}
+
+\begin{figure}
+  \centering %
+  \includeFigCond[width=.7\linewidth]{experiment-fig-sl-survSL-cens.pdf}
+  \caption[]{For the risk prediction models of the censoring model provided by
+    each of the super learners, the IPA at the fixed time horizon is plotted
+    against sample size. The results are averages across 1000 repetitions and
     the error bars are used to quantify the Monte Carlo uncertainty.}
-  % ANDERS: add marginal censoring probability to panel titles
-  \label{fig:zelefski}
+  \label{fig:zelefski-cens}
 \end{figure}
 
 
 \section{Prostate cancer study}
 \label{sec:real-data-appl}
 
-% ANDERS: har brug for en gentle intro saetning som fortaeller hvad der kommer:
-% in this section we re-analyse the ... Det skal ogsaa vaere klart i starten af
-% sektion af der kommer noget om average treatment effect.
-%
-% THOMAS: Yes, klart. Fungerer det her:
 In this section we use the prostate cancer data of
 \cite{kattan2000pretreatment} to illustrate the use of the state
 learner in the presence of competing risks. We have introduced the
@@ -1386,12 +1390,6 @@ and $\Gamma$ separately. While our proposal is based on constructing the library
 \( \mathcal{F} \) from libraries for learning \( \Lambda_1 \), $\Lambda_2$, and
 $\Gamma$, it could also be of interest to consider learners that estimate
 \( F \) directly.
-% ANDERS: how would one estimate F? using HAL? or RF? but such a learner would
-% not provide risk prediction models or would it? if yes you could say it
-%
-% THOMAS: I don't think that estimators for F exists -- that is what Vi is
-% working on, right? Given F we can always obtain \Lambda_1 and \Lambda_2
-% (equation 8 or eq:7 in tex) and then we can get predictions from these.
 
 In our numerical studies, we only considered learners of $\Lambda_j$ and
 $\Gamma$ that provide cumulative hazard functions which are piece-wise constant
