@@ -83,7 +83,7 @@
 % \bibliographystyle{rss}
 
 %% Toggle with or without figures
-\def\nofig{1}
+% \def\nofig{1}
 
 \newcommand{\includeFigCond}[2][]{
   \ifx\nofig\undefined %
@@ -136,8 +136,7 @@
   Methodology} %
 \DOI{DOI HERE} %
 \copyrightyear{xxxx} %
-\pubyear{yyyy}
-\access{Advance Access Publication Date: Day Month Year}
+\pubyear{yyyy} \access{Advance Access Publication Date: Day Month Year}
 \appnotes{Paper}
 
 
@@ -156,7 +155,7 @@
 \address[1]{\orgdiv{Section of Biostatistics}, \orgname{University of
     Copenhagen}, \orgaddress{\street{Østerfarigmagsgade 5}, \postcode{2100}, \state{Copenhagen}, \country{Denmark}}}
 
-\corresp[$\ast$]{Corresponding author. \href{email:email-id.com}{a.munch@sund.ku.dk}}
+\corresp[$\ast$]{Address for correspondence: \href{email:email-id.com}{a.munch@sund.ku.dk}}
 
 % \received{Date}{0}{Year}
 % \revised{Date}{0}{Year}
@@ -207,20 +206,20 @@ as Cox regression models and random survival forests
 % target parameter in presence of a high-dimensional nuisance parameter,
 % a super learner will usually also include the highly adaptive lasso
 % \citep{van2011targeted, benkeser2016highly,van2017generally}.
+While the general idea of combining strong learners based on cross-validation
+data stems from earlier work \citep{wolpert1992stacked,breiman1996stacked}, the
+name super learner is justified by an oracle inequality
+\citep{van2003unicv,vaart2006oracle}: The super learner is guaranteed to perform
+almost as well as the model which minimises the expected performance, i.e., the
+model we would select if we could evaluate the prediction performance in an
+infinite hold-out sample.
 
-While the general idea of combining strong learners based on
-cross-validation data stems from earlier work
-\citep{wolpert1992stacked,breiman1996stacked}, the name super learner
-is justified by an oracle inequality
-\citep{van2003unicv,vaart2006oracle}: The super learner is guaranteed
-to perform almost as well as the model which minimises the expected
-performance, i.e., the model we would select if we could evaluate the
-prediction performance in an infinite hold-out sample. The choice of
+The choice of
 the loss function for super learning in survival analysis deserves a
 closer look. Existing super learner algorithms for right-censored data
 use partial log-likelihood loss or inverse probability of censoring
 weighted loss
-\citep{polley2011-sl-cens,keles2004asymptotically,golmakani2020super,westling2021inference}.
+\citep{polley2011-sl-cens,keles2004asymptotically,golmakani2020super,gonzalez2021stacked,westling2021inference}.
 The use of the partial log-likelihood loss, however, restricts the
 class of learners and excludes for example simple Kaplan-Meier based
 learners and also more complex random survival forest algorithms. For
@@ -240,15 +239,14 @@ learning of the event time distribution. We pursue a
 different route.
 
 In this article we define the state learner, a new super learner for
-right-censored data, which simultaneously estimates the expected loss
-of learners of the event time distribution and the censoring
-distribution. The loss function which is used to define the state
-learner is based on the observed variables, that is the minimum and
-the order of the censoring time and the event
-time.
+right-censored data, which simultaneously estimates the expected loss of
+learners of the event time distribution and the censoring distribution. The loss
+function which is used to define the state learner is based on the observed
+variables, that is, the minimum and the order of the censoring time and the
+event time.
 
 The state learner can be applied to all types of survival models,
-works in the presence of competing risks, and does not require a
+it can handle competing risks, and it does not require a
 single pre-specified estimator of the conditional censoring
 distribution.  To analyze the theoretical properties of the state
 learner we focus on the discrete super learner which combines the
@@ -318,8 +316,8 @@ functions on \( [0,\tau] \times\mathcal{X}\). Any distribution
 \begin{equation*}
   \label{eq:parametrizeQ}
   \begin{split}
-    Q(\diff t,j,\diff x)&= \left\{S(t- \mid x)\Lambda_1(\diff t \mid x)H(\diff x)\right\}^{1_{\{j=1\}}}\\
-                        &\quad\left\{S(t- \mid x)\Lambda_2(\diff t \mid x)H(\diff x)\right\}^{1_{\{j=2\}}},
+    Q(\diff t,j,\diff x)=& \left\{S(t- \mid x)\Lambda_1(\diff t \mid x)H(\diff x)\right\}^{\1{\{j=1\}}}\\
+                         &  \left\{S(t- \mid x)\Lambda_2(\diff t \mid x)H(\diff x)\right\}^{\1{\{j=2\}}},
   \end{split}
 \end{equation*}
 where \(\Lambda_{j} \in \mathcal{M}_{\tau}\) for \(j=1,2\) and \(H\) is the marginal
@@ -343,14 +341,14 @@ function for censoring. For ease of presentation we now also assume
 that \( \Gamma(\blank \mid x) \) is continuous for all \( x \). We let
 \(G(t \mid x)=\exp\left\{-\Gamma(t \mid x)\right\}\) denote the
 survival function of the conditional censoring distribution. The
-distribution is characterised by
+distribution \( P \) is characterised by
 \begin{equation}\label{eq:parametrizeP}
   \begin{split}
-    P(\diff t, j, \diff x) &= \left\{G(t- \mid x)S(t- \mid x)\Lambda_1(\diff t \mid x)H(\diff x)\right\}^{\1{{\{j=1\}}}}\\
-                           &\quad\left\{G(t- \mid x)S(t- \mid x)\Lambda_2(\diff t \mid x)H(\diff x)\right\}^{\1{{\{j=2\}}}}\\
-                           &\quad\left\{G(t- \mid x)S(t- \mid x)\Gamma(\diff t \mid x)H(\diff x)\right\}^{\1{{\{j=0\}}}}\\
-                           &=\left\{G(t- \mid x)Q(\diff t,j,\diff x)\right\}^{\1{{\{j\ne 0\}}}}\\    
-                           &\quad\left\{G(t- \mid x)S(t- \mid x)\Gamma(\diff t \mid x)H(\diff x)\right\}^{\1{{\{j=0\}}}}.
+    P(\diff t, j, \diff x) =& \left\{G(t- \mid x)S(t- \mid x)\Lambda_1(\diff t \mid x)H(\diff x)\right\}^{\1{{\{j=1\}}}}\\
+                            & \left\{G(t- \mid x)S(t- \mid x)\Lambda_2(\diff t \mid x)H(\diff x)\right\}^{\1{{\{j=2\}}}}\\
+                            & \left\{G(t- \mid x)S(t- \mid x)\Gamma(\diff t \mid x)H(\diff x)\right\}^{\1{{\{j=0\}}}}\\
+    = & \left\{G(t- \mid x)Q(\diff t,j,\diff x)\right\}^{\1{{\{j\ne 0\}}}}\\    
+                            & \left\{G(t- \mid x)S(t- \mid x)\Gamma(\diff t \mid x)H(\diff x)\right\}^{\1{{\{j=0\}}}}.
   \end{split}
 \end{equation}
 Hence, we may write
@@ -526,18 +524,20 @@ introduce the state learner, we define the multi-state process
   D=2\} - \1\{\tilde{T} \leq t, \tilde D=0\},
   \quad \text{for} \quad t \in [0, \tau].
 \end{equation*}
-At time \(t\), we observe that each individual is in one of four
-mutually exclusive states (Figure \ref{fig:multi-state-process}).
+At time \(t\), we observe that each individual is in one of four mutually
+exclusive states (Figure \ref{fig:multi-state-process}).
+
 \begin{figure}[h]
   \centering %
-  \includeFigCond[width=.3\textwidth]{figure-multi-state-process.pdf}
+  \includeFigCond[width=.5\textwidth]{figure-multi-state-process.pdf}
   \caption{Illustration of the multi-state process \(\eta\) used by
     the state learner. Note that `censored' is a state, hence the
     process is always observed at any time.}
   \label{fig:multi-state-process}
 \end{figure}
-The conditional distribution of \( \eta(t) \) given \( X \) is determined by
-the function
+
+The conditional
+distribution of \( \eta(t) \) given \( X \) is determined by the function
 \begin{equation}
   \label{eq:F-def}
   F(t, k, x) = P(\eta(t) = k \mid X=x),
@@ -669,7 +669,7 @@ if we minimise the average loss of the integrated Brier score, we recover the
 parameters of the data-generating distribution. Specifically, this implies that
 the oracle of a state learner is consistent if the library of learners contains
 at least one learner that is consistent for estimation of \( F \). Recall that
-the function \(F\) implicitly depends on the data generating probability measure
+the function \(F\) implicitly depends on the data-generating probability measure
 \(P\in\mathcal P\) but that this was suppressed in the notation. We now make
 this dependence explicit by writing \(F_0\) for the function which is obtained
 by substituting a specific \(P_0\in\mathcal{P}\) for \(P\) in equation
@@ -1149,7 +1149,7 @@ Kaplan-Meier estimator or a Cox model to estimate the censoring probability
 \citep{gonzalez2021stacked}. In the second part we compare the state learner to
 the super learner proposed by \cite{westling2021inference}.
 
-In both parts we use the same data generating mechanism. We generate
+In both parts we use the same data-generating mechanism. We generate
 data according to a distribution motivated from a real dataset in
 which censoring depends on the baseline covariates. We simulate data
 based on a prostate cancer study described in

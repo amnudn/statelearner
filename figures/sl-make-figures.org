@@ -34,6 +34,27 @@ Remember to exceture (C-c C-c) the following line:
 
 #+RESULTS[(2024-05-10 10:29:32) 37eb9f869f57b61caaa6ebaf9b36cf716dee5bba]:
 
+* Multi state
+#+BEGIN_SRC R :results graphics file :exports results :file figure-multi-state-process.pdf :width 10
+library(prodlim)
+library(here)
+nTrans <- 3
+stateLabels = c("Initial","Cause 1", "Cause 2", "Censored")
+crHist <- Hist(time = 1:nTrans, event = list(from = rep("1", nTrans), to = stateLabels[-1]))
+plot(crHist,stateLabels = stateLabels,arrowLabels = FALSE,
+     tagBoxes = c(0,1,2,-1),
+     box.width = 25) 
+#+END_SRC
+
+#+RESULTS[(2024-05-14 12:51:55) b72598ec85e4f8caf9af0eae5086839e885181e7]:
+[[file:figure-multi-state-process.pdf]]
+
+#+BEGIN_SRC sh
+  cp figure-multi-state-process.pdf ../tex/jrss-version/
+#+END_SRC
+
+#+RESULTS:
+
 * IPCW super learners
 Get number of events:
 #+BEGIN_SRC R
