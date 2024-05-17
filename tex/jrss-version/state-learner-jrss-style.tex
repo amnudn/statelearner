@@ -529,16 +529,15 @@ suppressed in the notation.
 % The problem with most existing super learners for right-censored data is that
 % they depend on a pre-specified estimator of the censoring distribution.
 The main idea of the state learner is to jointly use learners for
-\( \Lambda_1 \), \( \Lambda_2 \), and \( \Gamma \), and the relations
-in equation~(\ref{eq:parametrizeP}), to learn a feature of the
-observed data distribution \( P \). The discrete state learner ranks a
-tuple of learners for the tuple of the cumulative hazard functions
-\( (\Lambda_1, \Lambda_2, \Gamma) \) based on how well they jointly
-model the observed data.  Risk predictions can then be obtained by
-combining \( \Lambda_1 \) and $\Lambda_2$ from the highest ranked
-tupel using a well-known formula \citep{benichou1990estimates,
-  ozenne2017riskregression}. To formally introduce the state learner,
-we define the multi-state process
+\( \Lambda_1 \), \( \Lambda_2 \), and \( \Gamma \), and the relations in
+equation~(\ref{eq:parametrizeP}), to learn a feature of the observed data
+distribution \( P \). The discrete state learner ranks a tuple of learners for
+the tuple of the cumulative hazard functions
+\( (\Lambda_1, \Lambda_2, \Gamma) \) based on how well they jointly model the
+observed data. Risk predictions can then be obtained by combining
+\( \Lambda_1 \) and $\Lambda_2$ from the highest ranked tuple using a well-known
+formula \citep{benichou1990estimates, ozenne2017riskregression}. To formally
+introduce the state learner, we define the multi-state process
 \begin{equation*}
   \eta(t) = \1\{\tilde{T} \leq t, \tilde D=1\} + 2\,\1\{\tilde{T} \leq t, \tilde
   D=2\} - \1\{\tilde{T} \leq t, \tilde D=0\},
@@ -905,14 +904,14 @@ this implies that we may write
 \begin{equation*}
   \theta(Q) = \Psi(P) = \tilde{\Psi}^0(\Lambda_1, \Lambda_2, H),
 \end{equation*}
-for some operator \( \tilde{\Psi}^0 \). The state learner provides a
-ranking of all tuples
-\( (a_1, a_2, b) \in \mathcal{A}_1 \times \mathcal{A}_2 \times
-\mathcal{B} \). We use \( \hat{a}_{1,n} \), \( \hat{a}_{2,n} \), and
-\( \hat{b}_n \) to denote the learners corresponding to the discrete
-state learner \( \hat{\phi}_n \), i.e., the tupel with the highest
-rank. Letting \( H_n(\data_n) \) denote the empirical measure of
-\( \{X_1, \dots, X_n\} \), we obtain a plug-in estimator of $\theta$:
+for some operator \( \tilde{\Psi}^0 \). The state learner provides a ranking of
+all tuples
+\( (a_1, a_2, b) \in \mathcal{A}_1 \times \mathcal{A}_2 \times \mathcal{B} \).
+We use \( \hat{a}_{1,n} \), \( \hat{a}_{2,n} \), and \( \hat{b}_n \) to denote
+the learners corresponding to the discrete state learner \( \hat{\phi}_n \),
+i.e., the tuple with the highest rank. Letting \( H_n(\data_n) \) denote the
+empirical measure of \( \{X_1, \dots, X_n\} \), we obtain a plug-in estimator of
+$\theta$:
 \begin{equation}
   \label{eq:2}
   \hat{\Psi}^0(\data_n) =
@@ -1055,11 +1054,11 @@ is the difference in the average risk of cause \( 1 \) occurring before time
 compared to if no one had been given treatment \( (A=0) \).
 
 Using equation~(\ref{eq:surv-def}) we may write
-\( \theta_{{\tau}}(Q) = \tilde{\Psi}_{t}^0(\Lambda_1, \Lambda_2, \mu) \), where
+\( \theta_{{\tau}}(Q) = \tilde{\Psi}_{\tau}^0(\Lambda_1, \Lambda_2, \mu) \), where
 \begin{equation}
   \label{eq:1}    
   \begin{split}
-  \tilde{\Psi}_{t}^0(\Lambda_1, \Lambda_2, \mu) & =
+  \tilde{\Psi}_{\tau}^0(\Lambda_1, \Lambda_2, \mu) & =
   \int_{\mathcal{W}} 
   \int_0^{\tau}
   e^{-\Lambda_1(s- \mid w, 1)-\Lambda_2(s- \mid w, 1)}  \Lambda_1(\diff s \mid
@@ -1101,7 +1100,7 @@ The efficient influence function can now be written as
   \psi_{\tau}(O; \Lambda_1, \Lambda_2, \Gamma, \pi)
   = \psi_{\tau}^1(O; \Lambda_1, \Lambda_2, \Gamma, \pi)
   - \psi_{\tau}^0(O; \Lambda_1, \Lambda_2, \Gamma, \pi)
-  -\tilde{\Psi}_{t}^0(\Lambda_1, \Lambda_2, \mu),
+  -\tilde{\Psi}_{\tau}^0(\Lambda_1, \Lambda_2, \mu),
 \end{equation*}
 where
 \begin{equation}
@@ -1139,9 +1138,9 @@ which gives the estimator
 \begin{equation}
   \label{eq:one-step-comp-ate}
   \begin{split}
-    \hat{\Psi}_{t,\text{OS}}(\data_n)
+    \hat{\Psi}_{\tau,\text{OS}}(\data_n)
     = &
-        \tilde{\Psi}_{t}^0(\hat{a}_1(\data_n), \hat{a}_2(\data_n),
+        \tilde{\Psi}_{\tau}^0(\hat{a}_1(\data_n), \hat{a}_2(\data_n),
         \hat{\mu}_n(\data_n))
     \\
       &
@@ -1519,7 +1518,7 @@ Define
   \( R_{0}(F) = \Vert F - F_0 \Vert_{P_0}^2 \), where \( \Vert \blank \Vert_{P_0}\) is defined
   in equation~(\ref{eq:norm}).
 \end{lemma}
-\begin{proof}
+\begin{proof}[Proof]
   For any \( t \in [0, \tau] \) and \( j\in \{-1,0,1,2\} \) we have
   \begin{align*}
     & \E_{P_0}{\left[ (F(t, j, X) - \1{\{\eta(t) = j \}})^2 \right]}
@@ -1545,7 +1544,7 @@ Define
   \end{equation*}
 \end{proof}
 
-\begin{proof}[Proof of Proposition~\ref{prop:stric-prop}.]
+\begin{proof}[Proof of Proposition~\ref{prop:stric-prop}]
   The result follows from Lemma~\ref{lemma:norm}.
 \end{proof}
 
@@ -1553,7 +1552,7 @@ Recall that $\mathcal{H}_{\mathcal{P}}$ denote the function space consisting of
 all conditional state occupation probability functions for some measure
 \( P \in \mathcal{P} \).
 
-\begin{proof}[Proof of Corollary~\ref{cor:oracle-prop}.]
+\begin{proof}[Proof of Corollary~\ref{cor:oracle-prop}]
   First note that minimising the loss \( \bar{B}_{\tau} \) is equivalent to
   minimising the loss \( \bar{B}_{\tau,0} \), so the discrete super learner and
   oracle according to \( \bar{B}_{\tau} \) and \( \bar{B}_{\tau,0} \) are
@@ -1678,7 +1677,7 @@ For all $\delta>0$ we thus have
 and then the final result follows from Lemma~\ref{lemma:norm}.
 \end{proof}
 
-\begin{proof}[Proof of Corollary~\ref{cor:asymp-cons}.]
+\begin{proof}[Proof of Corollary~\ref{cor:asymp-cons}]
   By definition of the oracle and Lemma~\ref{lemma:norm},
   \begin{equation*}
     \E_{P_0}{\left[ \Vert \tilde{\phi}_n(\data_n^{-k}) - F_0 \Vert_{P_0}^2
@@ -1698,7 +1697,7 @@ $\bar\Psi(\hat{F}_n, \hat{H}_n)$ is used instead of
 $\tilde\Psi(\hat{\Lambda}_n, \hat{\Gamma}_n, \hat{H}_n)$.
 
 
-\begin{proof}[Proof of Proposition~\ref{prop:dr-structure}.]
+\begin{proof}[Proof of Proposition~\ref{prop:dr-structure}]
   For notational convenience we suppress \( X \) in the following. The final
   result can be obtained by adding the argument \( X \) to all functions and
   averaging. We use the relations from equation~(\ref{eq:7}) to write
