@@ -1171,7 +1171,7 @@ Kaplan-Meier estimator or a Cox model to estimate the censoring probability
 the super learner proposed by \cite{westling2021inference}.
 
 In both parts we use the same data-generating mechanism. We generate
-data according to a distribution motivated from a real dataset in
+data according to a distribution motivated from a real data set in
 which censoring depends on the baseline covariates. We simulate data
 based on the prostate cancer study of
 \cite{kattan2000pretreatment}. The outcome of interest is the time to
@@ -1410,7 +1410,7 @@ includes all levels of interaction.
 % ANDERS: er du sikker paa at det er ALL levels of interaction, ogsaa higher order?
 %         der mangler en reference for lasso model
 The results are shown in Figure~\ref{fig:zelefski-real-target} for 6
-month intervals after baseline with point wise 95\% confidence
+month intervals after baseline with pointwise 95\% confidence
 intervals. We see that hormone therapy decreases the risk of tumor
 recurrence and increases the risk of death without tumor recurrence,
 but that none of the estimated effects are statistically significant.
@@ -1421,7 +1421,7 @@ but that none of the estimated effects are statistically significant.
   \caption[]{Estimates of the average treatment effect of hormone therapy on the
     risk of tumor recurrence and death obtained from the prostate cancer study
     analyzed by \cite{kattan2000pretreatment}. The estimates are based on the
-    estimator defined in equation~(\ref{eq:one-step-comp-ate}) with point wise
+    estimator defined in equation~(\ref{eq:one-step-comp-ate}) with pointwise
     95\% confidence intervals calculated as described in
     Section~\ref{sec:targeted-learning}. The estimates of the nuisance
     parameters are provided by the state learner.}
