@@ -580,16 +580,16 @@ Hence, a learner for \( F \) can be constructed from learners for
 \begin{equation}\label{eq:transition}
   \begin{split}
   F(t, 1, x)
-  & = P(\tilde{T} \leq t, \Delta=1 \mid X=x)
+  & = P(\tilde{T} \leq t, \tilde{D}=1 \mid X=x)
     = \int_0^t e^{\{-\Lambda_{1}(s \mid x)-\Lambda_{2}(s \mid x) - \Gamma(s \mid x)\} }  \Lambda_{1}(\diff s \mid x),
   \\
   F(t, 2, x)
-  & = P(\tilde{T} \leq t, \Delta=2 \mid X=x)
+  & = P(\tilde{T} \leq t, \tilde{D}=2 \mid X=x)
     = \int_0^t e^{\{-\Lambda_{1}(s \mid x)-\Lambda_{2}(s \mid x) - \Gamma(s \mid x)\} }  \Lambda_{2}(\diff s \mid x),
   \\
   F(t, -1, x)
   & =
-    P(\tilde{T} \leq t, \Delta=0 \mid X=x)
+    P(\tilde{T} \leq t, \tilde{D}=0 \mid X=x)
     = \int_0^t e^{\{-\Lambda_{1}(s \mid x)-\Lambda_{2}(s \mid x) - \Gamma(s \mid x)\} }  \Gamma(\diff s \mid x),
   \\
   F(t, 0, x)
