@@ -315,21 +315,19 @@ inverse probability of censoring weighted (IPCW) loss function
 \citep{graf1999assessment,van2003unicv,molinaro2004tree,keles2004asymptotically,hothorn2006survival,gerds2006consistent,gonzalez2021stacked}.
 An IPCW loss function is attractive because the associated risk does not depend
 on the censoring distribution but describes a feature of the population of
-interested governed by the measure \( Q \in \mathcal{Q} \). Similar results can
-be obtained using censoring unbiased transformations
-\citep{fan1996local,steingrimsson2019censoring} or pseudo-values
+interested. Similar results can be obtained using censoring unbiased
+transformations \citep{fan1996local,steingrimsson2019censoring} or pseudo-values
 \citep{andersen2003generalised,mogensen2013random,sachs2019ensemble}. All these
 methods rely on an estimator of the censoring distribution, and their drawback
 is that this estimator has to be pre-specified. When the data-generating
 mechanism is complex and not well-understood, pre-specification of the censoring
 distribution is a challenge.
 
-An attempt to avoid a pre-specified censoring model was proposed
-independently by \cite{han2021inverse} and
-\cite{westling2021inference}. In both articles, the authors suggest to
-iterate between learning of \( \Lambda \) and learning of $\Gamma$
-using IPCW loss functions. However, no general theoretical guarantees
-seem to exist for this procedure, and it has not yet been extended to
+An attempt to avoid a pre-specified censoring model was proposed independently
+by \cite{han2021inverse} and \cite{westling2021inference}. In both articles, the
+authors suggest to iterate between learning of the outcome model and learning of
+the censoring model using IPCW loss functions. However, no general theoretical
+guarantees seem to exist for this procedure, and it has not yet been extended to
 the situation with competing risks.
 
 \subsection{Organization of article}
