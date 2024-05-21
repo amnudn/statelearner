@@ -8,41 +8,54 @@ to reproduce the numerical experiments described in the article "The state
 learner -- a super learner for right-censored data" (Munch & Gerds). Details are
 given in [[./experiments/readme-experiments.org]]. The article also describes a real
 data example, but as we cannot share the data from that study, the tutorial
-below uses a publicly available data set provided by the =riskRegression=
-package.
+below uses an emulated data set with the same structure as the original data
+analysed in the article.
+
+* Setup and load data
 
 To run the examples below, first run the following code to load the needed
 functions.
 
 #+BEGIN_SRC R :exports code
-library(here)
-library(targets)
-tar_source(here("R-code/functions"))
+  library(here)
+  library(targets)
+  tar_source(here("R-code/functions"))
 #+END_SRC
 
 #+RESULTS:
 
+We load and setup the emulated data as follows.
+#+BEGIN_SRC R :exports code :results silent
+  library(riskRegression)
+  canc_dt <- fread(here("emulated-data/emulated-data.txt"))
+  canc_dt[,stage:=factor(stage)]
+  canc_dt[,hormones:=factor(hormones)]
+#+END_SRC
 
-** Stand alone use of the state learner
-We illustrate how to use the state learner by fitting it to the =Melanoma= data
-set as provided by the =riskRegression= package.
+The data looks as follows.
 
 #+BEGIN_SRC R :exports both
-library(riskRegression)
-data(Melanoma, package="riskRegression")
-setDT(Melanoma)
-head(Melanoma)
+  canc_dt
 #+END_SRC
 
 #+RESULTS:
-:     time status                    event invasion    ici      epicel       ulcer thick    sex   age   logthick
-:    <int>  <num>                   <fctr>   <fctr> <fctr>      <fctr>      <fctr> <num> <fctr> <int>      <num>
-: 1:    10      2       death.other.causes  level.1      2     present     present  6.76   Male    76  1.9110229
-: 2:    30      2       death.other.causes  level.0      0 not present not present  0.65   Male    56 -0.4307829
-: 3:    35      0                 censored  level.1      2 not present not present  1.34   Male    41  0.2926696
-: 4:    99      2       death.other.causes  level.0      2 not present not present  2.90 Female    71  1.0647107
-: 5:   185      1 death.malignant.melanoma  level.2      2     present     present 12.08   Male    52  2.4915512
-: 6:   204      1 death.malignant.melanoma  level.2      2 not present     present  4.84   Male    28  1.5769147
+#+begin_example
+          time status   logPSA  stage    ggtot       sDose hormones     A
+         <num>  <int>    <num> <fctr>    <num>       <num>   <fctr> <num>
+   1: 28.92331      1 2.043593   T3ab 9.851837 -0.76183395       No     0
+   2: 14.20877      1 2.274948    T3c 6.881895 -0.35527003       No     0
+   3: 15.89122      0 1.133611    T2a 7.794667 -1.59754020       No     0
+   4: 61.61761      2 2.595044    T1c 8.879701 -0.81713882      Yes     1
+   5: 26.01292      0 2.360323    T1c 5.804236  0.61412150      Yes     1
+  ---                                                                    
+1038: 44.26178      0 1.137501    T2b 5.942560 -0.06968029      Yes     1
+1039: 13.93434      0 1.898109    T1c 6.785073  0.46413725       No     0
+1040: 52.19202      1 3.521309   T3ab 5.539725 -1.02355475       No     0
+1041: 10.06398      0 2.900889    T2b 5.906983  1.18218871      Yes     1
+1042: 25.70154      0 1.888293    T3c 7.163754  1.25946357      Yes     1
+#+end_example
+
+* Stand alone use of the state learner
 
 We specify a list of learners. Each learner is specified through a list with a
 =model= entry (for now, =cox=, =GLMnet=, and =rfsrc= are implemented), and a
@@ -53,11 +66,11 @@ entries to the list (e.g., =ntree= for a random survival forest).
   library(glmnet)
   library(randomForestSRC)
   learners <- list(
-    cox = list(model = "cox", x_form = ~sex+age+logthick),
-    cox_penalty = list(model = "GLMnet", x_form = ~invasion+ici+epicel+ulcer+sex+age+logthick),
+    cox = list(model = "cox", x_form = ~logPSA+stage+ggtot+sDose+hormones),
+    cox_penalty = list(model = "GLMnet", x_form = ~logPSA+stage+ggtot+sDose+hormones),
     N_Aa = list(model = "cox", x_form = ~1),
-    N_Aa_strat = list(model = "cox", x_form = ~strata(epicel)),
-    rf = list(model = "rfsrc", x_form = ~invasion+ici+epicel+ulcer+sex+age+logthick, ntree = 50)
+    N_Aa_strat = list(model = "cox", x_form = ~strata(hormones)),
+    rf = list(model = "rfsrc", x_form = ~logPSA+stage+ggtot+sDose+hormones, ntree = 50)
   )
 #+END_SRC
 
@@ -73,58 +86,58 @@ Below we use the same list of learners to learn the cumulative hazards for cause
 
 Here we use an interval of 5 years and show the 6 highest ranked triples.
 #+BEGIN_SRC R :exports both
-  set.seed(111)
+  set.seed(114)
   sl = statelearner(learners = list(cause1 = learners,
 				    cause2 = learners,
 				    censor = learners),
-		    data = Melanoma,
-		    time = 5*365.25)
+		    data = canc_dt,
+		    time = 36)
   head(sl$cv_fit)
 #+END_SRC
 
 #+RESULTS:
 : Key: <loss>
-:    cause1      cause2      censor     loss     b
-:    <fctr>      <fctr>      <fctr>    <num> <int>
-: 1:     rf        N_Aa         cox 239.6142     1
-: 2:     rf        N_Aa cox_penalty 239.8218     1
-: 3:     rf        N_Aa        N_Aa 239.8678     1
-: 4:     rf cox_penalty         cox 239.9478     1
-: 5:     rf        N_Aa          rf 239.9732     1
-: 6:     rf cox_penalty cox_penalty 240.1687     1
+:         cause1      cause2 censor     loss     b
+:         <fctr>      <fctr> <fctr>    <num> <int>
+: 1:         cox cox_penalty    cox 8.608565     1
+: 2:         cox        N_Aa    cox 8.608565     1
+: 3: cox_penalty cox_penalty    cox 8.609008     1
+: 4: cox_penalty        N_Aa    cox 8.609008     1
+: 5:         cox         cox    cox 8.610104     1
+: 6: cox_penalty         cox    cox 8.610470     1
 
-** Use for targeted estimation
-We estimate the standardized risk difference between patient with and without
-ulcers for both death of malignant melanoma (cause=1) and death from other
-causes (cause=2). To do so, we need an estimate of the "treatment" mechanism,
-i.e., the probability of the presence of ulcers given other covariates.
+* Use for targeted estimation
+We estimate effect of hormone therapy on tumor recurrence (cause=1) and death
+(cause=2). To do so, we need an estimate of the "treatment" mechanism, i.e., the
+probability of the presence of ulcers given other covariates.
 
 #+BEGIN_SRC R :exports code
-  Melanoma[,A := as.numeric(ulcer)-1]
-  treat_fit <- GLMnet(A ~ invasion+ici+epicel+sex+age+logthick, family = binomial, data = Melanoma)
+  canc_dt[,A := as.numeric(hormones)-1]
+  treat_fit <- GLMnet(A ~ logPSA+stage+ggtot+sDose, family = binomial, data = canc_dt)
 #+END_SRC
 
 #+RESULTS:
 #+begin_example
-     time status                    event invasion ici      epicel       ulcer thick    sex age   logthick A
-  1:   10      2       death.other.causes  level.1   2     present     present  6.76   Male  76  1.9110229 1
-  2:   30      2       death.other.causes  level.0   0 not present not present  0.65   Male  56 -0.4307829 0
-  3:   35      0                 censored  level.1   2 not present not present  1.34   Male  41  0.2926696 0
-  4:   99      2       death.other.causes  level.0   2 not present not present  2.90 Female  71  1.0647107 0
-  5:  185      1 death.malignant.melanoma  level.2   2     present     present 12.08   Male  52  2.4915512 1
- ---                                                                                                        
-201: 4492      0                 censored  level.2   3     present     present  7.06   Male  29  1.9544451 1
-202: 4668      0                 censored  level.2   2     present not present  6.12 Female  40  1.8115621 0
-203: 4688      0                 censored  level.0   1     present not present  0.48 Female  42 -0.7339692 0
-204: 4926      0                 censored  level.0   1 not present not present  2.26 Female  50  0.8153648 0
-205: 5565      0                 censored  level.1   2 not present not present  2.90 Female  41  1.0647107 0
+          time status   logPSA  stage    ggtot       sDose hormones     A
+         <num>  <int>    <num> <fctr>    <num>       <num>   <fctr> <num>
+   1: 28.92331      1 2.043593   T3ab 9.851837 -0.76183395       No     0
+   2: 14.20877      1 2.274948    T3c 6.881895 -0.35527003       No     0
+   3: 15.89122      0 1.133611    T2a 7.794667 -1.59754020       No     0
+   4: 61.61761      2 2.595044    T1c 8.879701 -0.81713882      Yes     1
+   5: 26.01292      0 2.360323    T1c 5.804236  0.61412150      Yes     1
+  ---                                                                    
+1038: 44.26178      0 1.137501    T2b 5.942560 -0.06968029      Yes     1
+1039: 13.93434      0 1.898109    T1c 6.785073  0.46413725       No     0
+1040: 52.19202      1 3.521309   T3ab 5.539725 -1.02355475       No     0
+1041: 10.06398      0 2.900889    T2b 5.906983  1.18218871      Yes     1
+1042: 25.70154      0 1.888293    T3c 7.163754  1.25946357      Yes     1
 #+end_example
 
 We can now estimate the ATE using the fitted nuisance models. 
 
 #+BEGIN_SRC R
-  ate_est <- os_abs_risk_ate(data = Melanoma, 
-			     eval_times = c(2,5)*365.25,
+  ate_est <- os_abs_risk_ate(data = canc_dt, 
+			     eval_times = seq(6,36,6),
 			     fit_1 = sl$fitted_winners$cause1,
 			     fit_2 = sl$fitted_winners$cause2,
 			     fit_cens = sl$fitted_winners$censor,
@@ -133,16 +146,27 @@ We can now estimate the ATE using the fitted nuisance models.
 
 #+RESULTS:
 
-Below we show the estimated risk difference for both malignant melanoma and
-death two and 5 years after baseline. 
+Below we show the estimated ATE for both tumor recurrence and death for 6-month
+intervals up to 3 years after baseline.
 #+BEGIN_SRC R :exports both
-ate_est[effect=="ATE" & est_type=="one-step"]
+  setorder(ate_est, cause, time)
+  ate_est[effect=="ATE" & est_type=="one-step"]
 #+END_SRC
 
 #+RESULTS:
-:     cause    time effect est_type        est        see       lower     upper
-:    <char>   <num> <char>   <char>      <num>      <num>       <num>     <num>
-: 1: cause1  730.50    ATE one-step 0.05927392 0.02787726  0.00463449 0.1139133
-: 2: cause2  730.50    ATE one-step 0.08841733 0.09471332 -0.09722077 0.2740554
-: 3: cause1 1826.25    ATE one-step 0.01714993 0.07503970 -0.12992787 0.1642277
-: 4: cause2 1826.25    ATE one-step 0.11099469 0.09669491 -0.07852734 0.3005167
+#+begin_example
+     cause  time effect est_type          est         see        lower      upper
+    <char> <num> <char>   <char>        <num>       <num>        <num>      <num>
+ 1: cause1     6    ATE one-step  0.012155916 0.013268835 -0.013850999 0.03816283
+ 2: cause1    12    ATE one-step  0.010001492 0.017758405 -0.024804982 0.04480796
+ 3: cause1    18    ATE one-step -0.003063623 0.019611287 -0.041501745 0.03537450
+ 4: cause1    24    ATE one-step -0.005076999 0.023713768 -0.051555983 0.04140199
+ 5: cause1    30    ATE one-step  0.020519005 0.029185821 -0.036685203 0.07772321
+ 6: cause1    36    ATE one-step  0.034855532 0.032061411 -0.027984834 0.09769590
+ 7: cause2     6    ATE one-step  0.006344508 0.005310849 -0.004064755 0.01675377
+ 8: cause2    12    ATE one-step -0.004604911 0.009646595 -0.023512237 0.01430241
+ 9: cause2    18    ATE one-step -0.007466150 0.013269851 -0.033475058 0.01854276
+10: cause2    24    ATE one-step -0.006363876 0.015592043 -0.036924281 0.02419653
+11: cause2    30    ATE one-step  0.014983272 0.031678356 -0.047106306 0.07707285
+12: cause2    36    ATE one-step  0.014682592 0.032697166 -0.049403852 0.07876904
+#+end_example

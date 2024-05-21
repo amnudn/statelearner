@@ -3,9 +3,9 @@
 ## Author: Anders Munch
 ## Created: Aug 18 2023 (10:26) 
 ## Version: 
-## Last-Updated: Jan 23 2024 (14:42) 
+## Last-Updated: May 21 2024 (17:28) 
 ##           By: Anders Munch
-##     Update #: 406
+##     Update #: 413
 #----------------------------------------------------------------------
 ## 
 ### Commentary: 
@@ -64,6 +64,7 @@ abs_risk_from_cschf <- function(...){
     S = exp(-Reduce("+", chfs))
     Sminus = cbind(1,S[,-ncol(S)])
     abs_risk = lapply(chfs, function(xx) {
+        xx[xx == Inf | is.na(xx)] <- max(xx[xx != Inf], na.rm = TRUE) ## Hack to avoid NaN's. Make better fix
         cs_haz = t(apply(cbind(0,xx), 1, diff))
         abs_risk_diff = cs_haz*Sminus
         return(riskRegression::rowCumSum(abs_risk_diff))
