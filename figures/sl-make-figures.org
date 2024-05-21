@@ -4,11 +4,10 @@
 
 #+LANGUAGE:  en
 #+OPTIONS:   num:t toc:nil ':t ^:t
+#+PROPERTY: header-args:R :async :results output verbatim  :exports results  :session *R* :cache no
+#+PROPERTY: header-args:R :exports none
 
-* Setting :noexport:
-Remember to exceture (C-c C-c) the following line:
-#+PROPERTY: header-args:R :async :results output verbatim  :exports results  :session *R* :cache yes
-
+* Setup and load data
 #+BEGIN_SRC R
   ## try(setwd("~/research/SuperVision/Anders/survival-loss/statelearner/experiments/"))
   library(here)
@@ -16,14 +15,7 @@ Remember to exceture (C-c C-c) the following line:
   ## Set wd to where we want to place figures
   try(setwd(here("figures")))
   ## Load targets
-  tar_load(names = c("zel_sim2_1",
-                     "zel_sim2_1_n_events",
-		     ## "ipcw_fail",
-		     ## "sim_zel_learners",
-		     ## "sim_zel_learners2",
-		     ## "sim_zel_learners2_dgm_cens",
-		     ## "zelefsky_statelearner_real_data_comp"
-		     ),
+  tar_load(names = c("zel_sim2_1", "zel_sim2_1_n_events"),
            store = here("experiments/_targets/"))
   tar_load(c("zelefsky_statelearner", "ate_est_main_eff","ate_est_inter_eff"), store = here("zelefsky-case-study/_targets/"))
   library(data.table)
@@ -32,9 +24,9 @@ Remember to exceture (C-c C-c) the following line:
   library(MetBrewer)
 #+END_SRC
 
-#+RESULTS[(2024-05-10 10:29:32) 37eb9f869f57b61caaa6ebaf9b36cf716dee5bba]:
+#+RESULTS:
 
-* Multi state
+* Multi state illustration
 #+BEGIN_SRC R :results graphics file :exports results :file figure-multi-state-process.pdf :width 10
 library(prodlim)
 library(here)
@@ -46,46 +38,22 @@ plot(crHist,stateLabels = stateLabels,arrowLabels = FALSE,
      box.width = 25) 
 #+END_SRC
 
-#+RESULTS[(2024-05-14 12:51:55) b72598ec85e4f8caf9af0eae5086839e885181e7]:
+#+RESULTS:
 [[file:figure-multi-state-process.pdf]]
+
 
 #+BEGIN_SRC sh
   cp figure-multi-state-process.pdf ../tex/jrss-version/
 #+END_SRC
 
-#+RESULTS:
-
-* IPCW super learners
-Get number of events:
-#+BEGIN_SRC R
-  event_cens_prob_table <- zel_sim2_1_n_events[,lapply(.SD, function(x) 100*x/100000) , .(time, sim_setting)]
-  Publish::org(event_cens_prob_table)
-#+END_SRC
-
-#+RESULTS[(2024-05-10 10:33:13) d85110e0ce822f20b5afaaee71cb0009fa6acbba]:
-#+begin_example
-|  time | sim_setting | true_events | true_cens | at_risk |
-|-------+-------------+-------------+-----------+---------|
-|     6 |    original |       4.386 |     6.644 |  89.123 |
-|    12 |    original |       8.822 |    19.045 |  73.214 |
-|    18 |    original |      13.171 |    31.978 |  57.691 |
-|    24 |    original |      17.191 |    43.595 |  44.636 |
-|    30 |    original |      20.934 |    53.584 |  34.103 |
-|    36 |    original |      24.619 |    61.853 |  25.774 |
-|     6 |  indep_cens |       4.381 |     2.373 |  93.351 |
-|    12 |  indep_cens |       8.966 |     7.279 |  84.401 |
-|    18 |  indep_cens |      13.199 |    13.929 |  74.702 |
-|    24 |  indep_cens |      17.266 |    21.674 |  64.755 |
-|    30 |  indep_cens |      21.059 |    30.143 |  55.141 |
-|    36 |  indep_cens |      24.674 |    38.740 |  46.141 |
-#+end_example
-
-
+* Numerical experiments
+Marginal event and censoring probabilities:
 #+BEGIN_SRC R :results output drawer
+  event_cens_prob_table <- zel_sim2_1_n_events[,lapply(.SD, function(x) 100*x/100000) , .(time, sim_setting)]
   Publish::org(event_cens_prob_table[time == 36])
 #+END_SRC
 
-#+RESULTS[(2024-05-10 10:33:27) 4fef844694f029b39f62f07fe2212e200734bcff]:
+#+RESULTS:
 :results:
 | time | sim_setting | true_events | true_cens | at_risk |
 |------+-------------+-------------+-----------+---------|
@@ -94,8 +62,8 @@ Get number of events:
 :end:
 
 
-
-#+BEGIN_SRC R
+** IPCW based super learners
+#+BEGIN_SRC R :results silent
   summ_zel_sim2_1 <- zel_sim2_1[, .(IPA = mean(IPA, na.rm = TRUE), se = sd(IPA, na.rm = TRUE)/sqrt(.N)), .(n_obs, sim_set, type, SL, time, type)]
   summ_zel_sim2_1[,SL:=factor(SL,
                               levels=c("ipcw_cox","ipcw_km","oracle","statelearner","survSL"),
@@ -104,35 +72,6 @@ Get number of events:
   summ_zel_sim2_1[,sim_set2:=factor(sim_set,levels=c("Independent censoring","Dependent censoring"),labels=c("Independent censoring (38.7% censored)","Dependent censoring (61.9% censored)"))]
 #+END_SRC
 
-#+RESULTS[(2024-05-10 09:41:28) 62efccdfbc99bd26f20c677b915998700827a829]:
-#+begin_example
-     n_obs    sim_set   type            SL  time type.1       IPA           se
-     <int>     <char> <char>        <fctr> <int> <char>     <num>        <num>
-  1:   300   original   cens        survSL     6   cens 0.6978450 0.0008305614
-  2:   300   original   cens State learner     6   cens 0.6989384 0.0008192387
-  3:   300   original   cens        Oracle     6   cens 0.6992857 0.0008149009
-  4:   300   original  event        survSL     6  event 0.3488385 0.0019823097
-  5:   300   original  event State learner     6  event 0.3468667 0.0019972122
- ---                                                                          
-380:  2400 indep_cens  event        survSL    36  event 0.1922440 0.0003727166
-381:  2400 indep_cens  event State learner    36  event 0.2005905 0.0002755740
-382:  2400 indep_cens  event      IPCW(KM)    36  event 0.2005905 0.0002755740
-383:  2400 indep_cens  event     IPCW(Cox)    36  event 0.2005905 0.0002755740
-384:  2400 indep_cens  event        Oracle    36  event 0.2005905 0.0002755740
-     n_obs               sim_set   type            SL  time type.1       IPA           se
-     <int>                <fctr> <char>        <fctr> <int> <char>     <num>        <num>
-  1:   300   Dependent censoring   cens        survSL     6   cens 0.6978450 0.0008305614
-  2:   300   Dependent censoring   cens State learner     6   cens 0.6989384 0.0008192387
-  3:   300   Dependent censoring   cens        Oracle     6   cens 0.6992857 0.0008149009
-  4:   300   Dependent censoring  event        survSL     6  event 0.3488385 0.0019823097
-  5:   300   Dependent censoring  event State learner     6  event 0.3468667 0.0019972122
- ---                                                                                     
-380:  2400 Independent censoring  event        survSL    36  event 0.1922440 0.0003727166
-381:  2400 Independent censoring  event State learner    36  event 0.2005905 0.0002755740
-382:  2400 Independent censoring  event      IPCW(KM)    36  event 0.2005905 0.0002755740
-383:  2400 Independent censoring  event     IPCW(Cox)    36  event 0.2005905 0.0002755740
-384:  2400 Independent censoring  event        Oracle    36  event 0.2005905 0.0002755740
-#+end_example
 
 #+BEGIN_SRC R
   ipa_plot <- function(data, dd_ww = 0.1, linetype_vals = c(1,3,2,1), scales = "fixed", ncol = 2, nrow = 1){
@@ -169,104 +108,48 @@ Get number of events:
   }
 #+END_SRC
 
-#+BEGIN_SRC R  :results graphics file :exports results :file experiment-fig-sl-ipcw.pdf :width 8 :height 3.5
+#+RESULTS:
+
+#+BEGIN_SRC R  :results graphics file :exports both :file experiment-fig-sl-ipcw.pdf :width 8 :height 3.5
   ipa_plot(data = summ_zel_sim2_1[time == 36 & type == "event" & SL != "survSL"])
 #+END_SRC
 
-#+RESULTS[(2024-05-14 10:14:40) 9a99ee96578517de249215446e046138e715044f]:
+#+RESULTS:
 [[file:experiment-fig-sl-ipcw.pdf]]
 
 #+BEGIN_SRC sh
   cp experiment-fig-sl-ipcw.pdf ../tex/jrss-version/
 #+END_SRC
 
-#+RESULTS:
+** State learner versus survSL
 
-* survSL
-
-#+BEGIN_SRC R :results graphics file :exports results :file experiment-fig-sl-survSL-out.pdf :width 8 :height 3.5
+#+BEGIN_SRC R :results graphics file :exports both :file experiment-fig-sl-survSL-out.pdf :width 8 :height 3.5
   ipa_plot(data = summ_zel_sim2_1[time == 36 & type == "event" & !grepl("IPCW", SL)],
            linetype_vals = c(1,1,2))
 #+END_SRC
 
-#+RESULTS[(2024-05-14 10:19:10) c998882b605a9d60c2ac67e61bc1ff0e7415c634]:
+#+RESULTS:
 [[file:experiment-fig-sl-survSL-out.pdf]]
 
 #+BEGIN_SRC sh
   cp experiment-fig-sl-survSL-out.pdf ../tex/jrss-version/
 #+END_SRC
 
-#+RESULTS:
-
-
-#+BEGIN_SRC R :results graphics file :exports results :file experiment-fig-sl-survSL-cens.pdf :width 6 :height 6
+#+BEGIN_SRC R :results graphics file :exports both :file experiment-fig-sl-survSL-cens.pdf :width 6 :height 6
   ipa_plot(data = summ_zel_sim2_1[time == 36 & type == "cens" & !grepl("IPCW", SL)],
            linetype_vals = c(1,1,2), scales = "free_y", nrow = 2, ncol = 1)
 #+END_SRC
 
-#+RESULTS[(2024-05-14 10:20:10) 812dc40776d1b58a92033e20835c36d9b11aef5d]:
+#+RESULTS:
 [[file:experiment-fig-sl-survSL-cens.pdf]]
 
 #+BEGIN_SRC sh
   cp experiment-fig-sl-survSL-cens.pdf ../tex/jrss-version/
 #+END_SRC
 
-#+RESULTS:
-
-** Old version
-#+BEGIN_SRC R
-  dd_ww <- 0.1
-  type_out_plot <- ggplot(summ_zel_sim2_1[time == 36 & type == "event" & !grepl("IPCW", SL)],
-			  aes(x = n_obs, y = IPA, col = SL)) +
-    theme_bw() +
-    geom_errorbar(position=position_dodge(width = dd_ww),
-		  aes(ymin = IPA-1.96*se, ymax = IPA+1.96*se),
-		  width = .1,
-		  alpha = .5,
-		  linewidth = 1) + 
-    geom_line(position=position_dodge(width = dd_ww), linewidth = 1.5) +
-    geom_point(position=position_dodge(width = dd_ww), size = 2) +
-    scale_x_continuous(trans='log2') +
-    facet_wrap(~sim_set2, ncol = 2) +
-    ylab("IPA") + theme(legend.position="top")  +
-    xlab("") +
-    scale_color_manual("Super learner", values=c("gray","#E69F00", "darkgreen")) +
-    scale_y_continuous(labels = scales::percent)  +
-    ggtitle("Outcome model") + theme(plot.title = element_text(vjust = -13))
-  type_cens_plot <- ggplot(summ_zel_sim2_1[time == 36 & type == "cens" & !grepl("IPCW", SL)],
-			   aes(x = n_obs, y = IPA, col = SL)) +
-    theme_bw() +
-    geom_errorbar(position=position_dodge(width = dd_ww),
-		  aes(ymin = IPA-1.96*se, ymax = IPA+1.96*se),
-		  width = .1,
-		  alpha = .5,
-		  linewidth = 1) + 
-    geom_line(position=position_dodge(width = dd_ww), linewidth = 1.5) +
-    geom_point(position=position_dodge(width = dd_ww), size = 2) +
-    scale_x_continuous(trans='log2') +
-    facet_wrap(~sim_set, ncol = 2) +
-    ylab("IPA") + theme(legend.position="none")  +
-    xlab("Number of observations") +
-    scale_color_manual("Super learner", values=c("gray","#E69F00", "darkgreen")) +
-    scale_y_continuous(labels = scales::percent)  +
-    ggtitle("Censoring model")
-#+END_SRC
-
-#+BEGIN_SRC R :results graphics file :exports results :file experiment-fig-sl-survSL.pdf :width 8 :height 6
-  exp_fig_sl_survSL_plot <- grid.arrange(type_out_plot,
-	       type_cens_plot,
-	       nrow = 2,
-	       heights=c(0.53, 0.47))
-  exp_fig_sl_survSL_plot
-#+END_SRC
-
-#+RESULTS[(2024-05-03 08:23:53) f2a4e922c021d60e93f134d0bd5d63dd8d0202dc]:
-[[file:experiment-fig-sl-survSL.pdf]]
-
-* Real Zelefski data with competing event new version
-
+* Data application with competing event
 ** State learner
-#+BEGIN_SRC R  :results graphics file :exports results :file real-data-state-learner.pdf :width 8 :height 4
+#+BEGIN_SRC R  :results graphics file :exports both :file real-data-state-learner.pdf :width 8 :height 4
   zel_real_plot_dt <- copy(zelefsky_statelearner$cv_fit)
   zel_real_plot_dt[,cause1:=factor(cause1,levels=c("cox_lasso","cox_elastic","cox_strata_stage","km","rf"),labels=c("lasso","elastic","strata","KM","RF"))]
   zel_real_plot_dt[,cause2:=factor(cause2,levels=c("cox_lasso","cox_elastic","cox_strata_stage","km","rf"),labels=c("lasso","elastic","strata","KM","RF"))]
@@ -285,14 +168,12 @@ Get number of events:
     scale_colour_grey("Death learner", start = 0, end = 0.7)
 #+END_SRC
 
-#+RESULTS[(2024-05-14 13:39:50) a7187299c761ad53ab2d4d791c9f02e3c102a793]:
+#+RESULTS:
 [[file:real-data-state-learner.pdf]]
 
 #+BEGIN_SRC sh
   cp real-data-state-learner.pdf ../tex/jrss-version/
 #+END_SRC
-
-#+RESULTS:
 
 Table
 
@@ -314,78 +195,11 @@ Table
 	       file = "real-data-tab.tex")
 #+END_SRC
 
-#+RESULTS[(2024-05-14 13:37:03) 6b53c96ca90349cc41746271fe268eafd2abda3d]:
-#+begin_example
-Key: <loss>
-                      cause1           cause2 censor      loss          sd
-                      <fctr>           <fctr> <fctr>     <num>       <num>
-  1:            \\texttt{RF}               km     rf  7.022057 0.046024265
-  2: \\texttt{Cox strata CT}      cox_elastic     rf  7.025097 0.032110343
-  3:            \\texttt{RF}      cox_elastic     rf  7.025267 0.046638952
-  4:            \\texttt{RF}               rf     rf  7.025504 0.046457079
-  5: \\texttt{Cox strata CT}        cox_lasso     rf  7.025648 0.031585447
- ---                                                                      
-121:            \\texttt{KM}               rf     km 10.299304 0.005481968
-122:            \\texttt{KM}        cox_lasso     km 10.310004 0.004864230
-123:            \\texttt{KM}      cox_elastic     km 10.310062 0.005185197
-124:            \\texttt{KM} cox_strata_stage     km 10.310763 0.003174509
-125:            \\texttt{KM}               km     km 10.328653 0.004108411
-Key: <loss>
-                      cause1                  cause2 censor      loss          sd
-                      <fctr>                  <fctr> <fctr>     <num>       <num>
-  1:            \\texttt{RF}            \\texttt{KM}     rf  7.022057 0.046024265
-  2: \\texttt{Cox strata CT}       \\texttt{Elastic}     rf  7.025097 0.032110343
-  3:            \\texttt{RF}       \\texttt{Elastic}     rf  7.025267 0.046638952
-  4:            \\texttt{RF}            \\texttt{RF}     rf  7.025504 0.046457079
-  5: \\texttt{Cox strata CT}         \\texttt{Lasso}     rf  7.025648 0.031585447
- ---                                                                             
-121:            \\texttt{KM}            \\texttt{RF}     km 10.299304 0.005481968
-122:            \\texttt{KM}         \\texttt{Lasso}     km 10.310004 0.004864230
-123:            \\texttt{KM}       \\texttt{Elastic}     km 10.310062 0.005185197
-124:            \\texttt{KM} \\texttt{Cox strata CT}     km 10.310763 0.003174509
-125:            \\texttt{KM}            \\texttt{KM}     km 10.328653 0.004108411
-Key: <loss>
-                      cause1                  cause2       censor      loss          sd
-                      <fctr>                  <fctr>       <fctr>     <num>       <num>
-  1:            \\texttt{RF}            \\texttt{KM} \\texttt{RF}  7.022057 0.046024265
-  2: \\texttt{Cox strata CT}       \\texttt{Elastic} \\texttt{RF}  7.025097 0.032110343
-  3:            \\texttt{RF}       \\texttt{Elastic} \\texttt{RF}  7.025267 0.046638952
-  4:            \\texttt{RF}            \\texttt{RF} \\texttt{RF}  7.025504 0.046457079
-  5: \\texttt{Cox strata CT}         \\texttt{Lasso} \\texttt{RF}  7.025648 0.031585447
- ---                                                                                   
-121:            \\texttt{KM}            \\texttt{RF} \\texttt{KM} 10.299304 0.005481968
-122:            \\texttt{KM}         \\texttt{Lasso} \\texttt{KM} 10.310004 0.004864230
-123:            \\texttt{KM}       \\texttt{Elastic} \\texttt{KM} 10.310062 0.005185197
-124:            \\texttt{KM} \\texttt{Cox strata CT} \\texttt{KM} 10.310763 0.003174509
-125:            \\texttt{KM}            \\texttt{KM} \\texttt{KM} 10.328653 0.004108411
-#+end_example
-
 #+BEGIN_SRC sh
   cp real-data-tab.tex ../tex/jrss-version/
 #+END_SRC
 
-#+RESULTS:
-
 ** Target parameter
-
-# #+BEGIN_SRC R
-#   ggplot(rbind(ate_est_main_eff[, prop := "main"], ate_est_inter_eff[, prop := "inter"])[effect == "ATE" & est_type == "one-step"],
-# 	 aes(x = time, y = est, col = prop)) +
-#     geom_errorbar(aes(ymin = lower, ymax = upper), width = 1, position = position_dodge(width = 1)) + 
-#     ## geom_line() +
-#     geom_point(position = position_dodge(width = 1)) +
-#     geom_hline(yintercept = 0, linetype = 2) +
-#     theme_bw() +
-#     facet_wrap( ~ cause)
-
-#   ggplot(ate_est[effect != "ATE" & est_type == "one-step"], aes(x = time, y = est, col = effect)) +
-#     geom_errorbar(aes(ymin = lower, ymax = upper), width = 1, position = position_dodge(width = 1)) + 
-#     ## geom_line() +
-#     geom_point(position = position_dodge(width = 1)) +
-#     geom_hline(yintercept = 0, linetype = 2) +
-#     theme_bw() +
-#     facet_wrap( ~ cause)
-# #+END_SRC
 
 #+BEGIN_SRC R :results graphics file :exports results :file real-data-target.pdf  :width 8 :height 3.5
   ate_est_inter_eff[effect == "ATE" & est_type == "one-step"] |>
@@ -404,97 +218,10 @@ Key: <loss>
       })()
 #+END_SRC
 
-#+RESULTS[(2024-05-14 13:40:42) 912533a8d75a50eb169821cabbd8412f7dc3da73]:
+#+RESULTS:
 [[file:real-data-target.pdf]]
 
 #+BEGIN_SRC sh
   cp real-data-target.pdf ../tex/jrss-version/
 #+END_SRC
-
-#+RESULTS:
-
-* Real Zelefski data with competing event -- old :noexport:
-
-#+BEGIN_SRC R  :results graphics file :exports results :file zelefski-real-data.pdf :width 7 :height 4
-  zel_real_plot_dt <- copy(zelefsky_statelearner_real_data_comp)
-  zel_real_plot_dt[,cause1:=factor(cause1,levels=c("cox_lasso","cox_elastic","cox_strata_stage","km","rf"),labels=c("lasso","elastic","strata","KM","RF"))]
-  zel_real_plot_dt[,cause2:=factor(cause2,levels=c("cox_lasso","cox_elastic","cox_strata_stage","km","rf"),labels=c("lasso","elastic","strata","KM","RF"))]
-  zel_real_plot_dt[,censor:=factor(censor,levels=c("cox_lasso","cox_elastic","cox_strata_stage","km","rf"),labels=paste("Censoring learner\n", c("lasso","elastic","strata","KM","RF")))]
-
-  library(ggplot2)
-  ggplot(zel_real_plot_dt, aes(x = cause1, y = loss, col = cause2)) +
-    geom_point(position=position_dodge(width=1), size=.8) +
-    geom_errorbar(aes(ymin = loss-2*sd, ymax = loss+2*sd), width = .4,
-		  position=position_dodge(width=1)) +
-    theme_bw() + ylab("Integrated Brier score") +
-    theme(legend.position="top",
-	  axis.text.x = element_text(angle = 45, vjust = .8)) +
-    xlab("Tumor learner") +
-    facet_grid( ~ censor) +
-    scale_colour_grey("Death learner", start = 0, end = 0.7)
-#+END_SRC
-
-#+RESULTS[(2024-01-22 13:48:54) 3d4f75e3996bf997e893981620d6ad50bf4c6baf]:
-[[file:zelefski-real-data.pdf]]
-
-Table
-
-#+BEGIN_SRC R
-  library(xtable)
-  zel_real_tab_dt <- copy(zelefsky_statelearner_real_data_comp)
-  zel_real_tab_dt[,cause1:=factor(cause1,levels=c("cox_lasso","cox_elastic","cox_strata_stage","km","rf"),labels=c("\\texttt{Lasso}","\\texttt{Elastic}","\\texttt{Cox strata CT}","\\texttt{KM}","\\texttt{RF}"))]
-  zel_real_tab_dt[,cause2:=factor(cause2,levels=c("cox_lasso","cox_elastic","cox_strata_stage","km","rf"),labels=c("\\texttt{Lasso}","\\texttt{Elastic}","\\texttt{Cox strata CT}","\\texttt{KM}","\\texttt{RF}"))]
-  zel_real_tab_dt[,censor:=factor(censor,levels=c("cox_lasso","cox_elastic","cox_strata_stage","km","rf"),labels=c("\\texttt{Lasso}","\\texttt{Elastic}","\\texttt{Cox strata CT}","\\texttt{KM}","\\texttt{RF}"))]
-  xtab <- zel_real_tab_dt[1:10, .(cause1, cause2, censor, IBS = paste0("$", round(loss, digits = 2), "\\pm", round(sd, digits = 2), "$"))]
-  setnames(xtab,
-	   c("cause1", "cause2", "censor", "IBS"),
-	   new = c("Tumor learner", "Death learner", "Censoring learner", "Integrated Brier score"))
-  print.xtable(xtable(xtab, align = c(rep("l", 4), "|", "l")),
-	       include.rownames=FALSE,
-	       floating=FALSE,
-	       sanitize.text.function = force,
-	       booktabs=TRUE,
-	       file = "zel-tab.tex")
-#+END_SRC
-
-#+RESULTS[(2023-08-21 15:53:26) f2ee7e2467e0d7cc46cbcad1f0c5fd7f860c07de]:
-#+begin_example
-                cause1           cause2 censor      loss         sd
-  1: \\texttt{Elastic}      cox_elastic     rf  7.034702 0.02159417
-  2: \\texttt{Elastic}               km     rf  7.034812 0.02286074
-  3:   \\texttt{Lasso}      cox_elastic     rf  7.035051 0.02142064
-  4:   \\texttt{Lasso}               km     rf  7.035231 0.02266556
-  5: \\texttt{Elastic}        cox_lasso     rf  7.036116 0.02102182
- ---                                                               
-121:      \\texttt{KM}               rf     km 10.310009 0.01690905
-122:      \\texttt{KM}      cox_elastic     km 10.319369 0.01322889
-123:      \\texttt{KM}        cox_lasso     km 10.319741 0.01335233
-124:      \\texttt{KM} cox_strata_stage     km 10.322298 0.01455127
-125:      \\texttt{KM}               km     km 10.337965 0.01296003
-                cause1                  cause2 censor      loss         sd
-  1: \\texttt{Elastic}       \\texttt{Elastic}     rf  7.034702 0.02159417
-  2: \\texttt{Elastic}            \\texttt{KM}     rf  7.034812 0.02286074
-  3:   \\texttt{Lasso}       \\texttt{Elastic}     rf  7.035051 0.02142064
-  4:   \\texttt{Lasso}            \\texttt{KM}     rf  7.035231 0.02266556
-  5: \\texttt{Elastic}         \\texttt{Lasso}     rf  7.036116 0.02102182
- ---                                                                      
-121:      \\texttt{KM}            \\texttt{RF}     km 10.310009 0.01690905
-122:      \\texttt{KM}       \\texttt{Elastic}     km 10.319369 0.01322889
-123:      \\texttt{KM}         \\texttt{Lasso}     km 10.319741 0.01335233
-124:      \\texttt{KM} \\texttt{Cox strata CT}     km 10.322298 0.01455127
-125:      \\texttt{KM}            \\texttt{KM}     km 10.337965 0.01296003
-                cause1                  cause2       censor      loss         sd
-  1: \\texttt{Elastic}       \\texttt{Elastic} \\texttt{RF}  7.034702 0.02159417
-  2: \\texttt{Elastic}            \\texttt{KM} \\texttt{RF}  7.034812 0.02286074
-  3:   \\texttt{Lasso}       \\texttt{Elastic} \\texttt{RF}  7.035051 0.02142064
-  4:   \\texttt{Lasso}            \\texttt{KM} \\texttt{RF}  7.035231 0.02266556
-  5: \\texttt{Elastic}         \\texttt{Lasso} \\texttt{RF}  7.036116 0.02102182
- ---                                                                            
-121:      \\texttt{KM}            \\texttt{RF} \\texttt{KM} 10.310009 0.01690905
-122:      \\texttt{KM}       \\texttt{Elastic} \\texttt{KM} 10.319369 0.01322889
-123:      \\texttt{KM}         \\texttt{Lasso} \\texttt{KM} 10.319741 0.01335233
-124:      \\texttt{KM} \\texttt{Cox strata CT} \\texttt{KM} 10.322298 0.01455127
-125:      \\texttt{KM}            \\texttt{KM} \\texttt{KM} 10.337965 0.01296003
-#+end_example
-
 
