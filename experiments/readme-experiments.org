@@ -1,0 +1,10 @@
+#+Title: Numerical experiments with the state learner
+
+The experiment is run on a server using the Slurm Workload Manager, which is
+setup in the file [[submit_zel-sim2-1.sh]]. When the experiment is run, results are
+collected by running the command =targets::tar_make()= in =R=. The figures from the
+article are made in [[../figures/sl-make-figures.org]].
+
+To construct a single draw from the experiment, instead of all the 1000 draws
+used in the article, the function [[../R-code/functions/numerical-study-sampler.R]]
+can be used.

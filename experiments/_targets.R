@@ -3,9 +3,9 @@
 ## Author: Anders Munch
 ## Created: Nov 14 2023 (09:52) 
 ## Version: 
-## Last-Updated: May 21 2024 (09:29) 
+## Last-Updated: May 21 2024 (09:37) 
 ##           By: Anders Munch
-##     Update #: 45
+##     Update #: 53
 #----------------------------------------------------------------------
 ## 
 ### Commentary: 
@@ -27,22 +27,27 @@ combine_results <- function(job_name, results_dir){
                    function(fl) fread(paste0("./", results_dir, "/", fl))))
 }
 
-
 list(
     tar_target(results_dir, "results", format = "file"), ## Make it look for changes to results dir
     tar_target(zel_sim2_1, combine_results("zel-sim2-1", results_dir = results_dir)),
-    tar_target(zel_sim2_1_n_events, zel_sim2_1_n_events_mc_fun()),
-    tar_target(ipcw_fail_sim, {
-        run0 = combine_results("ipcw-fail-sim", results_dir = results_dir)
-        state_more = combine_results("ipcw-fail-sim-more-state-learners", results_dir = results_dir)
-        state_more[, SL := "statelearner_many"]
-        rbind(run0, state_more)
-    }),
-    tar_target(ipcw_fail_sim0_more, combine_results("ipcw-fail-sim-more-state-learners", results_dir = results_dir)),    
-    tar_target(ipcw_fail_sim0, combine_results("ipcw-fail-sim", results_dir = results_dir)),
-    tar_target(ipcw_fail_sim2, combine_results("ipcw-fail-sim2", results_dir = results_dir)),
-    tar_target(ipcw_fail_sim3, combine_results("ipcw-fail-sim3", results_dir = results_dir)),
-    tar_target(ipcw_fail_sim_without_rf, combine_results("ipcw-fail-sim-without-rf", results_dir = results_dir))
+    tar_target(zel_sim2_1_n_events, {
+        ## Get event and censoring probabilities:
+        eval_times = seq(6, 36, 6)
+        sim_sets = list(original = simZelefsky_wrapper,
+                        indep_cens = simZelefsky_indep_cens_wrapper)
+        out = do.call(rbind, lapply(seq_along(sim_sets), function(pp){
+            sim_set_name = names(sim_sets)[pp]
+            mc_sim = sim_sets[[pp]](n = 100000)
+            do.call(rbind, lapply(eval_times, function(tt){
+                data.table(sim_setting = sim_set_name,
+                           time = tt,
+                           true_events = mc_sim[, sum(true_time<tt)],
+                           true_cens = mc_sim[, sum(cens_time<tt)],
+                           at_risk = mc_sim[, sum(time>tt)])[]
+            }))
+        }))
+        out[]
+    })
 )
 
 

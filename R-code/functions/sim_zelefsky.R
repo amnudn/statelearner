@@ -3,9 +3,9 @@
 ## Author: Anders Munch
 ## Created: Nov 12 2023 (15:55) 
 ## Version: 
-## Last-Updated: Nov 28 2023 (09:57) 
+## Last-Updated: May 21 2024 (09:43) 
 ##           By: Anders Munch
-##     Update #: 74
+##     Update #: 76
 #----------------------------------------------------------------------
 ## 
 ### Commentary: 
@@ -96,54 +96,7 @@ simZelefsky <- function(n,censoring = TRUE,simulation_input = zelefsky_summary, 
     d[,]
     d
 }
-
-## simZelefsky <- function(n,censoring = TRUE,simulation_input = zelefsky_sim_input, ...){
-##     m <- lvm()
-##     input.surv = simulation_input$surv
-##     input.cens = simulation_input$cens
-##     zelefsky = simulation_input$zelefsky
-##     distribution(m,~time.recur) <- coxWeibull.lvm(scale=exp(-input.surv$coef["(Intercept)"]/input.surv$scale),shape=1/input.surv$scale)
-##     distribution(m,~time.cens) <- coxWeibull.lvm(scale=exp(-input.cens$coef["(Intercept)"]/input.cens$scale),shape=(1/input.cens$scale))
-##     ## put code to generate covariates: psa, stage, ggtot, dose100, hormones
-##     ## alike the real data distributions, maybe even with
-##     ## regression statements between them to make them correlated
-
-##     distribution(m,~logPSA) <- normal.lvm(mean=mean(log(zelefsky$psa)),sd=sd(log(zelefsky$psa)))
-##     m <- categorical(m,~stage, K=6, p=c(table(zelefsky$stage)[-6]/nrow(zelefsky)), labels=c("T1c","T2a","T2b","T2c","T3ab","T3c"))
-##     transform(m,stageT2a~stage) <- function(x){1*(x=="T2a")}
-##     transform(m,stageT2b~stage) <- function(x){1*(x=="T2b")}
-##     transform(m,stageT2c~stage) <- function(x){1*(x=="T2c")}
-##     transform(m,stageT3ab~stage) <- function(x){1*(x=="T3ab")}
-##     transform(m,stageT3c~stage) <- function(x){1*(x=="T3c")}
-##     distribution(m,~ggtot) <- normal.lvm(mean=mean(zelefsky$ggtot),sd=sd(zelefsky$ggtot))
-##     distribution(m,~sDose) <- normal.lvm(mean=mean(zelefsky$sDose),sd=sd(zelefsky$sDose))
-    
-##     distribution(m,~hormones) <- binomial.lvm(p=mean(zelefsky$hormonesYes))
-##     regression(m,time.recur~logPSA + stageT2a + stageT2b + stageT2c + stageT3ab + stageT3c + ggtot + sDose + hormones) <- -input.surv$coef[-1]/input.surv$scale
-##     regression(m,time.cens~logPSA + stageT2a + stageT2b + stageT2c + stageT3ab + stageT3c + ggtot + sDose + hormones) <- -input.cens$coef[-1]/input.cens$scale
-    
-##     if (censoring){
-##         m <- lava::eventTime(m, dmos ~ min(time.recur = 1, time.cens=0),eventName = "recur")
-##         d <- sim(m,n)
-##     } else {
-##         d <- sim(m,n)
-##         d$dmos <- d$time.recur
-##         d$recur <- 1
-##     }
-
-##     ## Something is strange here?
-##     for (x in 1:ncol(d)){
-##         d[,x] <- c(d[,x])
-##     }
-##     setDT(d)
-##     d[,psa:=exp(logPSA)]
-##     d[,hormones:=factor(hormones, levels=c("0","1"), labels = c("No", "Yes"))]
-##     d[,status:=1*recur==1]
-##     d[,recur:=factor(recur, levels=c("0","1"), labels = c("No", "Yes"))]
-##     d[,]
-##     d
-## }
-
+       
 simZelefsky_wrapper <- function(n,censoring = TRUE,simulation_input = zelefsky_summary, ...){
     raw_dat = simZelefsky(n = n, censoring = censoring, simulation_input = simulation_input, ...)
     out = raw_dat[, .(X1 = logPSA, X2 = stage, X3 = ggtot, X4 = sDose, X5 = hormones, time = dmos, status = 1*status, true_time = time.recur, cens_time = time.cens)]
@@ -179,17 +132,6 @@ simZelefsky_noise_wrapper <- function(n,censoring = TRUE,simulation_input = zele
     }
     return(out)
 }
-
-## ## Settings from Zelefsky:
-## surv$coef <-  c(7.6627958, -0.5111233, -0.6097065, -0.9189468, -1.1148973, -1.0502660, -1.1500966, -0.1302955,  0.3786362,  0.2308239)
-
-## ## surv
-## c(7.7,-0.5,-0.6,-0.9,-1.1,-1.1,-1.2,-0.1,0.4,0.2)
-## 0.9
-
-## ## cens
-## c(3.3,0.1,-0.1,0.2,0.4,0.5,0.5,0.0,-0.5,-0.2)
-## 0.6
 
 
 ######################################################################

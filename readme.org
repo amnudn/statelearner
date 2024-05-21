@@ -3,9 +3,15 @@
 
 This repository provides code that implements the state learner. We provide
 examples of how to use it as a stand-alone tool and in combination with targeted
-learning.
+learning. We also provide code to reproduce the numerical experiments described
+in the article "The state learner -- a super learner for right-censored data"
+(Munch & Gerds). Details are given in [[./experiments/readme-experiments.org]]. The
+article also described a real data example. As we cannot share the data from
+that study, the tutorial below uses a publicly available data set provided by
+the =riskRegression= package.
 
-To run the examples below, run the following code to load the needed functions.
+To run the examples below, first run the following code to load the needed
+functions.
 
 #+BEGIN_SRC R :exports code
 library(here)
