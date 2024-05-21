@@ -5,7 +5,6 @@
 #+LANGUAGE:  en
 #+OPTIONS:   num:t toc:nil ':t ^:t
 #+PROPERTY: header-args:R :async :results output verbatim  :exports results  :session *R* :cache no
-#+PROPERTY: header-args:sh :exports none
 
 * Setup and load data
 #+BEGIN_SRC R
@@ -116,7 +115,7 @@ Marginal event and censoring probabilities:
 #+RESULTS:
 [[file:experiment-fig-sl-ipcw.pdf]]
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports none
   cp experiment-fig-sl-ipcw.pdf ../tex/jrss-version/
 #+END_SRC
 
@@ -130,7 +129,7 @@ Marginal event and censoring probabilities:
 #+RESULTS:
 [[file:experiment-fig-sl-survSL-out.pdf]]
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports none
   cp experiment-fig-sl-survSL-out.pdf ../tex/jrss-version/
 #+END_SRC
 
@@ -142,7 +141,7 @@ Marginal event and censoring probabilities:
 #+RESULTS:
 [[file:experiment-fig-sl-survSL-cens.pdf]]
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports none
   cp experiment-fig-sl-survSL-cens.pdf ../tex/jrss-version/
 #+END_SRC
 
@@ -170,7 +169,7 @@ Marginal event and censoring probabilities:
 #+RESULTS:
 [[file:real-data-state-learner.pdf]]
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports none
   cp real-data-state-learner.pdf ../tex/jrss-version/
 #+END_SRC
 
@@ -194,7 +193,7 @@ Table
 	       file = "real-data-tab.tex")
 #+END_SRC
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports none
   cp real-data-tab.tex ../tex/jrss-version/
 #+END_SRC
 
@@ -220,7 +219,7 @@ Table
 #+RESULTS:
 [[file:real-data-target.pdf]]
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports none
   cp real-data-target.pdf ../tex/jrss-version/
 #+END_SRC
 
