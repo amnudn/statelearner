@@ -3,9 +3,9 @@
 ## Author: Anders Munch
 ## Created: Nov 14 2023 (09:52) 
 ## Version: 
-## Last-Updated: May 10 2024 (10:03) 
+## Last-Updated: May 21 2024 (09:29) 
 ##           By: Anders Munch
-##     Update #: 44
+##     Update #: 45
 #----------------------------------------------------------------------
 ## 
 ### Commentary: 
@@ -30,11 +30,6 @@ combine_results <- function(job_name, results_dir){
 
 list(
     tar_target(results_dir, "results", format = "file"), ## Make it look for changes to results dir
-    tar_target(zel_sim1_results, combine_results("zel_sim1", results_dir = results_dir)),
-    tar_target(zel_indep_cens_sim_results, combine_results("zel-indep-cens-sim", results_dir = results_dir)),
-    tar_target(zel_all_results, combine_results("zel-all-settings", results_dir = results_dir)),
-    tar_target(zel_all0_results, combine_results("zel-all-settings0", results_dir = results_dir)),
-    tar_target(zel_all2_results, combine_results("zel-all-settings2", results_dir = results_dir)),
     tar_target(zel_sim2_1, combine_results("zel-sim2-1", results_dir = results_dir)),
     tar_target(zel_sim2_1_n_events, zel_sim2_1_n_events_mc_fun()),
     tar_target(ipcw_fail_sim, {
