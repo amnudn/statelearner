@@ -1,19 +1,3 @@
-### _targets.R --- 
-#----------------------------------------------------------------------
-## Author: Anders Munch
-## Created: Mar 13 2024 (09:20) 
-## Version: 
-## Last-Updated: Mar 20 2024 (08:58) 
-##           By: Anders Munch
-##     Update #: 33
-#----------------------------------------------------------------------
-## 
-### Commentary: 
-## 
-### Change Log:
-#----------------------------------------------------------------------
-## 
-### Code:
 library(here)
 try(setwd(here("zelefsky-case-study")))
 try(setwd("~/research/SuperVision/Anders/survival-loss/statelearner/zelefsky-case-study/"))
@@ -82,7 +66,3 @@ list(
                         fit_treat = treat_fit)}
         )
 )
-
-
-######################################################################
-### _targets.R ends here
