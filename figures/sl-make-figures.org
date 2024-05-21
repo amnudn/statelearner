@@ -9,7 +9,6 @@
 
 * Setup and load data
 #+BEGIN_SRC R
-  ## try(setwd("~/research/SuperVision/Anders/survival-loss/statelearner/experiments/"))
   library(here)
   library(targets)
   ## Set wd to where we want to place figures
@@ -42,7 +41,7 @@ plot(crHist,stateLabels = stateLabels,arrowLabels = FALSE,
 [[file:figure-multi-state-process.pdf]]
 
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports none
   cp figure-multi-state-process.pdf ../tex/jrss-version/
 #+END_SRC
 
