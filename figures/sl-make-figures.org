@@ -5,7 +5,7 @@
 #+LANGUAGE:  en
 #+OPTIONS:   num:t toc:nil ':t ^:t
 #+PROPERTY: header-args:R :async :results output verbatim  :exports results  :session *R* :cache no
-#+PROPERTY: header-args:R :exports none
+#+PROPERTY: header-args:sh :exports none
 
 * Setup and load data
 #+BEGIN_SRC R
@@ -27,7 +27,7 @@
 #+RESULTS:
 
 * Multi state illustration
-#+BEGIN_SRC R :results graphics file :exports results :file figure-multi-state-process.pdf :width 10
+#+BEGIN_SRC R :results graphics file :exports both :file figure-multi-state-process.pdf :width 10
 library(prodlim)
 library(here)
 nTrans <- 3
@@ -201,7 +201,7 @@ Table
 
 ** Target parameter
 
-#+BEGIN_SRC R :results graphics file :exports results :file real-data-target.pdf  :width 8 :height 3.5
+#+BEGIN_SRC R :results graphics file :exports both :file real-data-target.pdf  :width 8 :height 3.5
   ate_est_inter_eff[effect == "ATE" & est_type == "one-step"] |>
     (\(plot_data)
       {
