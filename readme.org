@@ -4,8 +4,8 @@
 This repository provides code that implements the state learner which is a super
 learner for right-censored data. We provide examples of how to use it as a
 stand-alone tool and in combination with targeted learning. We also provide code
-to reproduce the numerical experiments described in the article "The state
-learner -- a super learner for right-censored data" (Munch & Gerds). Details are
+to reproduce the numerical experiments described in the article /The state
+learner -- a super learner for right-censored data/ (Munch & Gerds). Details are
 given in [[./experiments/readme-experiments.org]]. The article also describes a real
 data example, but as we cannot share the data from that study, the tutorial
 below uses an emulated data set with the same structure as the original data
@@ -83,8 +83,8 @@ Below we use the same list of learners to learn the cumulative hazards for cause
    performance in predicting the state of the observed data in the interval 0 to
    =time=;
 2) the top ranked triple of models fitted to the full data.
-
-Here we use an interval of 5 years and show the 6 highest ranked triples.
+   
+Here we use an interval of 36 month and show the 6 highest ranked triples.
 #+BEGIN_SRC R :exports both
   set.seed(114)
   sl = statelearner(learners = list(cause1 = learners,
@@ -108,7 +108,7 @@ Here we use an interval of 5 years and show the 6 highest ranked triples.
 
 * Use for targeted estimation
 We estimate effect of hormone therapy on tumor recurrence (cause=1) and death
-(cause=2). To do so, we need an estimate of the "treatment" mechanism, i.e., the
+(cause=2). To do so, we need an estimate of the treatment mechanism, i.e., the
 probability of the presence of ulcers given other covariates.
 
 #+BEGIN_SRC R :exports code
