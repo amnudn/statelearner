@@ -34,13 +34,14 @@ head(Melanoma)
 #+END_SRC
 
 #+RESULTS:
-:    time status                    event invasion ici      epicel       ulcer thick    sex age   logthick
-: 1:   10      2       death.other.causes  level.1   2     present     present  6.76   Male  76  1.9110229
-: 2:   30      2       death.other.causes  level.0   0 not present not present  0.65   Male  56 -0.4307829
-: 3:   35      0                 censored  level.1   2 not present not present  1.34   Male  41  0.2926696
-: 4:   99      2       death.other.causes  level.0   2 not present not present  2.90 Female  71  1.0647107
-: 5:  185      1 death.malignant.melanoma  level.2   2     present     present 12.08   Male  52  2.4915512
-: 6:  204      1 death.malignant.melanoma  level.2   2 not present     present  4.84   Male  28  1.5769147
+:     time status                    event invasion    ici      epicel       ulcer thick    sex   age   logthick
+:    <int>  <num>                   <fctr>   <fctr> <fctr>      <fctr>      <fctr> <num> <fctr> <int>      <num>
+: 1:    10      2       death.other.causes  level.1      2     present     present  6.76   Male    76  1.9110229
+: 2:    30      2       death.other.causes  level.0      0 not present not present  0.65   Male    56 -0.4307829
+: 3:    35      0                 censored  level.1      2 not present not present  1.34   Male    41  0.2926696
+: 4:    99      2       death.other.causes  level.0      2 not present not present  2.90 Female    71  1.0647107
+: 5:   185      1 death.malignant.melanoma  level.2      2     present     present 12.08   Male    52  2.4915512
+: 6:   204      1 death.malignant.melanoma  level.2      2 not present     present  4.84   Male    28  1.5769147
 
 We specify a list of learners. Each learner is specified through a list with a
 =model= entry (for now, =cox=, =GLMnet=, and =rfsrc= are implemented), and a
@@ -80,13 +81,15 @@ of 5 years and show the 6 highest ranked triples.
 #+END_SRC
 
 #+RESULTS:
-:    cause1      cause2      censor     loss b
-: 1:     rf          km         cox 239.6142 1
-: 2:     rf          km cox_penalty 239.8218 1
-: 3:     rf          km          km 239.8678 1
-: 4:     rf cox_penalty         cox 239.9478 1
-: 5:     rf          km          rf 239.9732 1
-: 6:     rf cox_penalty cox_penalty 240.1687 1
+: Key: <loss>
+:    cause1      cause2      censor     loss     b
+:    <fctr>      <fctr>      <fctr>    <num> <int>
+: 1:     rf          km         cox 239.6142     1
+: 2:     rf          km cox_penalty 239.8218     1
+: 3:     rf          km          km 239.8678     1
+: 4:     rf cox_penalty         cox 239.9478     1
+: 5:     rf          km          rf 239.9732     1
+: 6:     rf cox_penalty cox_penalty 240.1687     1
 
 ** Use for targeted estimation
 We estimate the standardized risk difference between patient with and without
@@ -128,48 +131,16 @@ We can now estimate the ATE using the fitted nuisance models.
 
 #+RESULTS:
 
-Below we show the estimated risk difference for 
+Below we show the estimated risk difference for both malignant melanoma and
+death two and 5 years after baseline. 
 #+BEGIN_SRC R :exports both
 ate_est[effect=="ATE" & est_type=="one-step"]
 #+END_SRC
 
 #+RESULTS:
 :     cause    time effect est_type        est        see       lower     upper
-: 1: cause1  730.50    ATE one-step 0.05638786 0.02677092  0.00391686 0.1088589
-: 2: cause2  730.50    ATE one-step 0.08763156 0.08163485 -0.07237275 0.2476359
-: 3: cause1 1826.25    ATE one-step 0.05699237 0.05786330 -0.05641970 0.1704044
-: 4: cause2 1826.25    ATE one-step 0.10442644 0.08226031 -0.05680378 0.2656567
-
-** Simulated data
-
-We simulate data according to the Zelefsky study and evaluate different super learners.
-#+BEGIN_SRC R
-  set.seed(22)
-  start_t = 1
-  end_t = 36
-  time_inc = (end_t-start_t)/100
-  eval_times = seq(start_t, end_t, time_inc)
-  train_data <- simZelefsky_wrapper(n = 500, simulation_input = zelefsky_summary)[, !c("true_time", "cens_time")]
-  eval_data <- simZelefsky_wrapper(n = 1e4, simulation_input = zelefsky_summary)[, !c("time", "status")]
-  sim_est <- eval_sl(train_data, eval_data, eval_times = seq(1, 36, length.out = 100))
-#+END_SRC
-
-#+RESULTS:
-
-The scaled integrated Brier scores are obtained as follows.
-#+BEGIN_SRC R :exports both
-sim_est[!(type == "cens" & grepl("ipcw", SL)),
-        .(scaled_int_brier = sum(100*brier)*time_inc/end_t),
-        .(type, SL)]
-#+END_SRC
-
-#+RESULTS:
-:     type           SL scaled_int_brier
-: 1: event       survSL         9.951644
-: 2:  cens       survSL        13.723653
-: 3: event statelearner         9.826543
-: 4:  cens statelearner        14.055743
-: 5: event      ipcw_km         9.826543
-: 6: event     ipcw_cox         9.826543
-: 7: event       oracle         9.826543
-: 8:  cens       oracle        13.725703
+:    <char>   <num> <char>   <char>      <num>      <num>       <num>     <num>
+: 1: cause1  730.50    ATE one-step 0.05927392 0.02787726  0.00463449 0.1139133
+: 2: cause2  730.50    ATE one-step 0.08841733 0.09471332 -0.09722077 0.2740554
+: 3: cause1 1826.25    ATE one-step 0.01714993 0.07503970 -0.12992787 0.1642277
+: 4: cause2 1826.25    ATE one-step 0.11099469 0.09669491 -0.07852734 0.3005167
