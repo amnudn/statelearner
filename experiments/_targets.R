@@ -3,9 +3,9 @@
 ## Author: Anders Munch
 ## Created: Nov 14 2023 (09:52) 
 ## Version: 
-## Last-Updated: May 21 2024 (09:37) 
+## Last-Updated: May 21 2024 (11:38) 
 ##           By: Anders Munch
-##     Update #: 53
+##     Update #: 54
 #----------------------------------------------------------------------
 ## 
 ### Commentary: 
@@ -18,7 +18,6 @@ library(targets)
 library(data.table)
 library(here)
 tar_source(here("R-code/functions"))
-tar_source(here("experiments/zel-sim2-1-n-events-mc-fun.R"))
 
 combine_results <- function(job_name, results_dir){
     fls = list.files(results_dir)
