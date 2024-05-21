@@ -584,16 +584,16 @@ Hence, a learner for \( F \) can be constructed from learners for
   \begin{split}
   F(t, 1, x)
   & = P(\tilde{T} \leq t, \tilde{D}=1 \mid X=x)
-    = \int_0^t e^{\{-\Lambda_{1}(s \mid x)-\Lambda_{2}(s \mid x) - \Gamma(s \mid x)\} }  \Lambda_{1}(\diff s \mid x),
+    = \int_0^t \exp{{\{-\Lambda_{1}(s \mid x)-\Lambda_{2}(s \mid x) - \Gamma(s \mid x)\} }}  \Lambda_{1}(\diff s \mid x),
   \\
   F(t, 2, x)
   & = P(\tilde{T} \leq t, \tilde{D}=2 \mid X=x)
-    = \int_0^t e^{\{-\Lambda_{1}(s \mid x)-\Lambda_{2}(s \mid x) - \Gamma(s \mid x)\} }  \Lambda_{2}(\diff s \mid x),
+    = \int_0^t \exp{\{-\Lambda_{1}(s \mid x)-\Lambda_{2}(s \mid x) - \Gamma(s \mid x)\} }  \Lambda_{2}(\diff s \mid x),
   \\
   F(t, -1, x)
   & =
     P(\tilde{T} \leq t, \tilde{D}=0 \mid X=x)
-    = \int_0^t e^{\{-\Lambda_{1}(s \mid x)-\Lambda_{2}(s \mid x) - \Gamma(s \mid x)\} }  \Gamma(\diff s \mid x),
+    = \int_0^t \exp{\{-\Lambda_{1}(s \mid x)-\Lambda_{2}(s \mid x) - \Gamma(s \mid x)\} }  \Gamma(\diff s \mid x),
   \\
   F(t, 0, x)
   &
@@ -624,9 +624,9 @@ for \( F \):
   \mathcal{F}(\mathcal{A}_1, \mathcal{A}_2, \mathcal{B})
   &= \{ \phi_{a_1,a_2, b} : a_1 \in \mathcal{A}_1, a_2 \in \mathcal{A}_2, b \in \mathcal{B}\},
     \intertext{where in correspondence with  the relations in equation \eqref{eq:transition},} 
-    \phi_{a_1,a_2, b}(\data_n)(t,1,x) &= \int_0^t e^{\{-a_1(\data_n)(s \mid x)-a_2(\data_n)(s \mid x) - b(\data_n)(s \mid x)\} }  a_1(\data_n)(\diff s \mid x),\\
-  \phi_{a_1,a_2, b}(\data_n)(t,2,x) &= \int_0^t e^{\{-a_1(\data_n)(s \mid x)-a_2(\data_n)(s \mid x) - b(\data_n)(s \mid x)\} }  a_2(\data_n)(\diff s \mid x),\\
-  \phi_{a_1,a_2, b}(\data_n)(t,-1,x) &= \int_0^t e^{\{-a_1(\data_n)(s \mid x)-a_2(\data_n)(s \mid x) - b(\data_n)(s \mid x)\} }  b(\data_n)(\diff s \mid x),\\
+    \phi_{a_1,a_2, b}(\data_n)(t,1,x) &= \int_0^t \exp{\{-a_1(\data_n)(s \mid x)-a_2(\data_n)(s \mid x) - b(\data_n)(s \mid x)\} }  a_1(\data_n)(\diff s \mid x),\\
+  \phi_{a_1,a_2, b}(\data_n)(t,2,x) &= \int_0^t \exp{\{-a_1(\data_n)(s \mid x)-a_2(\data_n)(s \mid x) - b(\data_n)(s \mid x)\} }  a_2(\data_n)(\diff s \mid x),\\
+  \phi_{a_1,a_2, b}(\data_n)(t,-1,x) &= \int_0^t \exp{\{-a_1(\data_n)(s \mid x)-a_2(\data_n)(s \mid x) - b(\data_n)(s \mid x)\} }  b(\data_n)(\diff s \mid x),\\
   \phi_{a_1,a_2, b}(\data_n)(t,0,x) &= 1
                                       - \phi_{a_1,a_2, b}(\data_n)(t,1,x)
                                       - \phi_{a_1,a_2, b}(\data_n)(t,2,x)
@@ -1062,18 +1062,19 @@ Using equation~(\ref{eq:surv-def}) we may write
 \begin{equation}
   \label{eq:1}    
   \begin{split}
-  \tilde{\Psi}_{\tau}^0(\Lambda_1, \Lambda_2, \mu) & =
-  \int_{\mathcal{W}} 
-  \int_0^{\tau}
-  e^{-\Lambda_1(s- \mid w, 1)-\Lambda_2(s- \mid w, 1)}  \Lambda_1(\diff s \mid
-  w, 1)
-  \mu(\diff w)
-  \\
-  &  \quad
-  -\int_{\mathcal{W}} 
-  \int_0^{\tau}
-  e^{-\Lambda_1(s- \mid w, 0)-\Lambda_2(s- \mid w, 0)}  \Lambda_1(\diff s \mid w, 0)
-  \mu(\diff w).
+    \tilde{\Psi}_{\tau}^0(\Lambda_1, \Lambda_2, \mu)
+    & =
+      \int_{\mathcal{W}} 
+      \int_0^{\tau}
+      \exp{\{{-\Lambda_1(s- \mid w, 1)-\Lambda_2(s- \mid w, 1)}\}}  \Lambda_1(\diff s \mid
+      w, 1)
+      \mu(\diff w)
+    \\
+    &  \quad
+      -\int_{\mathcal{W}} 
+      \int_0^{\tau}
+      \exp{\{{-\Lambda_1(s- \mid w, 0)-\Lambda_2(s- \mid w, 0)}\}}  \Lambda_1(\diff s \mid w, 0)
+      \mu(\diff w).
   \end{split}
 \end{equation}
 The efficient influence function for the parameter $\tilde{\Psi}_{\tau}$ depends
@@ -1086,15 +1087,15 @@ We define
   \\
   g(t, A, W; \Lambda_1, \Lambda_2)
   & = \int_0^{t}
-    e^{-\Lambda_1(s- \mid W, A)-\Lambda_2(s- \mid W, A)}  \Lambda_1(\diff s \mid
+    \exp{\{ {-\Lambda_1(s- \mid W, A)-\Lambda_2(s- \mid W, A)} \}}  \Lambda_1(\diff s \mid
     W, A),
   \\  
   M_j(\diff t \mid A, W;  \Lambda_j  )
   & = N_j(\diff t) -
     \1{\{\tilde{T} \geq t\}} \Lambda_j(\diff t \mid W, A),
     \quad j \in \{1,2\},
-  \intertext{and}
-  M(\diff t \mid A, W;  \Lambda_1, \Lambda_2  )
+    \intertext{and}
+    M(\diff t \mid A, W;  \Lambda_1, \Lambda_2  )
   & = M_1(\diff t \mid A, W;  \Lambda_1  ) +
     M_2(\diff t \mid A, W;  \Lambda_2  ).
 \end{align*}
@@ -1114,7 +1115,7 @@ where
     \\
     & =
       \omega_a(A,W; \pi)
-      \int_0^{\tau} e^{\Gamma(t- \mid A, W)}   
+      \int_0^{\tau} \exp{\{{\Gamma(t- \mid A, W)}\}}   
       M_1(\diff t \mid A, W; \Lambda_1)
     \\
     & \quad
@@ -1122,7 +1123,7 @@ where
       \omega_a(A,W; \pi)
       g(\tau, A, W; \Lambda_1, \Lambda_2)
       \int_0^{\tau}
-      e^{[\Gamma+\Lambda_1 + \Lambda_2](t- \mid A, W)}
+      \exp{\{{[\Gamma+\Lambda_1 + \Lambda_2](t- \mid A, W)}\}}
       M(\diff t \mid A, W; \Lambda_1, \Lambda_2)
     \\
     & \quad
@@ -1130,7 +1131,7 @@ where
       \omega_a(A,W; \pi)      
       \int_0^{\tau}
       g(t, A, W; \Lambda_1, \Lambda_2)
-      e^{[\Gamma+\Lambda_1 + \Lambda_2](t- \mid A, W)}
+      \exp{\{{[\Gamma+\Lambda_1 + \Lambda_2](t- \mid A, W)}\}}
       M(\diff t \mid A, W; \Lambda_1, \Lambda_2)
     \\
     & \quad + g(\tau, a, W; \Lambda_1, \Lambda_2).
