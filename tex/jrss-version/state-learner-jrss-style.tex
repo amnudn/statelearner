@@ -70,7 +70,7 @@
 
 \usepackage{dsfont, booktabs}
 
-\usepackage[tablesonly,heads,nolists]{endfloat}
+% \usepackage[tablesonly,heads,nolists]{endfloat}
 
 %% change enumerate labels
 \renewcommand{\labelenumi}{\normalfont (\alph{enumi})}
@@ -87,7 +87,7 @@
 % \bibliographystyle{rss}
 
 %% Toggle with or without figures
-\def\nofig{1}
+% \def\nofig{1}
 
 \newcommand{\includeFigCond}[2][]{
   \ifx\nofig\undefined %
@@ -148,8 +148,7 @@
 
 %\subtitle{Subject Section}
 
-\title[The state learner]{The state learner -- a super learner for
-  right-censored data}
+\title[The state learner]{The state learner -- a super learner for right-censored data}
 
 \author[1,$\ast$]{Anders Munch}
 \author[1]{Thomas A.\ Gerds}
@@ -168,7 +167,7 @@
 
 \abstract{In survival analysis, prediction models are needed as
   stand-alone tools and in applications of causal inference to
-  estimate nuisance parameters.  The super learner is a machine
+  estimate nuisance parameters. The super learner is a machine
   learning algorithm which combines a library of prediction models
   into a meta learner based on cross-validated loss. In right censored
   data, the choice of the loss function and the estimation of the
@@ -183,7 +182,7 @@
   learner and investigate its performance through numerical
   experiments. We illustrate the application of the state learner with
   prostate cancer data, as a stand-alone prediction tool, and, for
-  causal inference, as a way to estimate the nuissance parameter models of
+  causal inference, as a way to estimate the nuisance parameter models of
   a smooth statistical functional.
   % We illustrate how the state learner allows us to
   % estimate causal effects in a competing risks setting without having
