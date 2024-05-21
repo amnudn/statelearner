@@ -72,6 +72,10 @@
 
 \usepackage[tablesonly,heads,nolists]{endfloat}
 
+%% change enumerate labels
+\renewcommand{\labelenumi}{\normalfont (\alph{enumi})}
+
+
 
 %% Only for comments:
 \usepackage[author=]{fixme}
@@ -765,7 +769,7 @@ Corollary~\ref{cor:oracle-prop} has the following asymptotic consequences.
   \( n \in \N \), such that
   \( \E_{P_0}{\left[ \Vert \phi_n(\data_n^{-k}) - F_{0} \Vert_{P_0}^2 \right]} =
   \bigO(n^{-\alpha}) \), for some \( \alpha\leq 1 \).
-  \begin{enumerate}
+  \begin{enumerate}[1.]
   \item If $\alpha=1$ then
     \( \E_{P_0}{\left[ \Vert \hat{\phi}_n(\data_n^{-k}) - F_0 \Vert_{P_0}^2
       \right]} = \bigO(\log(n)n^{-1}) \).
