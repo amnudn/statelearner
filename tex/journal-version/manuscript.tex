@@ -1,50 +1,31 @@
-%%
-%% Copyright 2022 OXFORD UNIVERSITY PRESS
-%%
-%% This file is part of the 'oup-authoring-template Bundle'.
-%% ---------------------------------------------
-%%
-%% It may be distributed under the conditions of the LaTeX Project Public
-%% License, either version 1.2 of this license or (at your option) any
-%% later version.  The latest version of this license is in
-%%    http://www.latex-project.org/lppl.txt
-%% and version 1.2 or later is part of all distributions of LaTeX
-%% version 1999/12/01 or later.
-%%
-%% The list of all files belonging to the 'oup-authoring-template Bundle' is
-%% given in the file `manifest.txt'.
-%%
-%% Template article for OXFORD UNIVERSITY PRESS's document class `oup-authoring-template'
-%% with bibliographic references
-%%
+\documentclass[12pt]{article}
+\usepackage[a4paper,left=2.8cm, right=2.8cm, top=3cm, bottom=3cm]{geometry}
 
-%%%CONTEMPORARY%%%
-% \documentclass[unnumsec,webpdf,contemporary,large]{oup-authoring-template}%
-\documentclass[numsec,webpdf,contemporary,medium,namedate]{oup-authoring-template}% uncomment this line for author year citations and comment the above
-%\documentclass[unnumsec,webpdf,contemporary,medium]{oup-authoring-template}
-%\documentclass[unnumsec,webpdf,contemporary,small]{oup-authoring-template}
+%% Packages
+\usepackage{amsthm, dsfont, amssymb,soul,xcolor,
+  % amsfonts,
+  enumitem,
+  amsmath,graphicx,verbatim,pgfplots,tikz,prodint,booktabs}
 
-%%%MODERN%%%
-%\documentclass[unnumsec,webpdf,modern,large]{oup-authoring-template}
-% \documentclass[unnumsec,webpdf,modern,large,namedate]{oup-authoring-template}% uncomment this line for author year citations and comment the above
-%\documentclass[unnumsec,webpdf,modern,medium]{oup-authoring-template}
-%\documentclass[unnumsec,webpdf,modern,small]{oup-authoring-template}
+\usepackage[authoryear]{natbib}
+\bibliographystyle{abbrvnat}
 
-%%%TRADITIONAL%%%
-%\documentclass[unnumsec,webpdf,traditional,large]{oup-authoring-template}
-% \documentclass[unnumsec,webpdf,traditional,large,namedate]{oup-authoring-template}% uncomment this line for author year citations and comment the above
-%\documentclass[unnumsec,namedate,webpdf,traditional,medium]{oup-authoring-template}
-%\documentclass[namedate,webpdf,traditional,small]{oup-authoring-template}
+% % Handling new lines
+% \setlength{\parskip}{1em}
+% \setlength{\parindent}{0em}
 
-\onecolumn % for one column layouts
+% % Handling space after sections
+% \usepackage{titlesec}
+% \titlespacing*{\section}{0em}{2em}{0em}
+% \titlespacing*{\subsection}{0em}{2em}{0em}
+% \titlespacing*{\subsubsection}{0em}{2em}{0em}
 
-%\usepackage{showframe}
+% % No spacing after in start of list
+% \setlist[itemize]{topsep=0pt}
+% \setlist[enumerate]{topsep=0pt}
 
-% \graphicspath{{Fig/}}
-
-% line numbers
-%\usepackage[mathlines, switch]{lineno}
-%\usepackage[right]{lineno}
+\definecolor{linkcolor}{rgb}{0, 0, 0.54}
+\usepackage[colorlinks,allcolors=linkcolor]{hyperref}
 
 \theoremstyle{thmstyleone}%\
 \newtheorem{theorem}{Theorem}%  meant for continuous numbers
@@ -62,20 +43,16 @@
 \newtheorem{definition}{Definition}
 
 
-
-%% OLD
-
-% \usepackage{natbib, dsfont,
-% amssymb,soul,xcolor,amsmath,graphicx,verbatim,pgfplots,tikz,prodint,booktabs}
-
-\usepackage{dsfont, booktabs}
-
 % \usepackage[tablesonly,heads,nolists]{endfloat}
 
 %% change enumerate labels
-\renewcommand{\labelenumi}{\normalfont (\alph{enumi})}
+% \renewcommand{\labelenumi}{\normalfont (\alph{enumi})}
 
+%% Font size etc
+\linespread{1.65}
 
+\usepackage{lineno}
+\linenumbers
 
 %% Only for comments:
 \usepackage[author=]{fixme}
@@ -84,11 +61,21 @@
 \definecolor{fxnote}{rgb}{.5,.5,.5}
 \fxsetup{status=draft}
 
-% \bibliographystyle{rss}
-
 %% Toggle with or without figures
 % \def\nofig{1}
 
+\RequirePackage{graphicx}
+% \RequirePackage{caption}
+% \RequirePackage{array}
+% \RequirePackage{color}
+% \RequirePackage{xcolor}
+% \RequirePackage{amssymb}
+% \RequirePackage{flushend}
+% \RequirePackage{stfloats}
+% \RequirePackage[figuresright]{rotating}
+% \RequirePackage{chngpage}
+% \RequirePackage{totcount}
+% \RequirePackage{fix-cm}
 \newcommand{\includeFigCond}[2][]{
   \ifx\nofig\undefined %
     \includegraphics[#1]{#2} %
@@ -132,68 +119,54 @@
 \newcommand{\data}{\ensuremath{\mathcal{D}}}
 
 
+%% Title
+\title{The state learner -- a super learner for right-censored data}
+
+\usepackage{authblk}
+\author[1]{Anders Munch}
+\author[1]{Thomas~A.~Gerds}
+\affil[1]{Section of Biostatistics, University of Copenhagen}
+
+
 \begin{document}
 
-%% NEW
 
-\journaltitle{Journal of the Royal Statistical Society Series B: Statistical
-  Methodology} %
-\DOI{DOI HERE} %
-\copyrightyear{xxxx} %
-\pubyear{yyyy} \access{Advance Access Publication Date: Day Month Year}
-\appnotes{Paper}
+% \authormark{Munch et al.}
 
+% \address[1]{\orgdiv{Section of Biostatistics}, \orgname{University of
+%     Copenhagen}, \orgaddress{\street{Østerfarigmagsgade 5}, \postcode{2100}, \state{Copenhagen}, \country{Denmark}}}
 
-\firstpage{1}
-
-%\subtitle{Subject Section}
-
-\title[The state learner]{The state learner -- a super learner for right-censored data}
-
-\author[1,$\ast$]{Anders Munch}
-\author[1]{Thomas A.\ Gerds}
-
-\authormark{Munch et al.}
-
-\address[1]{\orgdiv{Section of Biostatistics}, \orgname{University of
-    Copenhagen}, \orgaddress{\street{Østerfarigmagsgade 5}, \postcode{2100}, \state{Copenhagen}, \country{Denmark}}}
-
-\corresp[$\ast$]{Address for correspondence: \href{email:email-id.com}{a.munch@sund.ku.dk}}
+% \corresp[$\ast$]{Address for correspondence: \href{email:email-id.com}{a.munch@sund.ku.dk}}
 
 % \received{Date}{0}{Year}
 % \revised{Date}{0}{Year}
 % \accepted{Date}{0}{Year}
 
 
-\abstract{In survival analysis, prediction models are needed as
-  stand-alone tools and in applications of causal inference to
-  estimate nuisance parameters. The super learner is a machine
-  learning algorithm which combines a library of prediction models
-  into a meta learner based on cross-validated loss. In right censored
-  data, the choice of the loss function and the estimation of the
-  expected loss need careful consideration. We introduce the state
-  learner, a new super learner for survival analysis, which
-  simultaneously evaluates libraries of prediction models for the
-  event of interest and the censoring distribution. The state learner
-  can be applied to all types of survival models, works in the
-  presence of competing risks, and does not require a single
-  pre-specified estimator of the conditional censoring
-  distribution. We establish an oracle inequality for the state
-  learner and investigate its performance through numerical
-  experiments. We illustrate the application of the state learner with
-  prostate cancer data, as a stand-alone prediction tool, and, for
-  causal inference, as a way to estimate the nuisance parameter models of
-  a smooth statistical functional.
-  % We illustrate how the state learner allows us to
-  % estimate causal effects in a competing risks setting without having
-  % to pre-specify models for neither the cause-specific hazards of
-  % interest nor the censoring distribution.
-}
 
-\keywords{Competing risks, cross-validation, loss based estimation,
-  right-censored data, super learner}
+% \keywords{Competing risks, cross-validation, loss based estimation,
+%   right-censored data, super learner}
 
 \maketitle
+
+\begin{abstract}
+  In survival analysis, prediction models are needed as stand-alone tools and in
+  applications of causal inference to estimate nuisance parameters. The super
+  learner is a machine learning algorithm which combines a library of prediction
+  models into a meta learner based on cross-validated loss. In right censored
+  data, the choice of the loss function and the estimation of the expected loss
+  need careful consideration. We introduce the state learner, a new super
+  learner for survival analysis, which simultaneously evaluates libraries of
+  prediction models for the event of interest and the censoring distribution.
+  The state learner can be applied to all types of survival models, works in the
+  presence of competing risks, and does not require a single pre-specified
+  estimator of the conditional censoring distribution. We establish an oracle
+  inequality for the state learner and investigate its performance through
+  numerical experiments. We illustrate the application of the state learner with
+  prostate cancer data, as a stand-alone prediction tool, and, for causal
+  inference, as a way to estimate the nuisance parameter models of a smooth
+  statistical functional.
+\end{abstract}
 
 \section{Introduction}
 \label{sec:introduction}
@@ -571,38 +544,63 @@ baseline covariates \( X \) is determined by the function
   k \in \{-1,0,1,2\},
   x \in \mathcal{X}.
 \end{equation}
-The function \( F \) describes the conditional state occupation
-probabilities of the multi-state process \(\eta\). We construct a
-super learner for \( F \). The target of this super learner is the
-function-valued parameter $\Psi(P) = F$ which is identified through
-equation~(\ref{eq:F-def}).
-Under conditional independent censoring each quadruple
-$(\Lambda_{1}, \Lambda_{2}, \Gamma, H)$ characterises a distribution
-\(P\in\mathcal P\), c.f.\ equation~\eqref{eq:parametrizeP}, which in turn
-determines \( (F, H) \).
-Hence, a learner for \( F \) can be constructed from learners for
-\( \Lambda_1 \), \( \Lambda_2 \), and $\Gamma$ as follows:
+The function \( F \) describes the conditional state occupation probabilities of
+the multi-state process \(\eta\). We construct a super learner for \( F \). The
+target of this super learner is the function-valued parameter $\Psi(P) = F$
+which is identified through equation~(\ref{eq:F-def}). Under conditional
+independent censoring each quadruple $(\Lambda_{1}, \Lambda_{2}, \Gamma, H)$
+characterises a distribution \(P\in\mathcal P\), c.f.\
+equation~\eqref{eq:parametrizeP}, which in turn determines \( (F, H) \). Hence,
+a learner for \( F \) can be constructed from learners for \( \Lambda_1 \),
+\( \Lambda_2 \), and $\Gamma$ as follows:
 \begin{equation}\label{eq:transition}
   \begin{split}
-  F(t, 1, x)
-  & = P(\tilde{T} \leq t, \tilde{D}=1 \mid X=x)
-    = \int_0^t \exp{{\{-\Lambda_{1}(s \mid x)-\Lambda_{2}(s \mid x) - \Gamma(s \mid x)\} }}  \Lambda_{1}(\diff s \mid x),
-  \\
-  F(t, 2, x)
-  & = P(\tilde{T} \leq t, \tilde{D}=2 \mid X=x)
-    = \int_0^t \exp{\{-\Lambda_{1}(s \mid x)-\Lambda_{2}(s \mid x) - \Gamma(s \mid x)\} }  \Lambda_{2}(\diff s \mid x),
-  \\
-  F(t, -1, x)
-  & =
-    P(\tilde{T} \leq t, \tilde{D}=0 \mid X=x)
-    = \int_0^t \exp{\{-\Lambda_{1}(s \mid x)-\Lambda_{2}(s \mid x) - \Gamma(s \mid x)\} }  \Gamma(\diff s \mid x),
-  \\
-  F(t, 0, x)
-  &
-    = P(\tilde{T} > t \mid X= x)
-    = 1- F(t, 1, x) - F(t, 2, x)- F(t, -1, x).
+    F(t, 0, x)
+    &
+      = P(\tilde{T} > t \mid X= x)
+      =
+      \exp{{\{-\Lambda_{1}(t \mid x)-\Lambda_{2}(t \mid x) - \Gamma(t \mid x)\}
+      }},
+    \\
+    F(t, 1, x)
+    &
+      = P(\tilde{T} \leq t, \tilde{D}=1 \mid X=x)
+      = \int_0^t F(s-, 0, x)  \Lambda_{1}(\diff s \mid x),
+    \\
+    F(t, 2, x)
+    &
+      = P(\tilde{T} \leq t, \tilde{D}=2 \mid X=x)
+      = \int_0^t  F(s-, 0, x)  \Lambda_{2}(\diff s \mid x),
+    \\
+    F(t, -1, x)
+    &
+      = P(\tilde{T} \leq t, \tilde{D}=0 \mid X=x)
+      = \int_0^t F(s-, 0, x)  \Gamma(\diff s \mid x).
   \end{split}
 \end{equation}
+% \begin{equation}\label{eq:transition}
+%   \begin{split}
+%   F(t, 1, x)
+%     &
+%       % = P(\tilde{T} \leq t, \tilde{D}=1 \mid X=x)
+%     = \int_0^t \exp{{\{-\Lambda_{1}(s \mid x)-\Lambda_{2}(s \mid x) - \Gamma(s \mid x)\} }}  \Lambda_{1}(\diff s \mid x),
+%   \\
+%   F(t, 2, x)
+%     &
+%       % = P(\tilde{T} \leq t, \tilde{D}=2 \mid X=x)
+%       = \int_0^t \exp{\{-\Lambda_{1}(s \mid x)-\Lambda_{2}(s \mid x) - \Gamma(s \mid x)\} }  \Lambda_{2}(\diff s \mid x),
+%     \\
+%     F(t, -1, x)
+%     &
+%       % = P(\tilde{T} \leq t, \tilde{D}=0 \mid X=x)
+%       = \int_0^t \exp{\{-\Lambda_{1}(s \mid x)-\Lambda_{2}(s \mid x) - \Gamma(s \mid x)\} }  \Gamma(\diff s \mid x),
+%     \\
+%     F(t, 0, x)
+%     &
+%       = P(\tilde{T} > t \mid X= x)
+%       = 1- F(t, 1, x) - F(t, 2, x)- F(t, -1, x).
+%   \end{split}
+% \end{equation}
 The state learner requires three libraries of learners (c.f., Section \ref{sec:super-learning}),
 \(\mathcal{A}_1\), \( \mathcal{A}_2 \), and \( \mathcal{B} \), where
 \(\mathcal{A}_1\) and \( \mathcal{A}_2\) contain learners for the
@@ -625,15 +623,34 @@ for \( F \):
 \begin{align*}
   \mathcal{F}(\mathcal{A}_1, \mathcal{A}_2, \mathcal{B})
   &= \{ \phi_{a_1,a_2, b} : a_1 \in \mathcal{A}_1, a_2 \in \mathcal{A}_2, b \in \mathcal{B}\},
-    \intertext{where in correspondence with  the relations in equation \eqref{eq:transition},} 
-    \phi_{a_1,a_2, b}(\data_n)(t,1,x) &= \int_0^t \exp{\{-a_1(\data_n)(s \mid x)-a_2(\data_n)(s \mid x) - b(\data_n)(s \mid x)\} }  a_1(\data_n)(\diff s \mid x),\\
-  \phi_{a_1,a_2, b}(\data_n)(t,2,x) &= \int_0^t \exp{\{-a_1(\data_n)(s \mid x)-a_2(\data_n)(s \mid x) - b(\data_n)(s \mid x)\} }  a_2(\data_n)(\diff s \mid x),\\
-  \phi_{a_1,a_2, b}(\data_n)(t,-1,x) &= \int_0^t \exp{\{-a_1(\data_n)(s \mid x)-a_2(\data_n)(s \mid x) - b(\data_n)(s \mid x)\} }  b(\data_n)(\diff s \mid x),\\
-  \phi_{a_1,a_2, b}(\data_n)(t,0,x) &= 1
-                                      - \phi_{a_1,a_2, b}(\data_n)(t,1,x)
-                                      - \phi_{a_1,a_2, b}(\data_n)(t,2,x)
-    -\phi_{a_1,a_2, b}(\data_n)(t,-1,x)
+    \intertext{where in correspondence with  the relations in equation
+    \eqref{eq:transition},}
+    \phi_{a_1,a_2, b}(\data_n)(t,0,x)
+  &= \exp{\{-a_1(\data_n)(s \mid x)-a_2(\data_n)(s \mid x) - b(\data_n)(s \mid
+    x)\} },
+  \\
+  \phi_{a_1,a_2, b}(\data_n)(t,1,x)
+  &= \int_0^t
+    \phi_{a_1,a_2, b}(\data_n)(s-,0,x)  a_1(\data_n)(\diff s \mid x),
+  \\
+  \phi_{a_1,a_2, b}(\data_n)(t,2,x)
+  &= \int_0^t\phi_{a_1,a_2, b}(\data_n)(s-,0,x)  a_2(\data_n)(\diff s \mid x),
+  \\
+  \phi_{a_1,a_2, b}(\data_n)(t,-1,x)
+  &= \int_0^t \phi_{a_1,a_2, b}(\data_n)(s-,0,x)  b(\data_n)(\diff s \mid x).
 \end{align*}
+% \begin{align*}
+%   \mathcal{F}(\mathcal{A}_1, \mathcal{A}_2, \mathcal{B})
+%   &= \{ \phi_{a_1,a_2, b} : a_1 \in \mathcal{A}_1, a_2 \in \mathcal{A}_2, b \in \mathcal{B}\},
+%     \intertext{where in correspondence with  the relations in equation \eqref{eq:transition},} 
+%     \phi_{a_1,a_2, b}(\data_n)(t,1,x) &= \int_0^t \exp{\{-a_1(\data_n)(s \mid x)-a_2(\data_n)(s \mid x) - b(\data_n)(s \mid x)\} }  a_1(\data_n)(\diff s \mid x),\\
+%   \phi_{a_1,a_2, b}(\data_n)(t,2,x) &= \int_0^t \exp{\{-a_1(\data_n)(s \mid x)-a_2(\data_n)(s \mid x) - b(\data_n)(s \mid x)\} }  a_2(\data_n)(\diff s \mid x),\\
+%   \phi_{a_1,a_2, b}(\data_n)(t,-1,x) &= \int_0^t \exp{\{-a_1(\data_n)(s \mid x)-a_2(\data_n)(s \mid x) - b(\data_n)(s \mid x)\} }  b(\data_n)(\diff s \mid x),\\
+%   \phi_{a_1,a_2, b}(\data_n)(t,0,x) &= 1
+%                                       - \phi_{a_1,a_2, b}(\data_n)(t,1,x)
+%                                       - \phi_{a_1,a_2, b}(\data_n)(t,2,x)
+%     -\phi_{a_1,a_2, b}(\data_n)(t,-1,x)
+% \end{align*}
 To evaluate how well a function \( F \) predicts the observed
 multi-state process we use the integrated Brier score
 \( \bar B_\tau( F,O) = \int_0^{\tau} B_t(F,O) \diff t \), where \( B_t \) is the
@@ -749,8 +766,8 @@ In the following we let the space \( \mathcal{H}_{\mathcal{P}} \) be equipped wi
     \E_{P_0}{\left[ \Vert \hat{\phi}_n(\data_n^{-k}) - F_0 \Vert_{P_0}^2 \right]}
     & \leq (1 + 2\delta)
       \E_{P_0}{\left[ \Vert \tilde{\phi}_n(\data_n^{-k}) - F_0 \Vert_{P_0}^2 \right]}
-    % \\
-    % & \quad
+    \\
+    & \quad
       + (1+ \delta) 16   K \tau
       \left(
       13 + \frac{12}{\delta}
@@ -766,12 +783,12 @@ Corollary~\ref{cor:oracle-prop} has the following asymptotic consequences.
 
 \begin{corollary}
   \label{cor:asymp-cons}
-  Assume that \( |\mathcal{F}_n| = \bigO(n^q)\), for some \( q \in \N \)
-  and that there exists a sequence \( \phi_n \in \mathcal{F}_n \),
-  \( n \in \N \), such that
+  Assume that \( |\mathcal{F}_n| = \bigO(n^q)\), for some \( q \in \N \) and
+  that there exists a sequence \( \phi_n \in \mathcal{F}_n \), \( n \in \N \),
+  such that
   \( \E_{P_0}{\left[ \Vert \phi_n(\data_n^{-k}) - F_{0} \Vert_{P_0}^2 \right]} =
   \bigO(n^{-\alpha}) \), for some \( \alpha\leq 1 \).
-  \begin{enumerate}[1.]
+  \begin{enumerate}[label=(\alph*)]
   \item If $\alpha=1$ then
     \( \E_{P_0}{\left[ \Vert \hat{\phi}_n(\data_n^{-k}) - F_0 \Vert_{P_0}^2
       \right]} = \bigO(\log(n)n^{-1}) \).
@@ -1124,6 +1141,8 @@ where
       -
       \omega_a(A,W; \pi)
       g(\tau, A, W; \Lambda_1, \Lambda_2)
+    \\
+    & \quad \quad \times
       \int_0^{\tau}
       \exp{\{{[\Gamma+\Lambda_1 + \Lambda_2](t- \mid A, W)}\}}
       M(\diff t \mid A, W; \Lambda_1, \Lambda_2)
@@ -1133,6 +1152,8 @@ where
       \omega_a(A,W; \pi)      
       \int_0^{\tau}
       g(t, A, W; \Lambda_1, \Lambda_2)
+    \\
+    & \quad \quad \times
       \exp{\{{[\Gamma+\Lambda_1 + \Lambda_2](t- \mid A, W)}\}}
       M(\diff t \mid A, W; \Lambda_1, \Lambda_2)
     \\
@@ -1509,7 +1530,7 @@ discretisation.
 
 
 
-\begin{appendices}
+\appendix
 
 \section{Theoretical guarantees for the state learner}
 \label{sec:proof-proposition}
@@ -1567,11 +1588,12 @@ all conditional state occupation probability functions for some measure
   \( F \in \mathcal{H}_{\mathcal{P}} \), and so using Theorem 2.3 from \citep{vaart2006oracle} with
   \( p=1 \), we have that for all \( \delta >0 \),
 \begin{align*}
-  \E_{P_0}{\left[ R_0(\hat{\phi}_n(\data_n^{-k})) \right]}
-  \leq
-  &(1+2\delta)\E_{P_0}{\left[ R_0(\tilde{\phi}_n(\data_n^{-k})) \right]}
+  & \E_{P_0}{\left[ R_0(\hat{\phi}_n(\data_n^{-k})) \right]}
   \\
-  & \quad + (1+\delta) \frac{16 K}{n}
+  &  \quad \leq
+    (1+2\delta)\E_{P_0}{\left[ R_0(\tilde{\phi}_n(\data_n^{-k})) \right]}
+  \\
+  & \qquad + (1+\delta) \frac{16 K}{n}
     \log(1 + |\mathcal{F}_n|)\sup_{F \in \mathcal{H}_{\mathcal{P}}}
     \left\{
     M(F) + \frac{v(F)}{R_0(F)}
@@ -1863,9 +1885,6 @@ $\tilde\Psi(\hat{\Lambda}_n, \hat{\Gamma}_n, \hat{H}_n)$.
   three remaining terms which gives the result.
 \end{proof}
 
-\end{appendices}
-
-\bibliographystyle{abbrvnat}
 \bibliography{bib.bib}
 
 \end{document}
