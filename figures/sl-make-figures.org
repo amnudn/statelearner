@@ -41,7 +41,7 @@ plot(crHist,stateLabels = stateLabels,arrowLabels = FALSE,
 
 
 #+BEGIN_SRC sh :exports none
-  cp figure-multi-state-process.pdf ../tex/jrss-version/
+  cp figure-multi-state-process.pdf ../tex/journal-version/
 #+END_SRC
 
 * Numerical experiments
@@ -116,7 +116,7 @@ Marginal event and censoring probabilities:
 [[file:experiment-fig-sl-ipcw.pdf]]
 
 #+BEGIN_SRC sh :exports none
-  cp experiment-fig-sl-ipcw.pdf ../tex/jrss-version/
+  cp experiment-fig-sl-ipcw.pdf ../tex/journal-version/
 #+END_SRC
 
 ** State learner versus survSL
@@ -130,7 +130,7 @@ Marginal event and censoring probabilities:
 [[file:experiment-fig-sl-survSL-out.pdf]]
 
 #+BEGIN_SRC sh :exports none
-  cp experiment-fig-sl-survSL-out.pdf ../tex/jrss-version/
+  cp experiment-fig-sl-survSL-out.pdf ../tex/journal-version/
 #+END_SRC
 
 #+BEGIN_SRC R :results graphics file :exports both :file experiment-fig-sl-survSL-cens.pdf :width 6 :height 6
@@ -142,16 +142,18 @@ Marginal event and censoring probabilities:
 [[file:experiment-fig-sl-survSL-cens.pdf]]
 
 #+BEGIN_SRC sh :exports none
-  cp experiment-fig-sl-survSL-cens.pdf ../tex/jrss-version/
+  cp experiment-fig-sl-survSL-cens.pdf ../tex/journal-version/
 #+END_SRC
 
 * Data application with competing event
 ** State learner
-#+BEGIN_SRC R  :results graphics file :exports both :file real-data-state-learner.pdf :width 8 :height 4
+#+BEGIN_SRC R :results graphics file :exports both :file real-data-state-learner.pdf :width 8 :height 4
   zel_real_plot_dt <- copy(zelefsky_statelearner$cv_fit)
-  zel_real_plot_dt[,cause1:=factor(cause1,levels=c("cox_lasso","cox_elastic","cox_strata_stage","km","rf"),labels=c("lasso","elastic","strata","KM","RF"))]
-  zel_real_plot_dt[,cause2:=factor(cause2,levels=c("cox_lasso","cox_elastic","cox_strata_stage","km","rf"),labels=c("lasso","elastic","strata","KM","RF"))]
-  zel_real_plot_dt[,censor:=factor(censor,levels=c("cox_lasso","cox_elastic","cox_strata_stage","km","rf"),labels=paste("Censoring learner\n", c("lasso","elastic","strata","KM","RF")))]
+  learners_levels <- c("km","cox_strata_stage","cox_lasso","cox_elastic","rf")
+  learners_labels <- c("N-Aa","Cox","lasso","elastic","RF")
+  zel_real_plot_dt[,cause1:=factor(cause1,levels=learners_levels,labels=learners_labels)]
+  zel_real_plot_dt[,cause2:=factor(cause2,levels=learners_levels,labels=learners_labels)]
+  zel_real_plot_dt[,censor:=factor(censor,levels=learners_levels,labels=paste("Censoring learner\n", learners_labels))]
 
   library(ggplot2)
   ggplot(zel_real_plot_dt, aes(x = cause1, y = loss, col = cause2)) +
@@ -163,15 +165,17 @@ Marginal event and censoring probabilities:
 	  axis.text.x = element_text(angle = 45, vjust = .8)) +
     xlab("Tumor learner") +
     facet_grid( ~ censor) +
-    scale_colour_grey("Death learner", start = 0, end = 0.7)
+    scale_colour_grey("Mortality learner", start = 0, end = 0.7)
 #+END_SRC
 
 #+RESULTS:
 [[file:real-data-state-learner.pdf]]
 
 #+BEGIN_SRC sh :exports none
-  cp real-data-state-learner.pdf ../tex/jrss-version/
+  cp real-data-state-learner.pdf ../tex/journal-version/
 #+END_SRC
+
+#+RESULTS:
 
 Table
 
@@ -194,7 +198,7 @@ Table
 #+END_SRC
 
 #+BEGIN_SRC sh :exports none
-  cp real-data-tab.tex ../tex/jrss-version/
+  cp real-data-tab.tex ../tex/journal-version/
 #+END_SRC
 
 ** Target parameter
@@ -220,6 +224,6 @@ Table
 [[file:real-data-target.pdf]]
 
 #+BEGIN_SRC sh :exports none
-  cp real-data-target.pdf ../tex/jrss-version/
+  cp real-data-target.pdf ../tex/journal-version/
 #+END_SRC
 
