@@ -171,21 +171,21 @@
 \section{Introduction}
 \label{sec:introduction}
 
-Medical decision making is traditionally based on the discrepancy
-between intuitive judgment and the law of chance
-\citep{redelmeier1995probability}. We are concerned with the
-statistical models that provide probabilistic predictions about the
-medical future of a patient. We have two different applications of
-these models in mind. One is as a stand-alone tool where the model
-provides predictions about the future, such as the predicted risk of
-adverse outcomes for a newly diagnosed patient. The other is as input
-to an algorithm which estimates a causal target parameter such as an
-average treatment effect and depends on estimates of nuisance
-parameters such as the conditional probability of being uncensored.
-An example of the latter is the targeted minimum loss based estimator
-\citep{rytgaard2022targeted}. In both applications, the models have to
-be learned based on available data from previous patients.
-
+% Medical decision making is traditionally based on the discrepancy
+% between intuitive judgment and the law of chance
+% \citep{redelmeier1995probability}.
+% We are concerned with the statistical models that provide
+% probabilistic predictions about the medical future of a patient. We
+% have two different applications of these models in mind. One is as a
+% stand-alone tool which predicts the likelihood of medical outcomes.
+% The other is as nuisance parameter estimate
+% input to an algorithm which estimates a causal target
+% parameter such as an average treatment effect and depends on estimates
+% of nuisance parameters such as the conditional probability of being
+% uncensored.  An example of the latter is the targeted minimum loss
+% based estimator \citep{rytgaard2022targeted}. In both applications,
+% the models have to be learned based on available data from previous
+% patients.
 A super learner is a machine learning algorithm that combines a finite
 set of learners into a meta learner by estimating prediction
 performance in hold-out samples using a pre-specified loss function
@@ -204,28 +204,6 @@ name super learner is justified by an oracle inequality
 % almost as well as the model which minimises the expected performance, i.e., the
 % model we would select if we could evaluate the prediction performance in an
 % infinite hold-out sample.
-The work presented in this article is motivated by the choice of the
-loss function for super learning in survival analysis. Existing super
-learner algorithms for right-censored data use partial log-likelihood
-loss or inverse probability of censoring weighted loss
-\citep{polley2011-sl-cens,keles2004asymptotically,golmakani2020super,gonzalez2021stacked,westling2021inference}.
-Unfortunately, the use of the partial log-likelihood loss restricts
-the class of learners and excludes for example simple Kaplan-Meier
-based learners and also more complex random survival forest
-algorithms. For this reason \cite{golmakani2020super} restrict their
-learners to Cox proportional hazard models. A lesser known fact is
-that a super learner constructed with the negative partial
-log-likelihood loss implicitly depends on the censoring distribution
-\citep{hjort1992inference,whitney2019comment}. Inverse probability of
-censoring weighted loss has been studied for decades
-\citep{graf1999assessment, hothorn2006survival,
-  gerds2006consistent}. A disadvantage of inverse probability of
-censoring weighted loss estimators is that they require a
-pre-specified model for the censoring distribution. Recently
-\cite{westling2021inference} proposed a procedure which iterates
-between super learning of the censoring distribution and super
-learning of the event time distribution. In this article, we pursue a
-different route.
 
 We define the state learner, a new super learner for right-censored
 data, which simultaneously estimates the expected loss of learners of
@@ -245,9 +223,62 @@ of learners for the cumulative hazard functions for each of the
 competing risks and for the censoring distribution. We show that the
 oracle selector of the state learner is consistent if all libraries
 contain a consistent learner and prove a finite sample oracle
-inequality. The result of the state learner algorithm could be a
-medical risk prediction model \citep{gerds2021medical} which predicts
-the probability of an event based on covariates in the presence of
+inequality.
+
+Machine learning based on right-censored data commonly uses the
+partial log-likelihood as a loss function
+\citep[e.g.,][]{li2016regularized,yao2017deep,lee2018deephit,katzman2018deepsurv,gensheimer2019scalable,lee2021boosted,kvamme2021continuous}.
+However, this loss function does not work well with data splitting
+(cross-validation) because the partial log-likelihood loss assigns an
+infinite value when applied to a test set time point which does not
+occur in the learning set as soon as the learner predicts piece-wise
+constant cumulative hazard functions. This is the case for prominent
+survival learners including the Kaplan-Meier estimator, the random
+survival forest, and the semi-parametric Cox regression model.  When a
+proportional hazards model is assumed, the baseline hazard function
+can be profiled out of the likelihood \citep{cox1972regression}.  The
+cross-validated partial log-likelihood loss \citep{verweij1993cross}
+has therefore been suggested as a loss function for super learning
+which however restricts the library of learners to include only Cox
+proportional hazards models \citep{golmakani2020super}.
+% A lesser
+% known fact is that a super learner constructed with the partial
+% log-likelihood loss implicitly depends on the censoring distribution
+% \citep{hjort1992inference,whitney2019comment}.
+
+Alternative approaches for super learning with right-censored data use
+an inverse probability of censoring weighted (IPCW) loss function
+\citep{graf1999assessment,van2003unicv,molinaro2004tree,keles2004asymptotically,hothorn2006survival,gerds2006consistent,gonzalez2021stacked},
+% An IPCW loss function is attractive because the associated risk does
+% not depend on the censoring distribution but describes a feature of
+% the population of interested. Similar results can be obtained using
+censoring unbiased transformations
+\citep{fan1996local,steingrimsson2019censoring}, or pseudo-values
+\citep{andersen2003generalised,mogensen2013random,sachs2019ensemble}.
+All these methods rely on an estimator of the censoring distribution,
+and their drawback is that this estimator has to be pre-specified.
+% When the data-generating mechanism is complex and not
+% well-understood, pre-specification of the censoring distribution is a
+% challenge.
+% Inverse probability of censoring weighted loss has been studied for
+% decades \citep{graf1999assessment, hothorn2006survival,
+  % gerds2006consistent}. A disadvantage of inverse probability of
+% censoring weighted loss estimators is that they require a
+% pre-specified model for the censoring distribution.
+% Recently \cite{westling2021inference} proposed a procedure which
+% iterates between super learning of the censoring distribution and
+% super learning of the event time distribution.
+An approach which avoids a pre-specified censoring model was proposed
+independently by \cite{han2021inverse} and
+\cite{westling2021inference}. In both articles, the authors suggest to
+iterate between learning of the outcome model and learning of the
+censoring model using IPCW loss functions. However, no general
+theoretical guarantees seem to exist for this procedure, and it has
+not yet been extended to the situation with competing risks.
+
+The result of the state learner algorithm could be a medical risk
+prediction model \citep{gerds2021medical} which predicts the
+probability of an event based on covariates in the presence of
 competing risks. The other application is in targeted learning where
 conditional event probabilities occur as high-dimensional nuisance
 parameters which need to be estimated at a certain rate
@@ -256,76 +287,22 @@ For the asymptotic bias term of targeted estimator, which uses the
 state learner to estimate nuisance parameters, we show that a second
 order product structure holds. We illustrate both applications of the
 state learner with prostate cancer data
-\citep{kattan2000pretreatment}.
-
-\subsection{Existing methods}
-\label{sec:relat-liter-exist}
-
-Machine learning based on right-censored data commonly uses the
-negative partial log-likelihood as a loss function
-\citep[e.g.,][]{li2016regularized,yao2017deep,lee2018deephit,katzman2018deepsurv,gensheimer2019scalable,lee2021boosted,kvamme2021continuous}.
-This loss function is however not perfectly suited for super learning
-because it cannot be applied to prominent survival learners. For
-example, the Kaplan-Meier estimator, the random survival forest, and
-the semi-parametric Cox regression model provide cumulative hazard
-functions that are piece-wise constant in the time argument. Suppose
-these methods were applied to a learning data set and the aim is to
-evaluate the partial log-likelihood loss in an independent test data
-set. Suppose further that the test data set contains event times that
-were not also seen in the learning data set, as it would naturally
-happen when the events are observed in continuous time. The problem is
-that these methods assign zero probability to all the event times in
-the test set which were not also contained in the training data set.
-Hence the partial log-likelihood loss in the test set would be
-infinity (the logarithm of zero is infinity).
-
-When a proportional hazards model is assumed, the baseline hazard
-function can be profiled out of the likelihood \citep{cox1972regression}.
-The cross-validated partial log-likelihood loss  \citep{verweij1993cross} has therefore been
-suggested as a loss function for super learning which however
-restricts the library of learners to include only Cox proportional
-hazards models \citep{golmakani2020super}.
-
-Another approach for super learning with right-censored data is to use an
-inverse probability of censoring weighted (IPCW) loss function
-\citep{graf1999assessment,van2003unicv,molinaro2004tree,keles2004asymptotically,hothorn2006survival,gerds2006consistent,gonzalez2021stacked}.
-An IPCW loss function is attractive because the associated risk does not depend
-on the censoring distribution but describes a feature of the population of
-interested. Similar results can be obtained using censoring unbiased
-transformations \citep{fan1996local,steingrimsson2019censoring} or pseudo-values
-\citep{andersen2003generalised,mogensen2013random,sachs2019ensemble}. All these
-methods rely on an estimator of the censoring distribution, and their drawback
-is that this estimator has to be pre-specified. When the data-generating
-mechanism is complex and not well-understood, pre-specification of the censoring
-distribution is a challenge.
-
-An attempt to avoid a pre-specified censoring model was proposed independently
-by \cite{han2021inverse} and \cite{westling2021inference}. In both articles, the
-authors suggest to iterate between learning of the outcome model and learning of
-the censoring model using IPCW loss functions. However, no general theoretical
-guarantees seem to exist for this procedure, and it has not yet been extended to
-the situation with competing risks.
-
-\subsection{Organization of article}
-
-We introduce our notation and framework in
-Section~\ref{sec:framework}. In Section~\ref{sec:super-learning} we
-define general super learning for right-censored data.
-% , and in
-% Section~\ref{sec:relat-liter-exist} we review existing methods.
-Section~\ref{sec:super-learner-simple} introduces the state learner,
-and Section~\ref{sec:theor-results-prop} provides theoretical
-guarantees. In Section~\ref{sec:targeted-learning} we discuss the use
-of the state learner in the context of targeted learning. We report
-results of our numerical experiments in Section~\ref{sec:numer-exper}
-and analyze a prostate cancer data set in
-Section~\ref{sec:real-data-appl}.  Section~\ref{sec:discussion}
+\citep{kattan2000pretreatment}. We introduce our notation and
+framework in Section~\ref{sec:framework}. In
+Section~\ref{sec:super-learning} we define general super learning for
+right-censored data. Section~\ref{sec:super-learner-simple} introduces
+the state learner, and Section~\ref{sec:theor-results-prop} provides
+theoretical guarantees. In Section~\ref{sec:targeted-learning} we
+discuss the use of the state learner in the context of targeted
+learning. We report results of our numerical experiments in
+Section~\ref{sec:numer-exper} and analyze a prostate cancer data set
+in Section~\ref{sec:real-data-appl}.  Section~\ref{sec:discussion}
 contains a discussion of the merits and limitations of our
 proposal. Appendices~\ref{sec:proof-proposition}
-and~\ref{sec:state-learner-with} contain proofs.
-An implementation of the state learner is available at
-\url{https://github.com/amnudn/statelearner} along with codes for reproducing
-our numerical experiments.
+and~\ref{sec:state-learner-with} contain proofs.  An implementation of
+the state learner is available at
+\url{https://github.com/amnudn/statelearner} along with codes for
+reproducing our numerical experiments.
 
 
 \section{Notation and framework}
@@ -523,17 +500,15 @@ introduce the state learner, we define the multi-state process
   \quad \text{for} \quad t \in [0, \tau].
 \end{equation*}
 At time \(t\), we observe that each individual is in one of four mutually
-exclusive states (Figure \ref{fig:multi-state-process}).
-
-\begin{figure}[h]
-  \centering %
-  \includeFigCond[width=.5\textwidth]{figure-multi-state-process.pdf}
-  \caption{Illustration of the multi-state process \(\eta\) used by
-    the state learner. Note that `censored' is a state, hence the
-    process is always observed at any time.}
-  \label{fig:multi-state-process}
-\end{figure}
-
+exclusive states. % (Figure \ref{fig:multi-state-process}).
+% \begin{figure}[h]
+  % \centering %
+  % \includeFigCond[width=.5\textwidth]{figure-multi-state-process.pdf}
+  % \caption{Illustration of the multi-state process \(\eta\) used by
+    % the state learner. Note that `censored' is a state, hence the
+    % process is always observed at any time.}
+  % \label{fig:multi-state-process}
+% \end{figure}
 The conditional distribution of the process \( \eta(t) \) given
 baseline covariates \( X \) is determined by the function
 \begin{equation}
@@ -1350,58 +1325,57 @@ recurrence, death without tumor recurrence or end of followup
 (censored) whatever came first. For the sole purpose of illustration,
 we estimate the average treatment effect of hormone therapy on death
 and tumor recurrence. To do this we adapt the estimation strategy of
-Section~\ref{sec:targeted-learning} as follows.  We use the state
+Section~\ref{sec:targeted-learning} as follows. We use the state
 learner to rank libraries of learners for the cause-specific
 cumulative hazard functions of tumor recurrence, death without tumor
-recurrence, and censoring.  The libraries of learners include the five
-learners described in Table~\ref{tab:zel-library}.  We use the same
-set of learners to learn the cumulative hazard function of tumor
-recurrence \( \Lambda_1 \), the cumulative hazard function of death
-without tumor recurrence \( \Lambda_2 \), and the cumulative hazard
-function of the conditional censoring distribution $\Gamma$. 
-We then use the highest ranked combination
-of learners and apply formula~\eqref{eq:one-step-comp-ate}.
+recurrence, and censoring.  The libraries of learners each include
+five learners: a Nelson-Aalen, three Cox regression models
+(unpenalized, Lasso, Elastic net) each including additive effects of
+the 5 covariates (Section~\ref{sec:numer-exper}), and a random
+survival forest. We use the same set of learners to learn the
+cumulative hazard function of tumor recurrence \( \Lambda_1 \), the
+cumulative hazard function of death without tumor recurrence
+\( \Lambda_2 \), and the cumulative hazard function of the conditional
+censoring distribution $\Gamma$.  We then use the highest ranked
+combination of learners and apply
+formula~\eqref{eq:one-step-comp-ate}.
 
+% \begin{table}
+  % \caption{\label{tab:zel-library}Overview of the five learners used by the
+    % state learner when applied to the prostate cancer data set. The Kaplan-Meier
+    % estimator was fitted using the package \texttt{prodlim}
+    % \citep{Gerds_2019prodlim}. All Cox models included all five covariates in
+    % the model and were fitted using the package \texttt{survival}
+    % \citep{survival-package}. All penalised Cox models included all five
+    % covariates as linear predictors and were fitted using the package
+    % \texttt{glmnet} \citep{glmnet-cox,glmnet-glm}. The random forest was fitted
+    % with the package \texttt{randomForestSRC} \citep{rfsrc-paclage}.}
+  % \centering
+  % \begin{tabular}{lll}
+    % \toprule
+    % Family & Model & Description \\
+    % \midrule
+    % Marginal & \texttt{KM} & The Kaplan-Meier estimator \\ 
+    % Cox & \texttt{Cox} & All five covariates included with additive effects \\
+           % & \( \texttt{Cox strata CS} \)  & Cox model stratified on CS  \\
+    % Penalised Cox & \texttt{Lasso} & Cox model with \( L_1 \)-norm penalty   \\
+           % & \texttt{Elastic} & Cox model with \( L_1 \)- and \( L_2 \)-norm penalty \\
+    % Random forest & \texttt{RF} & Random forest with default settings \\
+    % \bottomrule 
+  % \end{tabular}
+% \end{table}
 
-\begin{table}
-  \caption{\label{tab:zel-library}Overview of the five learners used by the
-    state learner when applied to the prostate cancer data set. The Kaplan-Meier
-    estimator was fitted using the package \texttt{prodlim}
-    \citep{Gerds_2019prodlim}. All Cox models included all five covariates in
-    the model and were fitted using the package \texttt{survival}
-    \citep{survival-package}. All penalised Cox models included all five
-    covariates as linear predictors and were fitted using the package
-    \texttt{glmnet} \citep{glmnet-cox,glmnet-glm}. The random forest was fitted
-    with the package \texttt{randomForestSRC} \citep{rfsrc-paclage}.}
-  \centering
-  \begin{tabular}{lll}
-    \toprule
-    Family & Model & Description \\
-    \midrule
-    Marginal & \texttt{KM} & The Kaplan-Meier estimator \\ 
-    Cox & \texttt{Cox} & All five covariates included with additive effects \\
-           & \( \texttt{Cox strata CS} \)  & Cox model stratified on CS  \\
-           % & \( \texttt{Cox strata HT} \)  & Cox model stratified on HT \\
-           % & \( \texttt{Cox spline} \)  & PSA and RD modeled with splines \\ 
-    Penalised Cox & \texttt{Lasso} & Cox model with \( L_1 \)-norm penalty   \\
-           % & \texttt{Ridge} & Cox model with \( L_2 \)-norm penalty \\
-           & \texttt{Elastic} & Cox model with \( L_1 \)- and \( L_2 \)-norm penalty \\
-    Random forest & \texttt{RF} & Random forest with default settings \\
-    \bottomrule 
-  \end{tabular}
-\end{table}
-
-This gives a library consisting of \( 5^3 = 125 \) learners for the conditional
-state occupation probability function \( F \) defined in
-equation~(\ref{eq:F-def}). We use five folds for training and testing the
-models, and we repeat training and evaluation five times with different splits.
-The integrated Brier score (defined in Section~\ref{sec:super-learner-simple})
-for all learners are shown in Figure~\ref{fig:zelefski-real}, and the top 10
-combinations of learners are displayed in Table~\ref{tab:zelefski-real}. We see
-that the prediction performance is mostly affected by the choice of learner for
-the censoring distribution. Several combinations of learners give similar
-performance as measured by the integrated Brier score, as long as a random
-forest is used to model the censoring distribution.
+This gives a library consisting of \( 5^3 = 125 \) learners for the
+conditional state occupation probability function \( F \) defined in
+equation~(\ref{eq:F-def}). We use five folds for training and testing
+the models, and we repeat training and evaluation five times with
+different splits.  The integrated Brier score (defined in
+Section~\ref{sec:super-learner-simple}) for all learners are shown in
+Figure~\ref{fig:zelefski-real}. We see that the prediction
+performance is mostly affected by the choice of learner for the
+censoring distribution. Several combinations of learners give similar
+performance as measured by the integrated Brier score, as long as a
+random forest is used to model the censoring distribution.
 
 \begin{figure}
   \centering %
@@ -1412,20 +1386,19 @@ forest is used to model the censoring distribution.
     and \texttt{RF} (RF) as described Table~\ref{tab:zel-library}. The error
     bars are based on five repetitions using different splits. We refer to
     learners of \( \Lambda_1 \), \( \Lambda_2 \), and $\Gamma$ as `Tumor
-    learner', `Death learner', and `Censoring learner', respectively.}
+    learner', `Mortality learner', and `Censoring learner', respectively.}
   \label{fig:zelefski-real}
 \end{figure}
 
-
-\begin{table}
-  \caption{\label{tab:zelefski-real}The 10 best performing models in terms of integrated Brier score. The
-    reported standard errors are based on five repetitions using different
-    splits. The models are described in Table~\ref{tab:zel-library}. We refer to
-    learners of \( \Lambda_1 \), \( \Lambda_2 \), and $\Gamma$ as `Tumor
-    learner', `Death learner', and `Censoring learner', respectively.}
-  \centering
-  \input{./real-data-tab.tex}
-\end{table}
+% \begin{table}
+  % \caption{\label{tab:zelefski-real}The 10 best performing models in terms of integrated Brier score. The
+    % reported standard errors are based on five repetitions using different
+    % splits. The models are described in Table~\ref{tab:zel-library}. We refer to
+    % learners of \( \Lambda_1 \), \( \Lambda_2 \), and $\Gamma$ as `Tumor
+    % learner', `Mortality learner', and `Censoring learner', respectively.}
+  % \centering
+  % \input{./real-data-tab.tex}
+% \end{table}
 
 
 We use the learners of the three cumulative hazard functions selected
