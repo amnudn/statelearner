@@ -6,10 +6,10 @@ learner for right-censored data. We provide examples of how to use it as a
 stand-alone tool and in combination with targeted learning. We also provide code
 to reproduce the numerical experiments described in the article /The state
 learner -- a super learner for right-censored data/ (Munch & Gerds). Details are
-given in [[./experiments/readme-experiments.org]]. The article also describes a real
-data example, but as we cannot share the data from that study, the tutorial
-below uses an emulated data set with the same structure as the original data
-analysed in the article.
+given in [[./experiments/readme-experiments.org]]. The article describes a real data
+example, but as we cannot share the data from that study, the tutorial below
+uses an emulated data set with the same structure as the original data analysed
+in the article.
 
 * Setup and load data
 
@@ -66,11 +66,11 @@ entries to the list (e.g., =ntree= for a random survival forest).
   library(glmnet)
   library(randomForestSRC)
   learners <- list(
-    cox = list(model = "cox", x_form = ~logPSA+stage+ggtot+sDose+hormones),
-    cox_penalty = list(model = "GLMnet", x_form = ~logPSA+stage+ggtot+sDose+hormones),
-    N_Aa = list(model = "cox", x_form = ~1),
-    N_Aa_strat = list(model = "cox", x_form = ~strata(hormones)),
-    rf = list(model = "rfsrc", x_form = ~logPSA+stage+ggtot+sDose+hormones, ntree = 50)
+      cox = list(model = "cox", x_form = ~logPSA+stage+ggtot+sDose+hormones),
+      cox_penalty = list(model = "GLMnet", x_form = ~logPSA+stage+ggtot+sDose+hormones),
+      N_Aa = list(model = "cox", x_form = ~1),
+      N_Aa_strat = list(model = "cox", x_form = ~strata(hormones)),
+      rf = list(model = "rfsrc", x_form = ~logPSA+stage+ggtot+sDose+hormones, ntree = 50)
   )
 #+END_SRC
 
@@ -105,6 +105,7 @@ Here we use an interval of 36 month and show the 6 highest ranked triples.
 : 4: cox_penalty        N_Aa    cox 8.609008     1
 : 5:         cox         cox    cox 8.610104     1
 : 6: cox_penalty         cox    cox 8.610470     1
+
 
 * Use for targeted estimation
 We estimate effect of hormone therapy on tumor recurrence (cause=1) and death
