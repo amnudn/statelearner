@@ -2,37 +2,16 @@
 \usepackage[a4paper,left=2.8cm, right=2.8cm, top=3cm, bottom=3cm]{geometry}
 
 %% Packages
-\usepackage{amsthm, dsfont, amssymb,soul,xcolor,
-  % amsfonts,
-  enumitem,
-  amsmath,graphicx,verbatim,pgfplots,tikz,prodint,booktabs}
+\usepackage{amsthm, dsfont, amssymb,soul,xcolor, enumitem, amsmath,verbatim}
 
 \usepackage[authoryear]{natbib}
 \bibliographystyle{abbrvnat}
-
-% % Handling new lines
-% \setlength{\parskip}{1em}
-% \setlength{\parindent}{0em}
-
-% % Handling space after sections
-% \usepackage{titlesec}
-% \titlespacing*{\section}{0em}{2em}{0em}
-% \titlespacing*{\subsection}{0em}{2em}{0em}
-% \titlespacing*{\subsubsection}{0em}{2em}{0em}
-
-% % No spacing after in start of list
-% \setlist[itemize]{topsep=0pt}
-% \setlist[enumerate]{topsep=0pt}
 
 \definecolor{linkcolor}{rgb}{0, 0, 0.54}
 \usepackage[colorlinks,allcolors=linkcolor]{hyperref}
 
 \theoremstyle{thmstyleone}%\
 \newtheorem{theorem}{Theorem}%  meant for continuous numbers
-%%\newtheorem{theorem}{Theorem}[section]% meant for sectionwise numbers
-%% optional argument [theorem] produces theorem numbering sequence instead of independent numbers for Proposition
-% \newtheorem{proposition}[theorem]{Proposition}%
-% to get separate numbers for theorem and proposition etc.:
 \newtheorem{proposition}{Proposition}
 \newtheorem{lemma}{Lemma}
 \newtheorem{corollary}{Corollary}
@@ -43,16 +22,11 @@
 \newtheorem{definition}{Definition}
 
 
-% \usepackage[tablesonly,heads,nolists]{endfloat}
-
-%% change enumerate labels
-% \renewcommand{\labelenumi}{\normalfont (\alph{enumi})}
-
-%% Font size etc
+%% Line spacing
 \linespread{1.65}
 
-\usepackage{lineno}
-\linenumbers
+% \usepackage{lineno}
+% \linenumbers
 
 %% Only for comments:
 \usepackage[author=]{fixme}
@@ -65,17 +39,8 @@
 % \def\nofig{1}
 
 \RequirePackage{graphicx}
-% \RequirePackage{caption}
-% \RequirePackage{array}
-% \RequirePackage{color}
-% \RequirePackage{xcolor}
-% \RequirePackage{amssymb}
-% \RequirePackage{flushend}
-% \RequirePackage{stfloats}
-% \RequirePackage[figuresright]{rotating}
-% \RequirePackage{chngpage}
-% \RequirePackage{totcount}
-% \RequirePackage{fix-cm}
+\usepackage[font=small]{caption}
+
 \newcommand{\includeFigCond}[2][]{
   \ifx\nofig\undefined %
     \includegraphics[#1]{#2} %
@@ -103,49 +68,36 @@
 \newcommand{\midd}{\; \middle|\;}
 \newcommand{\1}{\mathds{1}}
 \usepackage{ifthen} %% Empirical process with default argument
-% \newcommand{\G}[1][]{%
-%    \ifthenelse{ \equal{#1}{} }
-%       {\ensuremath{\mathbb{G}_n}}
-%       {\ensuremath{\mathbb{G}_{#1}}}
-% }
-% New version:
 \newcommand{\G}[2][n]{
 {\ensuremath{\mathbb{G}_{#1}}{\left[#2\right]}}
 }
 \DeclareMathOperator*{\argmin}{\arg\!\min}
 \DeclareMathOperator*{\argmax}{\arg\!\max}
 \newcommand{\empmeas}{\ensuremath{\mathbb{P}_n}} % empirical measure
-
 \newcommand{\data}{\ensuremath{\mathcal{D}}}
 
 
 %% Title
-\title{The state learner -- a super learner for right-censored data}
+\title{\Large The state learner -- a super learner for right-censored data}
+\date{\small \today}
 
 \usepackage{authblk}
-\author[1]{Anders Munch}
-\author[1]{Thomas~A.~Gerds}
-\affil[1]{Section of Biostatistics, University of Copenhagen}
+\author[1,*]{\normalsize Anders Munch}
+\author[1]{\normalsize Thomas~A.~Gerds}
+\affil[1]{\normalsize Section of Biostatistics, University of Copenhagen}
+\affil[*]{\normalsize Address for correspondence: \href{email:email-id.com}{a.munch@sund.ku.dk}}
+
+\usepackage{fancyhdr}
+\fancyhf{}
+\fancyhead[l]{\textit{Munch et al.}}
+\fancyhead[r]{\textit{The state learner}}
+\fancyfoot[c]{\thepage}
+\renewcommand\headrulewidth{0pt}
+\pagestyle{fancy}
 
 
 \begin{document}
 
-
-% \authormark{Munch et al.}
-
-% \address[1]{\orgdiv{Section of Biostatistics}, \orgname{University of
-%     Copenhagen}, \orgaddress{\street{Østerfarigmagsgade 5}, \postcode{2100}, \state{Copenhagen}, \country{Denmark}}}
-
-% \corresp[$\ast$]{Address for correspondence: \href{email:email-id.com}{a.munch@sund.ku.dk}}
-
-% \received{Date}{0}{Year}
-% \revised{Date}{0}{Year}
-% \accepted{Date}{0}{Year}
-
-
-
-% \keywords{Competing risks, cross-validation, loss based estimation,
-%   right-censored data, super learner}
 
 \maketitle
 
@@ -153,7 +105,7 @@
   In survival analysis, prediction models are needed as stand-alone tools and in
   applications of causal inference to estimate nuisance parameters. The super
   learner is a machine learning algorithm which combines a library of prediction
-  models into a meta learner based on cross-validated loss. In right censored
+  models into a meta learner based on cross-validated loss. In right-censored
   data, the choice of the loss function and the estimation of the expected loss
   need careful consideration. We introduce the state learner, a new super
   learner for survival analysis, which simultaneously evaluates libraries of
@@ -167,6 +119,14 @@
   inference, as a way to estimate the nuisance parameter models of a smooth
   statistical functional.
 \end{abstract}
+
+% \keywords{Competing risks, cross-validation, loss based estimation,
+% right-censored data, super learner}
+
+\textit{{\small \textbf{Keywords:} Competing risks, cross-validation, loss based
+    estimation, right-censored data, super learner}}
+
+\pagebreak
 
 \section{Introduction}
 \label{sec:introduction}
@@ -209,12 +169,12 @@ We define the state learner, a new super learner for right-censored
 data, which simultaneously estimates the expected loss of learners of
 the event time distribution and the censoring distribution. The loss
 function underlying the state learner operates on the coarsened
-data. In the right censored survival setting the coarsened data
+data. In the right-censored survival setting the coarsened data
 consist of the minimum and the order of the censoring time and the
 event time as well as the baseline covariates. The state learner can
 include a broad class of survival models as learners, it can handle
 competing risks, and it does not require a single pre-specified
-estimator of the conditional censoring distribution. To analyze the
+estimator of the conditional censoring distribution. To analyse the
 theoretical properties of the state learner we focus on the discrete
 super learner which combines the library of learners by picking the
 one that minimises the cross-validated loss \citep{van2007super}. In
@@ -276,33 +236,31 @@ censoring model using IPCW loss functions. However, no general
 theoretical guarantees seem to exist for this procedure, and it has
 not yet been extended to the situation with competing risks.
 
-The result of the state learner algorithm could be a medical risk
-prediction model \citep{gerds2021medical} which predicts the
-probability of an event based on covariates in the presence of
-competing risks. The other application is in targeted learning where
-conditional event probabilities occur as high-dimensional nuisance
-parameters which need to be estimated at a certain rate
-\citep{van2011targeted, rytgaard2021estimation, rytgaard2022targeted}.
-For the asymptotic bias term of targeted estimator, which uses the
-state learner to estimate nuisance parameters, we show that a second
-order product structure holds. We illustrate both applications of the
-state learner with prostate cancer data
-\citep{kattan2000pretreatment}. We introduce our notation and
-framework in Section~\ref{sec:framework}. In
-Section~\ref{sec:super-learning} we define general super learning for
-right-censored data. Section~\ref{sec:super-learner-simple} introduces
-the state learner, and Section~\ref{sec:theor-results-prop} provides
-theoretical guarantees. In Section~\ref{sec:targeted-learning} we
-discuss the use of the state learner in the context of targeted
-learning. We report results of our numerical experiments in
-Section~\ref{sec:numer-exper} and analyze a prostate cancer data set
-in Section~\ref{sec:real-data-appl}.  Section~\ref{sec:discussion}
-contains a discussion of the merits and limitations of our
-proposal. Appendices~\ref{sec:proof-proposition}
-and~\ref{sec:state-learner-with} contain proofs.  An implementation of
-the state learner is available at
-\url{https://github.com/amnudn/statelearner} along with codes for
-reproducing our numerical experiments.
+The state learner algorithm can output a medical risk prediction model
+\citep{gerds2021medical} which predicts the probability of an event based on
+covariates in the presence of competing risks. The other application is in
+targeted learning where conditional event probabilities occur as
+high-dimensional nuisance parameters which need to be estimated at a certain
+rate \citep{van2011targeted, rytgaard2021estimation, rytgaard2022targeted}. For
+the asymptotic bias term of targeted estimator, which uses the state learner to
+estimate nuisance parameters, we show that a second order product structure
+holds. We illustrate both applications of the state learner with prostate cancer
+data \citep{kattan2000pretreatment}.
+
+We introduce our notation and framework in
+Section~\ref{sec:framework}. In Section~\ref{sec:super-learning} we define
+general super learning for right-censored data.
+Section~\ref{sec:super-learner-simple} introduces the state learner, and
+Section~\ref{sec:theor-results-prop} provides theoretical guarantees. In
+Section~\ref{sec:targeted-learning} we discuss the use of the state learner in
+the context of targeted learning. We report results of our numerical experiments
+in Section~\ref{sec:numer-exper} and analyse a prostate cancer data set in
+Section~\ref{sec:real-data-appl}. Section~\ref{sec:discussion} contains a
+discussion of the merits and limitations of our proposal.
+Appendices~\ref{sec:proof-proposition} and~\ref{sec:state-learner-with} contain
+proofs. An implementation of the state learner is available at
+\url{https://github.com/amnudn/statelearner} along with codes for reproducing
+our numerical experiments.
 
 
 \section{Notation and framework}
@@ -500,7 +458,8 @@ introduce the state learner, we define the multi-state process
   \quad \text{for} \quad t \in [0, \tau].
 \end{equation*}
 At time \(t\), we observe that each individual is in one of four mutually
-exclusive states. % (Figure \ref{fig:multi-state-process}).
+exclusive states: \( 0 \), \( 1 \), \( 2 \), or \( -1 \).
+% (Figure \ref{fig:multi-state-process}).
 % \begin{figure}[h]
   % \centering %
   % \includeFigCond[width=.5\textwidth]{figure-multi-state-process.pdf}
@@ -917,7 +876,7 @@ $\theta$:
 \end{equation}
 
 The asymptotic distribution of \( \hat{\Psi}^0 \) is
-difficult to analyze due to the cross-validated model selection step
+difficult to analyse due to the cross-validated model selection step
 involved in the estimation of the nuisance parameters $\Lambda_1$ and
 $\Lambda_2$.
 % In addition, the estimator will typically have an
@@ -963,7 +922,7 @@ where the remainder term has the form
 \begin{equation}
   \label{eq:4}
   \mathrm{Rem}{(\hat{\Lambda}_{1,n},\hat{\Lambda}_{2,n},  \hat{\Gamma}_n, P)}
-  = \mathcal{O}_P{
+  = \bigO_P{
     \left\{
       \|\Lambda_1-\hat{\Lambda}_{1,n}\|^2
       +
@@ -1166,36 +1125,34 @@ which gives the estimator
 \label{sec:numer-exper}
 
 
-In this section we report results from a simulation study. In the first part we
-consider estimation of the conditional survival function. Here we compare the
-state learner to two IPCW based discrete super learners that use either the
+In this section we report results from a simulation study where we consider
+estimation of the conditional survival function. In the first part, we compare
+the state learner to two IPCW based discrete super learners that use either the
 Kaplan-Meier estimator or a Cox model to estimate the censoring probability
 \citep{gonzalez2021stacked}. In the second part we compare the state learner to
 the super learner proposed by \cite{westling2021inference}.
 
-In both parts we use the same data-generating mechanism. We generate
-data according to a distribution motivated from a real data set in
-which censoring depends on the baseline covariates. We simulate data
-based on the prostate cancer study of
-\cite{kattan2000pretreatment}. The outcome of interest is the time to
-tumor recurrence, and five baseline covariates are used to predict
-outcome: prostate-specific antigen (PSA, ng/mL), Gleason score sum
-(GSS, values between 6 and 10), radiation dose (RD), hormone therapy
-(HT, yes/no) and clinical stage (CS, six values). The study was
-designed such that a patient's radiation dose depended on when the
-patient entered the study \citep{gerds2013estimating}. This in turn
-implies that the time of censoring depends on the radiation dose. The
-data were re-analyzed in \citep{gerds2013estimating} where a
-sensitivity analysis was conducted based on simulated data. Here we use the
-same simulation setup, where event and censoring times are generated
-according to parametric Cox-Weibull models estimated from the original
-data, and the covariates are generated according to either marginal
-Gaussian normal or binomial distributions estimated from the original
-data \citep[c.f.,][Section~4.6]{gerds2013estimating}. We refer to this
-simulation setting as ``dependent censoring''. We also considered a
-simulation setting where data were generated in the same way, except
-that censoring was generated completely independently. We refer to
-this simulation setting as ``independent censoring''.
+In both parts we use the same data-generating mechanism. We generate data
+according to a distribution motivated from a real data set in which censoring
+depends on the baseline covariates. We simulate data based on the prostate
+cancer study of \cite{kattan2000pretreatment}. The outcome of interest is the
+time to tumor recurrence, and five baseline covariates are used to predict
+outcome: prostate-specific antigen (PSA, ng/mL), Gleason score sum (GSS, values
+between 6 and 10), radiation dose (RD), hormone therapy (HT, yes/no) and
+clinical stage (CS, six values). The study was designed such that a patient's
+radiation dose depended on when the patient entered the study
+\citep{gerds2013estimating}. This in turn implies that the time of censoring
+depends on the radiation dose. The data were re-analysed in
+\citep{gerds2013estimating} where a sensitivity analysis was conducted based on
+simulated data. Here we use the same simulation setup, where event and censoring
+times are generated according to parametric Cox-Weibull models estimated from
+the original data, and the covariates are generated according to either marginal
+Gaussian normal or binomial distributions estimated from the original data
+\citep[c.f.,][Section~4.6]{gerds2013estimating}. We refer to this simulation
+setting as `dependent censoring'. We also considered a simulation setting where
+data were generated in the same way, except that censoring was generated
+completely independently. We refer to this simulation setting as `independent
+censoring'.
 
 % ANDERS: hedder det ikke Nelson-Aalen i stedet for Kaplan-Meier?
 %         kan du skrive klart hvad outcome er i denne foerste del? er det combined endpoint som man kalder for tumor-free survival?  
@@ -1207,7 +1164,7 @@ survival forest \citep{ishwaran2008random,rfsrc-paclage}. We use the
 same library to learn the outcome distribution and the censoring
 distribution. Note that the three learners in our library of learners
 can be used to learn the cumulative hazard functions of the 
-outcome and the censoring distribution. This works by
+outcome and the censoring distribution. The latter works by
 training the learner on the data set \( \data_n^c \), where
 \( \data_n^c = \{O_i^c\}_{i=1}^n \) with
 \( O_i^c = (\tilde{T}_i, 1-\Delta, X_i) \). When we say that we use a
@@ -1234,9 +1191,9 @@ independent. Both IPCW super learners are fitted using the
 %
 The IPCW super learners use the integrated Brier score up to a fixed time
 horizon (36 months). The marginal risk of the event before this time horizon is
-\(\approx 24.6\)\%. Under the ``dependent censoring'' setting the marginal
+\(\approx 24.6\)\%. Under the `dependent censoring' setting the marginal
 censoring probability before the time horizon is \(\approx 61.9\)\%. Under the
-``independent censoring'' setting the marginal censoring probability before this
+`independent censoring' setting the marginal censoring probability before this
 time horizon is \( \approx 38.7 \)\%.
 
 Each super learner provides a learner for the cumulative hazard
@@ -1268,7 +1225,7 @@ performance of the oracle, except for small sample sizes.
 
 \begin{figure}
   \centering %
-  \includeFigCond[width=.8\linewidth]{experiment-fig-sl-ipcw.pdf}
+  \includeFigCond[width=1\linewidth]{experiment-fig-sl-ipcw.pdf}
   \caption[]{For the risk prediction models provided by each of the super
     learners, the IPA is plotted against sample size. The results are averages across 
     1000 simulated data sets and the error bars are used to quantify the Monte Carlo
@@ -1294,7 +1251,7 @@ similar or higher IPA compared to the prediction models selected by
 \texttt{survSL}.
 \begin{figure}
   \centering %
-  \includeFigCond[width=.8\linewidth]{experiment-fig-sl-survSL-out.pdf}
+  \includeFigCond[width=1\linewidth]{experiment-fig-sl-survSL-out.pdf}
   \caption[]{For the risk prediction models of the outcome provided by each
     of the super learners, the IPA at the fixed time horizon is plotted against
     sample size. The results are averages across 1000 repetitions and the error
@@ -1304,7 +1261,7 @@ similar or higher IPA compared to the prediction models selected by
 
 \begin{figure}
   \centering %
-  \includeFigCond[width=.5\linewidth]{experiment-fig-sl-survSL-cens.pdf}
+  \includeFigCond[width=.7\linewidth]{experiment-fig-sl-survSL-cens.pdf}
   \caption[]{For the risk prediction models of the censoring model provided by
     each of the super learners, the IPA at the fixed time horizon is plotted
     against sample size. The results are averages across 1000 repetitions and
@@ -1340,31 +1297,6 @@ censoring distribution $\Gamma$.  We then use the highest ranked
 combination of learners and apply
 formula~\eqref{eq:one-step-comp-ate}.
 
-% \begin{table}
-  % \caption{\label{tab:zel-library}Overview of the five learners used by the
-    % state learner when applied to the prostate cancer data set. The Kaplan-Meier
-    % estimator was fitted using the package \texttt{prodlim}
-    % \citep{Gerds_2019prodlim}. All Cox models included all five covariates in
-    % the model and were fitted using the package \texttt{survival}
-    % \citep{survival-package}. All penalised Cox models included all five
-    % covariates as linear predictors and were fitted using the package
-    % \texttt{glmnet} \citep{glmnet-cox,glmnet-glm}. The random forest was fitted
-    % with the package \texttt{randomForestSRC} \citep{rfsrc-paclage}.}
-  % \centering
-  % \begin{tabular}{lll}
-    % \toprule
-    % Family & Model & Description \\
-    % \midrule
-    % Marginal & \texttt{KM} & The Kaplan-Meier estimator \\ 
-    % Cox & \texttt{Cox} & All five covariates included with additive effects \\
-           % & \( \texttt{Cox strata CS} \)  & Cox model stratified on CS  \\
-    % Penalised Cox & \texttt{Lasso} & Cox model with \( L_1 \)-norm penalty   \\
-           % & \texttt{Elastic} & Cox model with \( L_1 \)- and \( L_2 \)-norm penalty \\
-    % Random forest & \texttt{RF} & Random forest with default settings \\
-    % \bottomrule 
-  % \end{tabular}
-% \end{table}
-
 This gives a library consisting of \( 5^3 = 125 \) learners for the
 conditional state occupation probability function \( F \) defined in
 equation~(\ref{eq:F-def}). We use five folds for training and testing
@@ -1379,26 +1311,14 @@ random forest is used to model the censoring distribution.
 
 \begin{figure}
   \centering %
-  \includeFigCond[width=.9\linewidth]{real-data-state-learner.pdf}
+  \includeFigCond[width=1\linewidth]{real-data-state-learner.pdf}
   \caption[]{The results of applying the 125 combinations of learners to the
-    prostate cancer data set. The learners are \texttt{KM} (KM), \texttt{Cox
-      strata CS} (strata), \texttt{Lasso} (lasso), \texttt{Elastic} (elastic),
-    and \texttt{RF} (RF) as described Table~\ref{tab:zel-library}. The error
-    bars are based on five repetitions using different splits. We refer to
-    learners of \( \Lambda_1 \), \( \Lambda_2 \), and $\Gamma$ as `Tumor
-    learner', `Mortality learner', and `Censoring learner', respectively.}
+    prostate cancer data set. The error bars are based on five repetitions using
+    different splits. We refer to learners of \( \Lambda_1 \), \( \Lambda_2 \),
+    and $\Gamma$ as `Tumor learner', `Mortality learner', and `Censoring
+    learner', respectively.}
   \label{fig:zelefski-real}
 \end{figure}
-
-% \begin{table}
-  % \caption{\label{tab:zelefski-real}The 10 best performing models in terms of integrated Brier score. The
-    % reported standard errors are based on five repetitions using different
-    % splits. The models are described in Table~\ref{tab:zel-library}. We refer to
-    % learners of \( \Lambda_1 \), \( \Lambda_2 \), and $\Gamma$ as `Tumor
-    % learner', `Mortality learner', and `Censoring learner', respectively.}
-  % \centering
-  % \input{./real-data-tab.tex}
-% \end{table}
 
 
 We use the learners of the three cumulative hazard functions selected
@@ -1418,10 +1338,10 @@ but that none of the estimated effects are statistically significant.
 
 \begin{figure}
   \centering%
-  \includeFigCond[width=.8\linewidth]{real-data-target.pdf}
+  \includeFigCond[width=.9\linewidth]{real-data-target.pdf}
   \caption[]{Estimates of the average treatment effect of hormone therapy on the
     risk of tumor recurrence and death obtained from the prostate cancer study
-    analyzed by \cite{kattan2000pretreatment}. The estimates are based on the
+    analysed by \cite{kattan2000pretreatment}. The estimates are based on the
     estimator defined in equation~(\ref{eq:one-step-comp-ate}) with pointwise
     95\% confidence intervals calculated as described in
     Section~\ref{sec:targeted-learning}. The estimates of the nuisance
@@ -1703,103 +1623,106 @@ $\tilde\Psi(\hat{\Lambda}_n, \hat{\Gamma}_n, \hat{H}_n)$.
   For notational convenience we suppress \( X \) in the following. The final
   result can be obtained by adding the argument \( X \) to all functions and
   averaging. We use the relations from equation~(\ref{eq:7}) to write
-  \begin{align*}
-    & \int_0^{\tau} w(s) 
-      \left\{
-      \Gamma(s) - \hat{\Gamma}_n(s)
-      \right\}
-      [\Lambda - \hat{\Lambda}_n](\diff s)
-    \\
-    & =
-      \int_0^{\tau} w(s) 
-      \left\{
-      \int_0^s \frac{F(\diff u, 2)}{F(u-, 0)} -
-      \int_0^s \frac{\hat{F}_n(\diff u, 2)}{\hat{F}_n(u-, 0)}  -
-      \right\}
-      \left[
-      \frac{F(\diff s, 1)}{F(s-, 0)}
-      - \frac{\hat{F}_n(\diff s, 1)}{\hat{F}_n(s-, 0)}
-      \right]
-    \\
-    & =
-      \int_0^{\tau} w(s) 
-      \Bigg\{
-      \int_0^s 
-      \left(
-      \frac{1}{F(u-, 0)} -  \frac{1}{\hat{F}_n(u-, 0)}
-      \right) F(\diff u, 2)
-    \\
-    & \qquad\qquad \qquad
-      +
-      \int_0^s \frac{1}{\hat{F}_n(u-, 0)} 
-      \left[
-      F(\diff u, 2) - \hat{F}_n(\diff u, 2)
-      \right]
-      \Bigg\}
-    \\
-    & \qquad\qquad \times
-      \left[
-      \left(
-      \frac{1}{F(s-, 0)} -
-      \frac{1}{\hat{F}_n(s-, 0)}
-      \right)F(\diff s, 1)
-       + \frac{1}{\hat{F}_n(s-, 0)}
-      \left(
-      F(\diff s, 1) -
-      \hat{F}_n(\diff s, 1)
-      \right)
-      \right]
-    \\
-    &
-      = \int_0^{\tau} 
-      \int_0^s
-      w(s) 
-      \left(
-      \frac{1}{F(u-, 0)} -  \frac{1}{\hat{F}_n(u-, 0)}
-      \right) 
-      \left(
-      \frac{1}{F(s-, 0)} -
-      \frac{1}{\hat{F}_n(s-, 0)}
-      \right)F(\diff u, 2)F(\diff s, 1)
-    \\
-    & \quad +
-      \int_0^{\tau}
-      \int_0^s
-      w(s) 
-      \left(
-      \frac{1}{F(u-, 0)} -  \frac{1}{\hat{F}_n(u-, 0)}
-      \right) \frac{F(\diff u, 2) }{\hat{F}_n(u-,0)}
-      \left(
-      F(\diff s, 1) -
-      \hat{F}_n(\diff s, 1)
-      \right)
-    \\
-    & \quad +
-      \int_0^{\tau} 
-      \int_0^s      
-      \frac{w(s) }{\hat{F}_n(u-, 0)} 
-      \left[
-      F(\diff u, 2) - \hat{F}_n(\diff u, 2)
-      \right]
-      \left(
-      \frac{1}{F(s-, 0)} -
-      \frac{1}{\hat{F}_n(s-, 0)}
-      \right)F(\diff s, 1)
-    \\
-    & \quad +
-      \int_0^{\tau} 
-      \int_0^s      
-      \frac{w(s) }{\hat{F}_n(u-, 0)} 
-      \left[
-      F(\diff u, 2) - \hat{F}_n(\diff u, 2)
-      \right]
-      \frac{1}{\hat{F}_n(s-, 0)}
-      \left(
-      F(\diff s, 1) -
-      \hat{F}_n(\diff s, 1)
-      \right).
-  \end{align*}
-  Consider the first term on the right hand side. Defining
+  \begingroup %
+  \allowdisplaybreaks
+    \begin{align*}
+      & \int_0^{\tau} w(s) 
+        \left\{
+        \Gamma(s) - \hat{\Gamma}_n(s)
+        \right\}
+        [\Lambda - \hat{\Lambda}_n](\diff s)
+      \\
+      & =
+        \int_0^{\tau} w(s) 
+        \left\{
+        \int_0^s \frac{F(\diff u, 2)}{F(u-, 0)} -
+        \int_0^s \frac{\hat{F}_n(\diff u, 2)}{\hat{F}_n(u-, 0)}  -
+        \right\}
+        \left[
+        \frac{F(\diff s, 1)}{F(s-, 0)}
+        - \frac{\hat{F}_n(\diff s, 1)}{\hat{F}_n(s-, 0)}
+        \right]
+      \\
+      & =
+        \int_0^{\tau} w(s) 
+        \Bigg\{
+        \int_0^s 
+        \left(
+        \frac{1}{F(u-, 0)} -  \frac{1}{\hat{F}_n(u-, 0)}
+        \right) F(\diff u, 2)
+      \\
+      & \qquad\qquad \qquad
+        +
+        \int_0^s \frac{1}{\hat{F}_n(u-, 0)} 
+        \left[
+        F(\diff u, 2) - \hat{F}_n(\diff u, 2)
+        \right]
+        \Bigg\}
+      \\
+      & \qquad\qquad \times
+        \left[
+        \left(
+        \frac{1}{F(s-, 0)} -
+        \frac{1}{\hat{F}_n(s-, 0)}
+        \right)F(\diff s, 1)
+        + \frac{1}{\hat{F}_n(s-, 0)}
+        \left(
+        F(\diff s, 1) -
+        \hat{F}_n(\diff s, 1)
+        \right)
+        \right]
+      \\
+      &
+        = \int_0^{\tau} 
+        \int_0^s
+        w(s) 
+        \left(
+        \frac{1}{F(u-, 0)} -  \frac{1}{\hat{F}_n(u-, 0)}
+        \right) 
+        \left(
+        \frac{1}{F(s-, 0)} -
+        \frac{1}{\hat{F}_n(s-, 0)}
+        \right)F(\diff u, 2)F(\diff s, 1)
+      \\
+      & \quad +
+        \int_0^{\tau}
+        \int_0^s
+        w(s) 
+        \left(
+        \frac{1}{F(u-, 0)} -  \frac{1}{\hat{F}_n(u-, 0)}
+        \right) \frac{F(\diff u, 2) }{\hat{F}_n(u-,0)}
+        \left(
+        F(\diff s, 1) -
+        \hat{F}_n(\diff s, 1)
+        \right)
+      \\
+      & \quad +
+        \int_0^{\tau} 
+        \int_0^s      
+        \frac{w(s) }{\hat{F}_n(u-, 0)} 
+        \left[
+        F(\diff u, 2) - \hat{F}_n(\diff u, 2)
+        \right]
+        \left(
+        \frac{1}{F(s-, 0)} -
+        \frac{1}{\hat{F}_n(s-, 0)}
+        \right)F(\diff s, 1)
+      \\
+      & \quad +
+        \int_0^{\tau} 
+        \int_0^s      
+        \frac{w(s) }{\hat{F}_n(u-, 0)} 
+        \left[
+        F(\diff u, 2) - \hat{F}_n(\diff u, 2)
+        \right]
+        \frac{1}{\hat{F}_n(s-, 0)}
+        \left(
+        F(\diff s, 1) -
+        \hat{F}_n(\diff s, 1)
+        \right).
+    \end{align*}
+    \endgroup %
+    Consider the first term on the right hand side. Defining
   \begin{equation*}
     w_n^*(t)  = 
     \left(
