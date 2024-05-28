@@ -4,12 +4,12 @@
 This repository provides code that implements the state learner which is a super
 learner for right-censored data. We provide examples of how to use it as a
 stand-alone tool and in combination with targeted learning. We also provide code
-to reproduce the numerical experiments described in [[https://arxiv.org/abs/2405.17259]["The state learner -- a
-super learner for right-censored data" (Munch & Gerds)]]. Details are given in
-[[./experiments/readme-experiments.org]]. The article describes a real data example,
-but as we cannot share the data from that study, the tutorial below uses an
-emulated data set with the same structure as the original data analysed in the
-article.
+to reproduce the numerical experiments described in the article [[https://arxiv.org/abs/2405.17259][The state
+learner -- a super learner for right-censored data (Munch & Gerds)]]. Details are
+given in [[./experiments/readme-experiments.org]]. The article describes a real data
+example, but as we cannot share the data from that study, the tutorial below
+uses an emulated data set with the same structure as the original data analysed
+in the article.
 
 * Setup and load data
 
