@@ -23,7 +23,7 @@
 
 
 %% Line spacing
-\linespread{1.65}
+% \linespread{1.65}
 
 % \usepackage{lineno}
 % \linenumbers
@@ -185,29 +185,50 @@ oracle selector of the state learner is consistent if all libraries
 contain a consistent learner and prove a finite sample oracle
 inequality.
 
-Machine learning based on right-censored data commonly uses the
-partial log-likelihood as a loss function
+The state learner algorithm can output a medical risk prediction model
+\citep{gerds2021medical} which predicts the probability of an event based on
+covariates in the presence of competing risks. Another important application,
+which motivated our contribution, is in targeted learning where conditional
+event probabilities occur as high-dimensional nuisance parameters which need to
+be estimated at a certain rate \citep{van2011targeted, rytgaard2021estimation,
+  rytgaard2022targeted}. The state learner is particularly well-suited for this
+application as it simultaneously provides estimates for both the outcome and the
+censoring, both of which are needed for targeted learning. For the asymptotic
+bias term of a targeted estimator, which uses the state learner to estimate
+nuisance parameters, we show that a second order product structure holds. We
+illustrate both applications of the state learner with prostate cancer data
+\citep{kattan2000pretreatment}.
+
+There are many existing super learners for right-censored data. We briefly
+review them here and contrast our suggestion. Machine learning based on
+right-censored data commonly uses the partial log-likelihood as a loss function
 \citep[e.g.,][]{li2016regularized,yao2017deep,lee2018deephit,katzman2018deepsurv,gensheimer2019scalable,lee2021boosted,kvamme2021continuous}.
-However, this loss function does not work well with data splitting
-(cross-validation) because the partial log-likelihood loss assigns an
-infinite value when applied to a test set time point which does not
-occur in the learning set as soon as the learner predicts piece-wise
-constant cumulative hazard functions. This is the case for prominent
-survival learners including the Kaplan-Meier estimator, the random
-survival forest, and the semi-parametric Cox regression model.  When a
-proportional hazards model is assumed, the baseline hazard function
-can be profiled out of the likelihood \citep{cox1972regression}.  The
-cross-validated partial log-likelihood loss \citep{verweij1993cross}
-has therefore been suggested as a loss function for super learning
-which however restricts the library of learners to include only Cox
-proportional hazards models \citep{golmakani2020super}.
+This loss function is also suggested for super learning with right-censored data
+by \cite{polley2011-sl-cens}, where data is assumed to be observed in discrete
+time. However, the partial log-likelihood loss does not work well with data
+splitting (cross-validation) in continuous time because this loss assigns an
+infinite value when applied to a test set time point which does not occur in the
+learning set as soon as the learner predicts piece-wise constant cumulative
+hazard functions. This is the case for prominent survival learners including the
+Kaplan-Meier estimator, the random survival forest, and the semi-parametric Cox
+regression model, which hence cannot be included in the library of the super
+learner proposed by \cite{polley2011-sl-cens}.
+
+When a proportional hazards model is assumed, the baseline hazard function can
+be profiled out of the likelihood \citep{cox1972regression}. The cross-validated
+partial log-likelihood loss \citep{verweij1993cross} has therefore been
+suggested as a loss function for super learning \citep{golmakani2020super}. This
+choice of loss function restricts the library of learners to include only Cox
+proportional hazards models, and hence excludes many learners such as, e.g.,
+random survival models, additive hazards models and accelerated failure time
+models.
 % A lesser
 % known fact is that a super learner constructed with the partial
 % log-likelihood loss implicitly depends on the censoring distribution
 % \citep{hjort1992inference,whitney2019comment}.
 
-Alternative approaches for super learning with right-censored data use
-an inverse probability of censoring weighted (IPCW) loss function
+Other attempts at super learning with right-censored data use an inverse
+probability of censoring weighted (IPCW) loss function
 \citep{graf1999assessment,van2003unicv,molinaro2004tree,keles2004asymptotically,hothorn2006survival,gerds2006consistent,gonzalez2021stacked},
 % An IPCW loss function is attractive because the associated risk does
 % not depend on the censoring distribution but describes a feature of
@@ -228,24 +249,23 @@ and their drawback is that this estimator has to be pre-specified.
 % Recently \cite{westling2021inference} proposed a procedure which
 % iterates between super learning of the censoring distribution and
 % super learning of the event time distribution.
-An approach which avoids a pre-specified censoring model was proposed
-independently by \cite{han2021inverse} and
-\cite{westling2021inference}. In both articles, the authors suggest to
-iterate between learning of the outcome model and learning of the
-censoring model using IPCW loss functions. However, no general
-theoretical guarantees seem to exist for this procedure, and it has
-not yet been extended to the situation with competing risks.
 
-The state learner algorithm can output a medical risk prediction model
-\citep{gerds2021medical} which predicts the probability of an event based on
-covariates in the presence of competing risks. The other application is in
-targeted learning where conditional event probabilities occur as
-high-dimensional nuisance parameters which need to be estimated at a certain
-rate \citep{van2011targeted, rytgaard2021estimation, rytgaard2022targeted}. For
-the asymptotic bias term of targeted estimator, which uses the state learner to
-estimate nuisance parameters, we show that a second order product structure
-holds. We illustrate both applications of the state learner with prostate cancer
-data \citep{kattan2000pretreatment}.
+A recent approach which avoids a pre-specified censoring model was proposed
+independently by \cite{han2021inverse} and \cite{westling2021inference}. In both
+articles, the authors suggest to iterate between learning of the outcome model
+and learning of the censoring model using IPCW loss functions. However, no
+general theoretical guarantees seem to exist for this procedure. For instance,
+the procedure is not guaranteed to converge to the true data-generating
+mechanism \citep{munch2024thesis}.
+
+Contrary to the super learners considered by \cite{polley2011-sl-cens} and
+\cite{golmakani2020super}, the state learner poses no restrictions on the type
+of learners that can be included in the library. Contrary to IPCW, censoring
+unbiased transformations, or pseudo-value based super learners, the state
+learner does not require a pre-specified censoring distribution, but constructs
+a super learner for both the outcome and the censoring distribution. Contrary to
+the proposals by \cite{han2021inverse} and \cite{westling2021inference}, the
+state learner is backed by theoretical guarantees.
 
 We introduce our notation and framework in
 Section~\ref{sec:framework}. In Section~\ref{sec:super-learning} we define
