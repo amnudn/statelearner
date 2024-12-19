@@ -23,6 +23,23 @@ functions.
 #+END_SRC
 
 #+RESULTS:
+#+begin_example
+here() starts at /home/amnudn/Documents/phd/statelearner
+data.table 1.15.4 using 4 threads (see ?getDTthreads).  Latest news: r-datatable.com
+riskRegression version 2023.12.21
+
+ randomForestSRC 3.2.3 
+ 
+ Type rfsrc.news() to see new features, changes, and bug fixes. 
+ 
+
+
+Attaching package: ‘ggplot2’
+
+The following object is masked from ‘package:lava’:
+
+    vars
+#+end_example
 
 We load and setup the emulated data as follows.
 #+BEGIN_SRC R :exports code :results silent
@@ -40,19 +57,19 @@ The data looks as follows.
 
 #+RESULTS:
 #+begin_example
-          time status   logPSA  stage    ggtot       sDose hormones     A
-         <num>  <int>    <num> <fctr>    <num>       <num>   <fctr> <num>
-   1: 28.92331      1 2.043593   T3ab 9.851837 -0.76183395       No     0
-   2: 14.20877      1 2.274948    T3c 6.881895 -0.35527003       No     0
-   3: 15.89122      0 1.133611    T2a 7.794667 -1.59754020       No     0
-   4: 61.61761      2 2.595044    T1c 8.879701 -0.81713882      Yes     1
-   5: 26.01292      0 2.360323    T1c 5.804236  0.61412150      Yes     1
-  ---                                                                    
-1038: 44.26178      0 1.137501    T2b 5.942560 -0.06968029      Yes     1
-1039: 13.93434      0 1.898109    T1c 6.785073  0.46413725       No     0
-1040: 52.19202      1 3.521309   T3ab 5.539725 -1.02355475       No     0
-1041: 10.06398      0 2.900889    T2b 5.906983  1.18218871      Yes     1
-1042: 25.70154      0 1.888293    T3c 7.163754  1.25946357      Yes     1
+          time status   logPSA  stage    ggtot       sDose hormones
+         <num>  <int>    <num> <fctr>    <num>       <num>   <fctr>
+   1: 28.92331      1 2.043593   T3ab 9.851837 -0.76183395       No
+   2: 14.20877      1 2.274948    T3c 6.881895 -0.35527003       No
+   3: 15.89122      0 1.133611    T2a 7.794667 -1.59754020       No
+   4: 61.61761      2 2.595044    T1c 8.879701 -0.81713882      Yes
+   5: 26.01292      0 2.360323    T1c 5.804236  0.61412150      Yes
+  ---                                                              
+1038: 44.26178      0 1.137501    T2b 5.942560 -0.06968029      Yes
+1039: 13.93434      0 1.898109    T1c 6.785073  0.46413725       No
+1040: 52.19202      1 3.521309   T3ab 5.539725 -1.02355475       No
+1041: 10.06398      0 2.900889    T2b 5.906983  1.18218871      Yes
+1042: 25.70154      0 1.888293    T3c 7.163754  1.25946357      Yes
 #+end_example
 
 * Stand alone use of the state learner
@@ -75,6 +92,8 @@ entries to the list (e.g., =ntree= for a random survival forest).
 #+END_SRC
 
 #+RESULTS:
+: Loading required package: Matrix
+: Loaded glmnet 4.1-8
 
 Below we use the same list of learners to learn the cumulative hazards for cause
 1, cause 2, and censoring. The state learner returns a =list= consisting of
@@ -171,3 +190,39 @@ intervals up to 3 years after baseline.
 11: cause2    30    ATE one-step  0.014983272 0.031678356 -0.047106306 0.07707285
 12: cause2    36    ATE one-step  0.014682592 0.032697166 -0.049403852 0.07876904
 #+end_example
+
+* Testing alternative loss function :noexport:
+
+#+BEGIN_SRC R
+  set.seed(114)
+  sl2 = statelearner2(learners = list(cause1 = learners,
+				    cause2 = learners,
+				    censor = learners),
+		    data = canc_dt,
+		    time = 36)  
+#+END_SRC
+
+#+BEGIN_SRC R
+  grid.arrange(ggplot(sl$cv_fit, aes(x = cause1, y = loss, col = cause2)) +
+               geom_point(position=position_dodge(width=1), size=.8) +
+               theme_bw() + ylab("Integrated Brier score") +
+               theme(legend.position="top",
+                     axis.text.x = element_text(angle = 45, vjust = .8)) +
+               xlab("Tumor learner") +
+               facet_grid( ~ censor) +
+               scale_colour_grey("Mortality learner", start = 0, end = 0.7),
+               ggplot(sl2$cv_fit, aes(x = cause1, y = loss, col = cause2)) +
+               geom_point(position=position_dodge(width=1), size=.8) +
+               theme_bw() + ylab("Integrated Brier score") +
+               theme(legend.position="top",
+                     axis.text.x = element_text(angle = 45, vjust = .8)) +
+               xlab("Tumor learner") +
+               facet_grid( ~ censor) +
+               scale_colour_grey("Mortality learner", start = 0, end = 0.7)
+               )
+#+END_SRC
+
+#+BEGIN_SRC R 
+  sl_test_plot <- merge(sl$cv_fit, sl2$cv_fit, by = c("cause1", "cause2", "censor"))
+  sl_test_plot[, plot(loss.x, loss.y)]
+#+END_SRC
