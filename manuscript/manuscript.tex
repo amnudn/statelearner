@@ -167,13 +167,27 @@ name super learner is justified by an oracle inequality
 
 We define the state learner, a new super learner for right-censored
 data, which simultaneously estimates the expected loss of learners of
-the event time distribution and the censoring distribution. The loss
-function underlying the state learner operates on the coarsened
-data. In the right-censored survival setting the coarsened data
-consist of the minimum and the order of the censoring time and the
-event time as well as the baseline covariates. The state learner can
-include a broad class of survival models as learners, it can handle
-competing risks, and it does not require a single pre-specified
+the event time distribution and the censoring distribution. Compared
+to the super learners of \cite{polley2011-sl-cens} and
+\cite{golmakani2020super}, the state learner proposed here poses no
+restrictions on the type of learners that can be included in the
+library. Compared to super learners that rely on inverse probability
+of censoring weighting, censoring unbiased transformations, or
+pseudo-value based super learners, the state learner does not require
+a pre-specified censoring distribution. Compared to the super learners
+by \cite{han2021inverse} and \cite{westling2021inference}, the state
+learner has theoretical guarantees which these methods do not
+have.
+% Moreover, state learner seems to be the first super learner for
+% right censored data which learns the outcome and the censoring
+% distribution simulaneously.
+
+The loss function underlying the state learner operates on the
+coarsened data. In the right-censored survival setting the coarsened
+data consist of the minimum and the order of the censoring time and
+the event time as well as the baseline covariates. The state learner
+can include a broad class of survival models as learners, it can
+handle competing risks, and it does not require a single pre-specified
 estimator of the conditional censoring distribution. To analyse the
 theoretical properties of the state learner we focus on the discrete
 super learner which combines the library of learners by picking the
@@ -199,73 +213,47 @@ nuisance parameters, we show that a second order product structure holds. We
 illustrate both applications of the state learner with prostate cancer data
 \citep{kattan2000pretreatment}.
 
-There are many existing super learners for right-censored data. We briefly
-review them here and contrast our suggestion. Machine learning based on
-right-censored data commonly uses the partial log-likelihood as a loss function
+There are many existing super learners for right-censored data. We
+briefly review them here. Machine learning based on right-censored
+data commonly uses the partial log-likelihood as a loss function
 \citep[e.g.,][]{li2016regularized,yao2017deep,lee2018deephit,katzman2018deepsurv,gensheimer2019scalable,lee2021boosted,kvamme2021continuous}.
-This loss function is also suggested for super learning with right-censored data
-by \cite{polley2011-sl-cens}, where data is assumed to be observed in discrete
-time. However, the partial log-likelihood loss does not work well with data
-splitting (cross-validation) in continuous time because this loss assigns an
-infinite value when applied to a test set time point which does not occur in the
-learning set as soon as the learner predicts piece-wise constant cumulative
-hazard functions. This is the case for prominent survival learners including the
-Kaplan-Meier estimator, the random survival forest, and the semi-parametric Cox
-regression model, which hence cannot be included in the library of the super
-learner proposed by \cite{polley2011-sl-cens}.
-
-When a proportional hazards model is assumed, the baseline hazard function can
-be profiled out of the likelihood \citep{cox1972regression}. The cross-validated
-partial log-likelihood loss \citep{verweij1993cross} has therefore been
-suggested as a loss function for super learning \citep{golmakani2020super}. This
-choice of loss function restricts the library of learners to include only Cox
-proportional hazards models, and hence excludes many learners such as, e.g.,
-random survival models, additive hazards models and accelerated failure time
-models.
-% A lesser
-% known fact is that a super learner constructed with the partial
-% log-likelihood loss implicitly depends on the censoring distribution
-% \citep{hjort1992inference,whitney2019comment}.
-
-Other attempts at super learning with right-censored data use an inverse
-probability of censoring weighted (IPCW) loss function
+This loss function is also suggested for super learning with
+right-censored data by \cite{polley2011-sl-cens}, where data is
+assumed to be observed in discrete time. However, the partial
+log-likelihood loss does not work well with data splitting
+(cross-validation) in continuous time. The reason is that the partial
+log-likelihood loss assigns an infinite value for any learner that
+predicts piece-wise constant cumulative hazard functions when there
+are event times in the test set which do not occur in the learning
+set. This problem occurs with prominent survival learners including
+the Kaplan-Meier estimator, the random survival forest, and the
+semi-parametric Cox regression model and these learners cannot be
+included in the library of the super learner proposed by
+\cite{polley2011-sl-cens}. When a proportional hazards model is
+assumed, the baseline hazard function can be profiled out of the
+likelihood \citep{cox1972regression}. The cross-validated partial
+log-likelihood loss \citep{verweij1993cross} has therefore been
+suggested as a loss function for super learning
+\citep{golmakani2020super}. This choice of loss function restricts the
+library of learners to include only Cox proportional hazards models,
+and hence excludes many learners such as, e.g., random survival
+models, additive hazards models and accelerated failure time models.
+Other proposals for super learning with right-censored data use an
+inverse probability of censoring weighted (IPCW) loss function
 \citep{graf1999assessment,van2003unicv,molinaro2004tree,keles2004asymptotically,hothorn2006survival,gerds2006consistent,gonzalez2021stacked},
-% An IPCW loss function is attractive because the associated risk does
-% not depend on the censoring distribution but describes a feature of
-% the population of interested. Similar results can be obtained using
 censoring unbiased transformations
 \citep{fan1996local,steingrimsson2019censoring}, or pseudo-values
 \citep{andersen2003generalised,mogensen2013random,sachs2019ensemble}.
 All these methods rely on an estimator of the censoring distribution,
-and their drawback is that this estimator has to be pre-specified.
-% When the data-generating mechanism is complex and not
-% well-understood, pre-specification of the censoring distribution is a
-% challenge.
-% Inverse probability of censoring weighted loss has been studied for
-% decades \citep{graf1999assessment, hothorn2006survival,
-  % gerds2006consistent}. A disadvantage of inverse probability of
-% censoring weighted loss estimators is that they require a
-% pre-specified model for the censoring distribution.
-% Recently \cite{westling2021inference} proposed a procedure which
-% iterates between super learning of the censoring distribution and
-% super learning of the event time distribution.
-
-A recent approach which avoids a pre-specified censoring model was proposed
-independently by \cite{han2021inverse} and \cite{westling2021inference}. In both
-articles, the authors suggest to iterate between learning of the outcome model
-and learning of the censoring model using IPCW loss functions. However, no
-general theoretical guarantees seem to exist for this procedure. For instance,
-the procedure is not guaranteed to converge to the true data-generating
+and their drawback is that this estimator has to be pre-specified. An
+approach which avoids a pre-specified censoring model was proposed
+independently by \cite{han2021inverse} and
+\cite{westling2021inference}. In both articles, the authors suggest to
+iterate between learning of the outcome model and learning of the
+censoring model using IPCW loss functions. However, no general
+theoretical guarantees seem to exist for this procedure and the
+procedure is not guaranteed to converge to the true data-generating
 mechanism \citep{munch2024thesis}.
-
-Contrary to the super learners considered by \cite{polley2011-sl-cens} and
-\cite{golmakani2020super}, the state learner poses no restrictions on the type
-of learners that can be included in the library. Contrary to IPCW, censoring
-unbiased transformations, or pseudo-value based super learners, the state
-learner does not require a pre-specified censoring distribution, but constructs
-a super learner for both the outcome and the censoring distribution. Contrary to
-the proposals by \cite{han2021inverse} and \cite{westling2021inference}, the
-state learner is backed by theoretical guarantees.
 
 We introduce our notation and framework in
 Section~\ref{sec:framework}. In Section~\ref{sec:super-learning} we define
