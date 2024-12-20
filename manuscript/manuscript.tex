@@ -213,46 +213,41 @@ nuisance parameters, we show that a second order product structure holds. We
 illustrate both applications of the state learner with prostate cancer data
 \citep{kattan2000pretreatment}.
 
-There are many existing super learners for right-censored data. We
-briefly review them here. Machine learning based on right-censored
-data commonly uses the partial log-likelihood as a loss function
+There are many existing super learners for right-censored data. We briefly
+review them here. Machine learning based on right-censored data commonly uses
+the partial log-likelihood as a loss function
 \citep[e.g.,][]{li2016regularized,yao2017deep,lee2018deephit,katzman2018deepsurv,gensheimer2019scalable,lee2021boosted,kvamme2021continuous}.
-This loss function is also suggested for super learning with
-right-censored data by \cite{polley2011-sl-cens}, where data is
-assumed to be observed in discrete time. However, the partial
-log-likelihood loss does not work well with data splitting
-(cross-validation) in continuous time. The reason is that the partial
-log-likelihood loss assigns an infinite value for any learner that
-predicts piece-wise constant cumulative hazard functions when there
-are event times in the test set which do not occur in the learning
-set. This problem occurs with prominent survival learners including
-the Kaplan-Meier estimator, the random survival forest, and the
-semi-parametric Cox regression model and these learners cannot be
-included in the library of the super learner proposed by
-\cite{polley2011-sl-cens}. When a proportional hazards model is
-assumed, the baseline hazard function can be profiled out of the
-likelihood \citep{cox1972regression}. The cross-validated partial
-log-likelihood loss \citep{verweij1993cross} has therefore been
-suggested as a loss function for super learning
-\citep{golmakani2020super}. This choice of loss function restricts the
-library of learners to include only Cox proportional hazards models,
-and hence excludes many learners such as, e.g., random survival
-models, additive hazards models and accelerated failure time models.
-Other proposals for super learning with right-censored data use an
-inverse probability of censoring weighted (IPCW) loss function
+This loss function is also suggested for super learning with right-censored data
+by \cite{polley2011-sl-cens}, where data is assumed to be observed in discrete
+time. However, the partial log-likelihood loss does not work well with data
+splitting (cross-validation) in continuous time. The reason is that the partial
+log-likelihood loss assigns an infinite value for any learner that predicts
+piece-wise constant cumulative hazard functions when there are event times in
+the test set which do not occur in the learning set. This problem occurs with
+prominent survival learners including the Kaplan-Meier estimator, the random
+survival forest, and the semi-parametric Cox regression model and these learners
+cannot be included in the library of the super learner proposed by
+\cite{polley2011-sl-cens}. When a proportional hazards model is assumed, the
+baseline hazard function can be profiled out of the likelihood
+\citep{cox1972regression}. The cross-validated partial log-likelihood loss
+\citep{verweij1993cross} has therefore been suggested as a loss function for
+super learning by \cite{golmakani2020super}. This choice of loss function
+restricts the library of learners to include only Cox proportional hazards
+models, and hence excludes many learners such as, e.g., random survival models,
+additive hazards models, and accelerated failure time models. Other proposals
+for super learning with right-censored data use an inverse probability of
+censoring weighted (IPCW) loss function
 \citep{graf1999assessment,van2003unicv,molinaro2004tree,keles2004asymptotically,hothorn2006survival,gerds2006consistent,gonzalez2021stacked},
 censoring unbiased transformations
 \citep{fan1996local,steingrimsson2019censoring}, or pseudo-values
-\citep{andersen2003generalised,mogensen2013random,sachs2019ensemble}.
-All these methods rely on an estimator of the censoring distribution,
-and their drawback is that this estimator has to be pre-specified. An
-approach which avoids a pre-specified censoring model was proposed
-independently by \cite{han2021inverse} and
-\cite{westling2021inference}. In both articles, the authors suggest to
-iterate between learning of the outcome model and learning of the
-censoring model using IPCW loss functions. However, no general
-theoretical guarantees seem to exist for this procedure and the
-procedure is not guaranteed to converge to the true data-generating
+\citep{andersen2003generalised,mogensen2013random,sachs2019ensemble}. All these
+methods rely on an estimator of the censoring distribution, and their drawback
+is that this estimator has to be pre-specified. An approach which avoids a
+pre-specified censoring model was proposed independently by
+\cite{han2021inverse} and \cite{westling2021inference}. In both articles, the
+authors suggest to iterate between learning of the outcome model and learning of
+the censoring model using IPCW loss functions. However, it seems that this
+procedure is in general not guaranteed to converge to the true data-generating
 mechanism \citep{munch2024thesis}.
 
 We introduce our notation and framework in
