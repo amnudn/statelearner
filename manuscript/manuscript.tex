@@ -165,39 +165,33 @@ name super learner is justified by an oracle inequality
 % model we would select if we could evaluate the prediction performance in an
 % infinite hold-out sample.
 
-We define the state learner, a new super learner for right-censored
-data, which simultaneously estimates the expected loss of learners of
-the event time distribution and the censoring distribution. Compared
-to the super learners of \cite{polley2011-sl-cens} and
-\cite{golmakani2020super}, the state learner proposed here poses no
-restrictions on the type of learners that can be included in the
-library. Compared to super learners that rely on inverse probability
-of censoring weighting, censoring unbiased transformations, or
-pseudo-value based super learners, the state learner does not require
-a pre-specified censoring distribution. Compared to the super learners
-by \cite{han2021inverse} and \cite{westling2021inference}, the state
-learner has theoretical guarantees which these methods do not
-have.
+We define the state learner, a new super learner for right-censored data, which
+simultaneously estimates the expected loss of learners of the event time
+distribution and the censoring distribution. Compared to the super learners of
+\cite{polley2011-sl-cens} and \cite{golmakani2020super}, the state learner
+proposed here poses no restrictions on the type of learners that can be included
+in the library. Compared to super learners that rely on inverse probability of
+censoring weighting, censoring unbiased transformations, or pseudo-values, the
+state learner does not require a pre-specified censoring distribution. Compared
+to the super learners by \cite{han2021inverse} and \cite{westling2021inference},
+the state learner has theoretical guarantees which these methods do not have.
 % Moreover, state learner seems to be the first super learner for
 % right censored data which learns the outcome and the censoring
 % distribution simulaneously.
 
-The loss function underlying the state learner operates on the
-coarsened data. In the right-censored survival setting the coarsened
-data consist of the minimum and the order of the censoring time and
-the event time as well as the baseline covariates. The state learner
-can include a broad class of survival models as learners, it can
-handle competing risks, and it does not require a single pre-specified
-estimator of the conditional censoring distribution. To analyse the
-theoretical properties of the state learner we focus on the discrete
-super learner which combines the library of learners by picking the
-one that minimises the cross-validated loss \citep{van2007super}. In
-the presence of competing risks, our algorithm uses separate libraries
-of learners for the cumulative hazard functions for each of the
-competing risks and for the censoring distribution. We show that the
-oracle selector of the state learner is consistent if all libraries
-contain a consistent learner and prove a finite sample oracle
-inequality.
+The loss function underlying the state learner operates on coarsened data. In
+the right-censored survival setting the coarsened data consist of the minimum
+and the order of the censoring time and the event time as well as the baseline
+covariates. The state learner works by simultaneously assessing how well
+learners of the event time distribution and the censoring distribution predict
+the states of the coarsened data. To analyse the theoretical properties of the
+state learner we focus on the discrete super learner which combines the library
+of learners by picking the one that minimises the cross-validated loss
+\citep{van2007super}. In the presence of competing risks, our algorithm uses
+separate libraries of learners for the cumulative hazard functions for each of
+the competing risks and for the censoring distribution. We show that the oracle
+selector of the state learner is consistent if all libraries contain a
+consistent learner and prove a finite sample oracle inequality.
 
 The state learner algorithm can output a medical risk prediction model
 \citep{gerds2021medical} which predicts the probability of an event based on
@@ -233,7 +227,7 @@ baseline hazard function can be profiled out of the likelihood
 \citep{verweij1993cross} has therefore been suggested as a loss function for
 super learning by \cite{golmakani2020super}. This choice of loss function
 restricts the library of learners to include only Cox proportional hazards
-models, and hence excludes many learners such as, e.g., random survival models,
+models, and hence excludes many learners such as, e.g., random survival forests,
 additive hazards models, and accelerated failure time models. Other proposals
 for super learning with right-censored data use an inverse probability of
 censoring weighted (IPCW) loss function
@@ -248,7 +242,7 @@ pre-specified censoring model was proposed independently by
 authors suggest to iterate between learning of the outcome model and learning of
 the censoring model using IPCW loss functions. However, it seems that this
 procedure is in general not guaranteed to converge to the true data-generating
-mechanism \citep{munch2024thesis}.
+mechanism \citep[][Appendix~A.4]{munch2024thesis}.
 
 We introduce our notation and framework in
 Section~\ref{sec:framework}. In Section~\ref{sec:super-learning} we define
