@@ -1152,8 +1152,6 @@ data were generated in the same way, except that censoring was generated
 completely independently. We refer to this simulation setting as `independent
 censoring'.
 
-% ANDERS: hedder det ikke Nelson-Aalen i stedet for Kaplan-Meier?
-%         kan du skrive klart hvad outcome er i denne foerste del? er det combined endpoint som man kalder for tumor-free survival?  
 For all super learners we use a library consisting of three learners:
 The Kaplan-Meier estimator
 \citep{kaplan1958nonparametric,Gerds_2019prodlim}, a Cox model with
@@ -1326,8 +1324,6 @@ equation~(\ref{eq:one-step-comp-ate}), to estimate the average
 treatment effect of hormone therapy on risk of tumor recurrence and
 death. The propensity score is estimated with a lasso model that
 includes all levels of interaction.
-% ANDERS: er du sikker paa at det er ALL levels of interaction, ogsaa higher order?
-%         der mangler en reference for lasso model
 The results are shown in Figure~\ref{fig:zelefski-real-target} for 6
 month intervals after baseline with pointwise 95\% confidence
 intervals. We see that hormone therapy decreases the risk of tumor
@@ -1370,7 +1366,6 @@ parameters. A potential drawback of our approach is that we are
 evaluating the loss of the learners on the level of the observed data
 distribution while the target of the analysis is either the event time
 distribution, or the censoring distribution, or both.
-% ANDERS: er du enig i min omformulering af forgaaende saetning?
 Specifically, the finite sample oracle inequality in
 Corollary~\ref{cor:oracle-prop} concerns the function \( F \), which
 is a feature of \( P \in \mathcal{P} \), while what we are typically
@@ -1383,14 +1378,6 @@ parameters, but only indirectly via the performance of \( F \).  For
 settings without competing risks, our numerical studies suggest that
 measuring the performance of \( F \) also leads to good performance
 for estimation of \( S \).
-% ANDERS: den forgaaende paragraf gentager det samme 2-3 gang. kan du forkorte en gang?
-
-% In the context of targeted learning, a drawback of the state learner is that the
-% doubly robustness property defined in equation~(\ref{eq:dr-property}) seem to be
-% lost because we only use a single nuisance parameter estimator. As defined here,
-% however, the state learner is build using libraries for the conditional
-% cause-specific cumulative hazard functions, so some doubly robustness might be
-% preserved.
 
 Our proposed super learner can be implemented with a broad library of learners
 and using existing software.
