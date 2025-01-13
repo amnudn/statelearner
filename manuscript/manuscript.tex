@@ -437,8 +437,6 @@ suppressed in the notation.
 \section{The state learner}
 \label{sec:super-learner-simple}
 
-% The problem with most existing super learners for right-censored data is that
-% they depend on a pre-specified estimator of the censoring distribution.
 The main idea of the state learner is to jointly use learners for
 \( \Lambda_1 \), \( \Lambda_2 \), and \( \Gamma \), and the relations in
 equation~(\ref{eq:parametrizeP}), to learn a feature of the observed data
@@ -456,15 +454,6 @@ introduce the state learner, we define the multi-state process
 \end{equation*}
 At time \(t\), we observe that each individual is in one of four mutually
 exclusive states: \( 0 \), \( 1 \), \( 2 \), or \( -1 \).
-% (Figure \ref{fig:multi-state-process}).
-% \begin{figure}[h]
-  % \centering %
-  % \includeFigCond[width=.5\textwidth]{figure-multi-state-process.pdf}
-  % \caption{Illustration of the multi-state process \(\eta\) used by
-    % the state learner. Note that `censored' is a state, hence the
-    % process is always observed at any time.}
-  % \label{fig:multi-state-process}
-% \end{figure}
 The conditional distribution of the process \( \eta(t) \) given
 baseline covariates \( X \) is determined by the function
 \begin{equation}
@@ -509,29 +498,6 @@ a learner for \( F \) can be constructed from learners for \( \Lambda_1 \),
       = \int_0^t F(s-, 0, x)  \Gamma(\diff s \mid x).
   \end{split}
 \end{equation}
-% \begin{equation}\label{eq:transition}
-%   \begin{split}
-%   F(t, 1, x)
-%     &
-%       % = P(\tilde{T} \leq t, \tilde{D}=1 \mid X=x)
-%     = \int_0^t \exp{{\{-\Lambda_{1}(s \mid x)-\Lambda_{2}(s \mid x) - \Gamma(s \mid x)\} }}  \Lambda_{1}(\diff s \mid x),
-%   \\
-%   F(t, 2, x)
-%     &
-%       % = P(\tilde{T} \leq t, \tilde{D}=2 \mid X=x)
-%       = \int_0^t \exp{\{-\Lambda_{1}(s \mid x)-\Lambda_{2}(s \mid x) - \Gamma(s \mid x)\} }  \Lambda_{2}(\diff s \mid x),
-%     \\
-%     F(t, -1, x)
-%     &
-%       % = P(\tilde{T} \leq t, \tilde{D}=0 \mid X=x)
-%       = \int_0^t \exp{\{-\Lambda_{1}(s \mid x)-\Lambda_{2}(s \mid x) - \Gamma(s \mid x)\} }  \Gamma(\diff s \mid x),
-%     \\
-%     F(t, 0, x)
-%     &
-%       = P(\tilde{T} > t \mid X= x)
-%       = 1- F(t, 1, x) - F(t, 2, x)- F(t, -1, x).
-%   \end{split}
-% \end{equation}
 The state learner requires three libraries of learners (c.f., Section \ref{sec:super-learning}),
 \(\mathcal{A}_1\), \( \mathcal{A}_2 \), and \( \mathcal{B} \), where
 \(\mathcal{A}_1\) and \( \mathcal{A}_2\) contain learners for the
@@ -570,18 +536,6 @@ for \( F \):
   \phi_{a_1,a_2, b}(\data_n)(t,-1,x)
   &= \int_0^t \phi_{a_1,a_2, b}(\data_n)(s-,0,x)  b(\data_n)(\diff s \mid x).
 \end{align*}
-% \begin{align*}
-%   \mathcal{F}(\mathcal{A}_1, \mathcal{A}_2, \mathcal{B})
-%   &= \{ \phi_{a_1,a_2, b} : a_1 \in \mathcal{A}_1, a_2 \in \mathcal{A}_2, b \in \mathcal{B}\},
-%     \intertext{where in correspondence with  the relations in equation \eqref{eq:transition},} 
-%     \phi_{a_1,a_2, b}(\data_n)(t,1,x) &= \int_0^t \exp{\{-a_1(\data_n)(s \mid x)-a_2(\data_n)(s \mid x) - b(\data_n)(s \mid x)\} }  a_1(\data_n)(\diff s \mid x),\\
-%   \phi_{a_1,a_2, b}(\data_n)(t,2,x) &= \int_0^t \exp{\{-a_1(\data_n)(s \mid x)-a_2(\data_n)(s \mid x) - b(\data_n)(s \mid x)\} }  a_2(\data_n)(\diff s \mid x),\\
-%   \phi_{a_1,a_2, b}(\data_n)(t,-1,x) &= \int_0^t \exp{\{-a_1(\data_n)(s \mid x)-a_2(\data_n)(s \mid x) - b(\data_n)(s \mid x)\} }  b(\data_n)(\diff s \mid x),\\
-%   \phi_{a_1,a_2, b}(\data_n)(t,0,x) &= 1
-%                                       - \phi_{a_1,a_2, b}(\data_n)(t,1,x)
-%                                       - \phi_{a_1,a_2, b}(\data_n)(t,2,x)
-%     -\phi_{a_1,a_2, b}(\data_n)(t,-1,x)
-% \end{align*}
 To evaluate how well a function \( F \) predicts the observed
 multi-state process we use the integrated Brier score
 \( \bar B_\tau( F,O) = \int_0^{\tau} B_t(F,O) \diff t \), where \( B_t \) is the
