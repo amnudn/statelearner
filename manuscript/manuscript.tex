@@ -246,20 +246,18 @@ the censoring model using IPCW loss functions. However, it seems that this
 procedure is in general not guaranteed to converge to the true data-generating
 mechanism \citep[][Appendix~A.4]{munch2024thesis}.
 
-We introduce our notation and framework in
-Section~\ref{sec:framework}. In Section~\ref{sec:super-learning} we define
-general super learning for right-censored data.
-Section~\ref{sec:super-learner-simple} introduces the state learner, and
-Section~\ref{sec:theor-results-prop} provides theoretical guarantees. In
-Section~\ref{sec:targeted-learning} we discuss the use of the state learner in
-the context of targeted learning. We report results of our numerical experiments
-in Section~\ref{sec:numer-exper} and analyse a prostate cancer data set in
-Section~\ref{sec:real-data-appl}. Section~\ref{sec:discussion} contains a
-discussion of the merits and limitations of our proposal.
-Appendices~\ref{sec:proof-proposition} and~\ref{sec:state-learner-with} contain
-proofs. An implementation of the state learner is available at
-\url{https://github.com/amnudn/statelearner} along with codes for reproducing
-our numerical experiments.
+We introduce our notation and framework in Section~\ref{sec:framework}. In
+Section~\ref{sec:super-learning} we define general super learning for
+right-censored data. Section~\ref{sec:super-learner-simple} introduces the state
+learner, and Section~\ref{sec:theor-results-prop} provides theoretical
+guarantees. In Section~\ref{sec:targeted-learning} we discuss the use of the
+state learner in the context of targeted learning. We report results of our
+numerical experiments in Section~\ref{sec:numer-exper} and analyse a prostate
+cancer data set in Section~\ref{sec:real-data-appl}.
+Section~\ref{sec:discussion} contains a discussion of the merits and limitations
+of our proposal. Proofs are given in the Appendix. An implementation of the
+state learner is available at \url{https://github.com/amnudn/statelearner} along
+with codes for reproducing our numerical experiments.
 
 
 \section{Notation and framework}
@@ -661,7 +659,7 @@ equation~(\ref{eq:F-def}) using the measure \( P \in \mathcal{P} \).
   \( t \in [0, \tau]\).
 \end{proposition}
 \begin{proof}
-  See Appendix~\ref{sec:proof-proposition}.
+  See Appendix~\ref{sec:consistency-proof}.
 \end{proof}
 
 \subsection{Oracle inequalities}
@@ -709,7 +707,7 @@ In the following we let the space \( \mathcal{H}_{\mathcal{P}} \) be equipped wi
   \end{align*}
 \end{corollary}
 \begin{proof}
-  See Appendix~\ref{sec:proof-proposition}.
+  See Appendix~\ref{sec:oracle-inequalities}.
 \end{proof}
 
 Corollary~\ref{cor:oracle-prop} has the following asymptotic consequences.
@@ -731,11 +729,12 @@ Corollary~\ref{cor:oracle-prop} has the following asymptotic consequences.
   \end{enumerate}
 \end{corollary}
 \begin{proof}
-  See Appendix~\ref{sec:proof-proposition}.
+  See Appendix~\ref{sec:oracle-inequalities}.
 \end{proof}
 
 
 \subsection{Transience of the second order remainder structure}
+\label{sec:trans-second-order}
 
 In this section we demonstrate a theoretical property of the state
 learner which is useful for targeted learning (c.f., Section
@@ -797,37 +796,37 @@ any combinations of \( \Gamma-\hat{\Gamma}_n\),
   uniformly bounded functions \( w^a_n \), \( w^b_n \), \( w^c_n \), and
   \( w^d_n \) with domain \( [0,\tau]^2 \times \mathcal{X} \) such that
   \begin{align*}
-    & P_0{\left[
+    & P{\left[
       \int_0^{\tau} w(s, \blank)
       \left\{
-      \Gamma_0(s,\blank) -\hat{\Gamma}_n(s,\blank)
+      \Gamma(s,\blank) -\hat{\Gamma}_n(s,\blank)
       \right\}
-      [\Lambda_0-\hat{\Lambda}_n]
+      [\Lambda_1-\hat{\Lambda}_{1,n}]
       (\diff s, \blank)
       \right]}
     \\
-    & =
-      P_0{\left[
-      \int_0^{\tau} \int_0^{s} w^a_n(s,u,\blank) [F_0 - \hat{F}_n](u-, 0, \blank)[F_0 - \hat{F}_n](s-, 0, \blank) F_0(\diff u, 2, \blank ) F_0 ( \diff s, 1, \blank)
+     & =
+      P{\left[
+      \int_0^{\tau} \int_0^{s} w^a_n(s,u,\blank) [F - \hat{F}_n](u-, 0, \blank)[F - \hat{F}_n](s-, 0, \blank) F(\diff u, -1, \blank ) F ( \diff s, 1, \blank)
       \right]}
     \\
     & \quad +
-      P_0{\left[
-      \int_0^{\tau} \int_0^{s} w^b_n(s,u,\blank) [F_0 - \hat{F}_n](u-, 0, \blank)
-      F_0(\diff u, 2, \blank ) [F_0 - \hat{F}_n](\diff s, 1, \blank)
+      P{\left[
+      \int_0^{\tau} \int_0^{s} w^b_n(s,u,\blank) [F - \hat{F}_n](u-, 0, \blank)
+      F(\diff u, -1, \blank ) [F - \hat{F}_n](\diff s, 1, \blank)
       \right]}
     \\
     & \quad +
-      P_0{\left[
-      \int_0^{\tau} \int_0^{s} w^c_n(s,u,\blank) [F_0 - \hat{F}_n](\diff u, 2, \blank)
-      [F_0 - \hat{F}_n](s-, 0, \blank)
-      F_0(\diff s, 1, \blank ) 
+      P{\left[
+      \int_0^{\tau} \int_0^{s} w^c_n(s,u,\blank) [F - \hat{F}_n](\diff u, -1, \blank)
+      [F - \hat{F}_n](s-, 0, \blank)
+      F(\diff s, 1, \blank ) 
       \right]}
     \\
     & \quad +
-      P_0{\left[
-      \int_0^{\tau} \int_0^{s} w^d_n(s,u,\blank) [F_0 - \hat{F}_n](\diff u, 2, \blank)
-      [F_0 - \hat{F}_n](\diff s, 1, \blank)
+      P{\left[
+      \int_0^{\tau} \int_0^{s} w^d_n(s,u,\blank) [F - \hat{F}_n](\diff u, -1, \blank)
+      [F - \hat{F}_n](\diff s, 1, \blank)
       \right]}.
   \end{align*}
 \end{proposition}
@@ -1425,24 +1424,53 @@ No competing interest is declared.
 
 \bibliography{bib.bib}
 
-\section{Supplementary material}
-\label{sec:suppl-mater}
-
-This section contains technical proof. Section~\ref{sec:proof-proposition}
-provides proofs of the results stated in Section~\ref{sec:theor-results-prop} of
-the main paper. Section~\ref{sec:state-learner-with} show that a product
-structure is preserved when an estimator $\bar\Psi(\hat{F}_n, \hat{H}_n)$ is
-used instead of $\tilde\Psi(\hat{\Lambda}_n, \hat{\Gamma}_n, \hat{H}_n)$.
-
-
 \appendix
 
-\section{Theoretical guarantees for the state learner}
-\label{sec:proof-proposition}
+\section{Proofs}
+\label{sec:proofs}
+
+This section contains proofs of the results stated in the paper.
+Section~\ref{sec:consistency-proof} contains a proof of the consistency result
+from Section~\ref{sec:consistency}; Section~\ref{sec:oracle-inequalities}
+contains proofs of the oracle inequalities from
+Section~\ref{sec:finite-sample-oracle}; and
+Section~\ref{sec:state-learner-with} demonstrates transience of the second
+order remainder structure stated in Section~\ref{sec:trans-second-order}.
+
+% We start by recalling some notation. We use \( F \) to denote a function that
+% describes the conditional state occupation probabilities of the observed data,
+% as defined in equation~(5) of the main paper. We denote the integrated Brier
+% score as \( \bar B_\tau( F,O) = \int_0^{\tau} B_t(F,O) \diff t \), where
+% \( B_t \) is defined
+% \begin{equation*}
+%   B_t(F,O) = \sum_{j=-1}^{2}
+%   \left(
+%       F(t,j,X) - \1{\{\eta(t)=j\}}
+%   \right)^2.
+% \end{equation*}
+% Finally, recall that we let $\mathcal{H}_{\mathcal{P}}$ denote the function
+% space consisting of all conditional state occupation probability functions for
+% some measure \( P \in \mathcal{P} \), and that we equipped this space with the
+% norm
+% \begin{equation}
+%   \label{eq:norm}
+%   \| F \|_{P_0} = 
+%   \left\{
+%     \sum_{j=-1}^{2}\int_{\mathcal{X}} \int_0^{\tau} F(t, j, x)^2 \diff t H_0( \diff x)
+%   \right\}^{1/2},
+% \end{equation}
+% for some fixed measure \( P_0 \in \mathcal{P} \). We use \( F_0 \) to denote the
+% conditional state occupation probability function associated with the measure
+% \( P_0 \).
+
+\subsection{Consistency}
+\label{sec:consistency-proof}
 
 Define
 \( \bar{B}_{\tau,0}(F, o) = \bar{B}_{\tau}(F, o) - \bar{B}_{\tau}(F_0, o) \) and
-\( R_{0}(F) = P_0{[\bar{B}_{\tau,0}(F, \blank)]} \).
+\( R_{0}(F) = P_0{[\bar{B}_{\tau,0}(F, \blank)]} \), where the integrated Brier
+score \( \bar{B}_{\tau} \) was defined in
+Section~\ref{sec:super-learner-simple}.
 \begin{lemma}
   \label{lemma:norm}
   \( R_{0}(F) = \Vert F - F_0 \Vert_{P_0}^2 \), where \( \Vert \blank \Vert_{P_0}\) is defined
@@ -1478,17 +1506,21 @@ Define
   The result follows from Lemma~\ref{lemma:norm}.
 \end{proof}
 
-Recall that $\mathcal{H}_{\mathcal{P}}$ denote the function space consisting of
-all conditional state occupation probability functions for some measure
-\( P \in \mathcal{P} \).
+\subsection{Oracle inequalities}
+\label{sec:oracle-inequalities}
+
+Recall that we use \( \mathcal{F}_n \) to denote a library of learners for the
+function \( F \), and that \( \hat{\phi} \) and \( \tilde{\phi} \) denotes,
+respectively, the discrete super learner and the oracle learner for the library
+\( \mathcal{F}_n \), c.f., Section~\ref{sec:super-learner-simple}.
 
 \begin{proof}[Proof of Corollary~\ref{cor:oracle-prop}]
   First note that minimising the loss \( \bar{B}_{\tau} \) is equivalent to
   minimising the loss \( \bar{B}_{\tau,0} \), so the discrete super learner and
   oracle according to \( \bar{B}_{\tau} \) and \( \bar{B}_{\tau,0} \) are
   identical. By Lemma~\ref{lemma:norm}, \( R_0(F) \geq 0 \) for any
-  \( F \in \mathcal{H}_{\mathcal{P}} \), and so using Theorem 2.3 from \citep{vaart2006oracle} with
-  \( p=1 \), we have that for all \( \delta >0 \),
+  \( F \in \mathcal{H}_{\mathcal{P}} \), and so using Theorem 2.3 from
+  \citep{vaart2006oracle} with \( p=1 \), we have that for all \( \delta >0 \),
 \begin{align*}
   & \E_{P_0}{\left[ R_0(\hat{\phi}_n(\data_n^{-k})) \right]}
   \\
@@ -1620,14 +1652,17 @@ and then the final result follows from Lemma~\ref{lemma:norm}.
 \end{proof}
 
 
-\section{The state learner with targeted learning}
+\subsection{Transience of the second order remainder structure}
 \label{sec:state-learner-with}
 
+Recall that we let $\Lambda_1$ denote the conditional cumulative hazard function
+for one of the event times of interest and $\Gamma$ the conditional cumulative
+hazard function for censoring, c.f., Section~\ref{sec:framework}.
 
 \begin{proof}[Proof of Proposition~\ref{prop:dr-structure}]
   For notational convenience we suppress \( X \) in the following. The final
   result can be obtained by adding the argument \( X \) to all functions and
-  averaging. We use the relations from equation~(\ref{eq:7}) to write
+  averaging. We use the relations from equation~\eqref{eq:7} to write
   \begingroup %
   \allowdisplaybreaks
     \begin{align*}
@@ -1635,13 +1670,13 @@ and then the final result follows from Lemma~\ref{lemma:norm}.
         \left\{
         \Gamma(s) - \hat{\Gamma}_n(s)
         \right\}
-        [\Lambda - \hat{\Lambda}_n](\diff s)
+        [\Lambda_1 - \hat{\Lambda}_{1,n}](\diff s)
       \\
       & =
         \int_0^{\tau} w(s) 
         \left\{
-        \int_0^s \frac{F(\diff u, 2)}{F(u-, 0)} -
-        \int_0^s \frac{\hat{F}_n(\diff u, 2)}{\hat{F}_n(u-, 0)}  -
+        \int_0^s \frac{F(\diff u, -1)}{F(u-, 0)} -
+        \int_0^s \frac{\hat{F}_n(\diff u, -1)}{\hat{F}_n(u-, 0)}  -
         \right\}
         \left[
         \frac{F(\diff s, 1)}{F(s-, 0)}
@@ -1654,13 +1689,13 @@ and then the final result follows from Lemma~\ref{lemma:norm}.
         \int_0^s 
         \left(
         \frac{1}{F(u-, 0)} -  \frac{1}{\hat{F}_n(u-, 0)}
-        \right) F(\diff u, 2)
+        \right) F(\diff u, -1)
       \\
       & \qquad\qquad \qquad
         +
         \int_0^s \frac{1}{\hat{F}_n(u-, 0)} 
         \left[
-        F(\diff u, 2) - \hat{F}_n(\diff u, 2)
+        F(\diff u, -1) - \hat{F}_n(\diff u, -1)
         \right]
         \Bigg\}
       \\
@@ -1687,7 +1722,7 @@ and then the final result follows from Lemma~\ref{lemma:norm}.
         \left(
         \frac{1}{F(s-, 0)} -
         \frac{1}{\hat{F}_n(s-, 0)}
-        \right)F(\diff u, 2)F(\diff s, 1)
+        \right)F(\diff u, -1)F(\diff s, 1)
       \\
       & \quad +
         \int_0^{\tau}
@@ -1695,7 +1730,7 @@ and then the final result follows from Lemma~\ref{lemma:norm}.
         w(s) 
         \left(
         \frac{1}{F(u-, 0)} -  \frac{1}{\hat{F}_n(u-, 0)}
-        \right) \frac{F(\diff u, 2) }{\hat{F}_n(u-,0)}
+        \right) \frac{F(\diff u, -1) }{\hat{F}_n(u-,0)}
         \left(
         F(\diff s, 1) -
         \hat{F}_n(\diff s, 1)
@@ -1706,7 +1741,7 @@ and then the final result follows from Lemma~\ref{lemma:norm}.
         \int_0^s      
         \frac{w(s) }{\hat{F}_n(u-, 0)} 
         \left[
-        F(\diff u, 2) - \hat{F}_n(\diff u, 2)
+        F(\diff u, -1) - \hat{F}_n(\diff u, -1)
         \right]
         \left(
         \frac{1}{F(s-, 0)} -
@@ -1718,7 +1753,7 @@ and then the final result follows from Lemma~\ref{lemma:norm}.
         \int_0^s      
         \frac{w(s) }{\hat{F}_n(u-, 0)} 
         \left[
-        F(\diff u, 2) - \hat{F}_n(\diff u, 2)
+        F(\diff u, -1) - \hat{F}_n(\diff u, -1)
         \right]
         \frac{1}{\hat{F}_n(s-, 0)}
         \left(
@@ -1727,19 +1762,19 @@ and then the final result follows from Lemma~\ref{lemma:norm}.
         \right).
     \end{align*}
     \endgroup %
-    Consider the first term on the right hand side. Defining
-  \begin{equation*}
-    w_n^*(t)  = 
-    \left(
-      F(t-, 0)
-      - \hat{F}_n(t-, 0)
-    \right)
-    \left(
+    Consider the first term on the right hand side. By the mean value theorem,
+    \begin{equation*}
       \frac{1}{F(t-, 0)}
       - \frac{1}{\hat{F}_n(t-, 0)}
-    \right),
-  \end{equation*}
-  we can write
+      = \frac{-1}{\tilde{r}_n(t)^2}
+      \left[
+        F(t-, 0)
+        - \hat{F}_n(t-, 0)
+      \right],
+    \end{equation*}
+    where \( \tilde{r}_n(t) \) is some value between \( \hat{F}(t-, 0) \) and
+    \( \hat{F}_n(t-, 0) \). Letting \( w_n^*(t) = -\tilde{r}_n(t)^{-2} \), we
+    may write
   \begin{align*}
     & \int_0^{\tau} 
       \int_0^s
@@ -1750,7 +1785,7 @@ and then the final result follows from Lemma~\ref{lemma:norm}.
       \left(
       \frac{1}{F(s-, 0)} -
       \frac{1}{\hat{F}_n(s-, 0)}
-      \right)F(\diff u, 2)F(\diff s, 1)
+      \right)F(\diff u, -1)F(\diff s, 1)
     \\
     & =
       \int_0^{\tau} 
@@ -1767,7 +1802,7 @@ and then the final result follows from Lemma~\ref{lemma:norm}.
       \left(
       F(s-, 0) - \hat{F}_n(s-, 0)
       \right)       
-      F(\diff u, 2)F(\diff s, 1)
+      F(\diff u, -1)F(\diff s, 1)
     \\
     & =
       \int_0^{\tau} 
@@ -1779,13 +1814,15 @@ and then the final result follows from Lemma~\ref{lemma:norm}.
       \left(
       F(s-, 0) - \hat{F}_n(s-, 0)
       \right)       
-      F(\diff u, 2)F(\diff s, 1),
+      F(\diff u, -1)F(\diff s, 1),
   \end{align*}
-  where we have defined \( w_n^a(s,u) = w(s)w^*_n(s)w^*_n(u) \). By assumption,
-  \( w_n^a(s,u) \) is uniformly bounded. The same approach can be applied to the
-  three remaining terms which gives the result.
+  where we have defined \( w_n^a(s,u) = w(s)w^*_n(s)w^*_n(u) \). By the
+  assumption that \( F(\blank,0) \) and \( F_n(\blank,0) \) are uniformly
+  bounded away from zero on \( [0,\tau] \), it follows that \( w_n^* \) is
+  uniformly bounded, and hence \( w_n^a(s,u) \) is also uniformly bounded,
+  because \( w \) was assumed uniformly bounded. The same approach can be
+  applied to the three remaining terms which gives the result.
 \end{proof}
-
 \end{document}
 
 
