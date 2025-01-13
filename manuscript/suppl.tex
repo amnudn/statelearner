@@ -1,0 +1,504 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,left=2.8cm, right=2.8cm, top=3cm, bottom=3cm]{geometry}
+
+%% Packages
+\usepackage{amsthm, dsfont, amssymb,soul,xcolor, enumitem, amsmath,verbatim}
+
+\usepackage[authoryear]{natbib}
+\bibliographystyle{abbrvnat}
+
+\definecolor{linkcolor}{rgb}{0, 0, 0.54}
+\usepackage[colorlinks,allcolors=linkcolor]{hyperref}
+
+\theoremstyle{thmstyleone}%\
+\newtheorem{theorem}{Theorem}%  meant for continuous numbers
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\theoremstyle{thmstyletwo}%
+\newtheorem{example}{Example}%
+\newtheorem{remark}{Remark}%
+\theoremstyle{thmstylethree}%
+\newtheorem{definition}{Definition}
+
+
+%% Line spacing
+\linespread{2}
+
+% \usepackage{lineno}
+% \linenumbers
+
+\usepackage{endfloat}
+
+%% Only for comments:
+\usepackage[author=]{fixme}
+\fxusetheme{color}
+\definecolor{fxtarget}{rgb}{.5,.5,.5}
+\definecolor{fxnote}{rgb}{.5,.5,.5}
+\fxsetup{status=draft}
+
+%% Toggle with or without figures
+% \def\nofig{1}
+
+\RequirePackage{graphicx}
+\usepackage[font=small]{caption}
+
+\newcommand{\includeFigCond}[2][]{
+  \ifx\nofig\undefined %
+    \includegraphics[#1]{#2} %
+  \else %
+    \texttt{#2} %
+  \fi %
+}
+
+% New operators and commands
+\DeclareMathOperator{\E}{\mathbb{E}} % expectation
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\C}{\mathbb{C}}
+\renewcommand{\S}{\mathbb{S}}
+\newcommand{\blank}{\makebox[1ex]{\textbf{$\cdot$}}}
+\newcommand\independent{\protect\mathpalette{\protect\independenT}{\perp}}
+\def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern2mu{#1#2}}}
+\renewcommand{\phi}{\varphi}
+\renewcommand{\epsilon}{\varepsilon}
+\newcommand*\diff{\mathop{}\!\mathrm{d}}
+\newcommand{\weakly}{\rightsquigarrow}
+\newcommand\smallO{\textit{o}}
+\newcommand\bigO{\textit{O}}
+\newcommand{\midd}{\; \middle|\;}
+\newcommand{\1}{\mathds{1}}
+\usepackage{ifthen} %% Empirical process with default argument
+\newcommand{\G}[2][n]{
+{\ensuremath{\mathbb{G}_{#1}}{\left[#2\right]}}
+}
+\DeclareMathOperator*{\argmin}{\arg\!\min}
+\DeclareMathOperator*{\argmax}{\arg\!\max}
+\newcommand{\empmeas}{\ensuremath{\mathbb{P}_n}} % empirical measure
+\newcommand{\data}{\ensuremath{\mathcal{D}}}
+
+
+%% Title
+\title{\Large Supplementary material: The state learner -- a super learner for right-censored data}
+\date{\small \today}
+
+\usepackage{authblk}
+\author[1,*]{\normalsize Anders Munch}
+\author[1]{\normalsize Thomas~A.~Gerds}
+\affil[1]{\normalsize Section of Biostatistics, University of Copenhagen}
+\affil[*]{\normalsize Address for correspondence: \href{email:email-id.com}{a.munch@sund.ku.dk}}
+
+\usepackage{fancyhdr}
+\fancyhf{}
+\fancyhead[l]{\textit{Munch et al.}}
+\fancyhead[r]{\textit{The state learner}}
+\fancyfoot[c]{\thepage}
+\renewcommand\headrulewidth{0pt}
+\pagestyle{fancy}
+
+\renewcommand{\thesection}{S\arabic{section}}
+
+
+
+\begin{document}
+
+
+\maketitle
+
+This document contains proofs of the results stated in the main paper.
+Section~\ref{sec:consistency} contains a proof of the consistency result from
+Section~5.1 of the main paper; Section~\ref{sec:oracle-inequalities} contains
+proofs of the oracle inequalities from Section~5.2 of the main paper; and
+Section~\ref{sec:state-learner-with} demonstrates transience of the second order
+remainder structure stated in Section~5.3 of the main paper.
+
+We start by recalling some notation. We use \( F \) to denote a function that
+describes the conditional state occupation probabilities of the observed data,
+as defined in equation~(5) of the main paper. We denote the integrated Brier
+score as \( \bar B_\tau( F,O) = \int_0^{\tau} B_t(F,O) \diff t \), where
+\( B_t \) is defined
+\begin{equation*}
+  B_t(F,O) = \sum_{j=-1}^{2}
+  \left(
+      F(t,j,X) - \1{\{\eta(t)=j\}}
+  \right)^2.
+\end{equation*}
+Finally, recall that we let $\mathcal{H}_{\mathcal{P}}$ denote the function
+space consisting of all conditional state occupation probability functions for
+some measure \( P \in \mathcal{P} \), and that we equipped this space with the
+norm
+\begin{equation}
+  \label{eq:norm}
+  \| F \|_{P_0} = 
+  \left\{
+    \sum_{j=-1}^{2}\int_{\mathcal{X}} \int_0^{\tau} F(t, j, x)^2 \diff t H_0( \diff x)
+  \right\}^{1/2},
+\end{equation}
+for some fixed measure \( P_0 \in \mathcal{P} \). We use \( F_0 \) to denote the
+conditional state occupation probability function associated with the measure
+\( P_0 \).
+
+
+\section{Consistency}
+\label{sec:consistency}
+
+Define
+\( \bar{B}_{\tau,0}(F, o) = \bar{B}_{\tau}(F, o) - \bar{B}_{\tau}(F_0, o) \) and
+\( R_{0}(F) = P_0{[\bar{B}_{\tau,0}(F, \blank)]} \).
+\begin{lemma}
+  \label{lemma:norm}
+  \( R_{0}(F) = \Vert F - F_0 \Vert_{P_0}^2 \), where \( \Vert \blank \Vert_{P_0}\) is defined
+  in equation~(\ref{eq:norm}).
+\end{lemma}
+\begin{proof}[Proof]
+  For any \( t \in [0, \tau] \) and \( j\in \{-1,0,1,2\} \) we have
+  \begin{align*}
+    & \E_{P_0}{\left[ (F(t, j, X) - \1{\{\eta(t) = j \}})^2 \right]}
+    \\
+    & =    \E_{P_0}{\left[ (F(t, j, X) - F_0(t, j, X) + F_0(t, j, X) - \1{\{\eta(t) = j
+      \}})^2 \right]}
+    \\
+    & =    \E_{P_0}{\left[ (F(t, j, X) - F_0(t, j, X))^2\right]}
+      + \E_{P_0}{\left[ (F_0(t, j, X) - \1{\{\eta(t) = j \}})^2\right]}
+    \\
+    & \quad
+      + 2\E_{P_0}{\left[ (F(t, j, X) - F_0(t, j, X))(F_0(t, j, X) - \1{\{\eta(t) = j
+      \}})\right]}
+    \\
+    & =    \E_{P_0}{\left[ (F(t, j, X) - F_0(t, j, X))^2\right]}
+      + \E_{P_0}{\left[ (F_0(t, j, X) - \1{\{\eta(t) = j \}})^2\right]},
+  \end{align*}
+  where the last equality follows from the tower property. Hence, using Fubini,
+  we have
+  \begin{equation*}
+    P{[\bar{B}_{\tau}(F, \blank)]}
+    = \Vert F - F_0 \Vert_{P_0}^2 + P_0{[\bar{B}_{\tau}(F_0, \blank)]}.
+  \end{equation*}
+\end{proof}
+
+\begin{proof}[Proof of Proposition~1 of the main paper]
+  The result follows from Lemma~\ref{lemma:norm}.
+\end{proof}
+
+\section{Oracle inequalities}
+\label{sec:oracle-inequalities}
+
+Recall that we use \( \mathcal{F}_n \) to denote a library of learners for the
+function \( F \), and that \( \hat{\phi} \) and \( \tilde{\phi} \) denotes,
+respectively, the discrete super learner and the oracle learner for the library
+\( \mathcal{F}_n \), c.f., Section~4 of the main paper.
+
+\begin{proof}[Proof of Corollary~1 of the main paper]
+  First note that minimising the loss \( \bar{B}_{\tau} \) is equivalent to
+  minimising the loss \( \bar{B}_{\tau,0} \), so the discrete super learner and
+  oracle according to \( \bar{B}_{\tau} \) and \( \bar{B}_{\tau,0} \) are
+  identical. By Lemma~\ref{lemma:norm}, \( R_0(F) \geq 0 \) for any
+  \( F \in \mathcal{H}_{\mathcal{P}} \), and so using Theorem 2.3 from \citep{vaart2006oracle} with
+  \( p=1 \), we have that for all \( \delta >0 \),
+\begin{align*}
+  & \E_{P_0}{\left[ R_0(\hat{\phi}_n(\data_n^{-k})) \right]}
+  \\
+  &  \quad \leq
+    (1+2\delta)\E_{P_0}{\left[ R_0(\tilde{\phi}_n(\data_n^{-k})) \right]}
+  \\
+  & \qquad + (1+\delta) \frac{16 K}{n}
+    \log(1 + |\mathcal{F}_n|)\sup_{F \in \mathcal{H}_{\mathcal{P}}}
+    \left\{
+    M(F) + \frac{v(F)}{R_0(F)}
+    \left(
+    \frac{1}{\delta} + 1
+    \right)
+    \right\}
+\end{align*}
+where for each \( F \in \mathcal{H}_{\mathcal{P}} \), \( (M(F), v(F)) \) is some Bernstein pair for
+the function \(o \mapsto \bar{B}_{\tau,0}(F, o) \). As
+\( \bar{B}_{\tau,0}(F, \blank) \) is uniformly bounded by \( \tau \) for any
+\( F \in \mathcal{H}_{\mathcal{P}} \), it follows from section 8.1 in \citep{vaart2006oracle} that
+\( (\tau, 1.5 P_0{[\bar{B}_{\tau,0}(F, \blank)^2]}) \) is a Bernstein pair for
+\( \bar{B}_{\tau,0}(F, \blank) \). Now, for any \( a,b,c \in \R \) we have
+\begin{align*}
+  (a-c)^2 - (b-c)^2
+  & = (a-b+b-c)^2 - (b-c)^2
+  \\
+  & = (a-b)^2 + (b-c)^2 +2(b-c)(a-b) - (b-c)^2
+  \\
+  & = (a-b)
+    \left\{
+    (a-b) +  2(b-c)
+    \right\}
+  \\
+  & = (a-b)
+    \left\{
+     a + b -2c
+    \right\},
+\end{align*}
+so using this with \( a=F(t, j, x) \), \( b=F_0(t, j, x) \), and
+\( c = \1{\{\eta(t) = j\}} \), we have by Jensen's inequality
+\begin{align*}
+  & P_0{[\bar{B}_{\tau,0}(F, \blank)^2]}
+  \\
+  & \leq
+    2\tau\E_{P_0}{\left[
+    \sum_{j=-1}^{2} \int_0^{\tau}
+    \left\{
+    \left(
+    F(t, j, X) - \1{\{\eta(t) = j\}}
+    \right)^2
+    -
+    \left(
+    F_0(t, j, X) - \1{\{\eta(t) = j\}}
+    \right)^2
+    \right\}^2
+    \diff t 
+    \right]}
+  \\
+  & =2\tau
+    \E_{P_0}\Bigg[
+    \sum_{j=-1}^{2} \int_0^{\tau}
+    \left(
+    F(t, j, X) - F_0(t, j, X)
+    \right)^2
+  \\
+  & \quad \quad \quad\quad \quad \quad \times
+    \left\{
+    F(t, j, X) +  F_0(t, j, X)-2 \1{\{\eta(t) = j\}}
+    \right\}^2
+    \diff t 
+    \Bigg]
+  \\
+  & \leq
+    8\tau \E_{P_0}{\left[
+    \sum_{j=-1}^{2} \int_0^{\tau}
+    \left(
+    F(t, j, X) - F_0(t, j, X)
+    \right)^2
+    \diff t 
+    \right]}.
+  \\
+  & =
+    8\tau \Vert F - F_0 \Vert_{P_0}^2.
+\end{align*}
+Thus when \( v(F) = 1.5 P_0{[\bar{B}_{\tau,0}(F, \blank)^2]} \) we have by
+Lemma~\ref{lemma:norm}
+\begin{equation*}
+  \frac{v(F)}{R_0(F)}
+  = 1.5 \frac{P_0{[\bar{B}_{\tau,0}(F, \blank)^2]}}{P_0{[\bar{B}_{\tau,0}(F, \blank)]}}
+  \leq 12 \tau,
+\end{equation*}
+and so using the Bernstein pairs \( (\tau, 1.5 P_0{[\bar{B}_{\tau,0}(F, \blank)^2]}) \) we have
+\begin{equation*}
+  \sup_{F \in \mathcal{H}_{\mathcal{P}}}
+  \left\{
+    M(F) + \frac{v(F)}{R_0(F)}
+    \left(
+      \frac{1}{\delta} + 1
+    \right)
+  \right\}
+  \leq \tau
+  \left(
+    13 + \frac{12}{\delta}
+  \right),
+\end{equation*}
+For all $\delta>0$ we thus have
+\begin{align*}
+  \E_{P_0}{\left[ R_0(\hat{\phi}_n(\data_n^{-k})) \right]}
+  \leq
+  &(1+2\delta)\E_{P_0}{\left[ R_0(\tilde{\phi}_n(\data_n^{-k})) \right]}
+  \\
+  & \quad
+    + (1+\delta)\log(1 + |\mathcal{F}_n|) \tau \frac{16 K}{n}
+    \left(
+    13 + \frac{12}{\delta}
+    \right),
+\end{align*}
+and then the final result follows from Lemma~\ref{lemma:norm}.
+\end{proof}
+
+\begin{proof}[Proof of Corollary~2 of the main paper]
+  By definition of the oracle and Lemma~\ref{lemma:norm},
+  \begin{equation*}
+    \E_{P_0}{\left[ \Vert \tilde{\phi}_n(\data_n^{-k}) - F_0 \Vert_{P_0}^2
+      \right]} \leq \E_{P_0}{\left[ \Vert \phi_n(\data_n^{-k}) - F_0 \Vert_{P_0}^2
+      \right]}  
+  \end{equation*}
+  for all \( n \in \N \). The results then follows from
+  Corollary~1 of the main paper.
+\end{proof}
+
+
+\section{Transience of the second order remainder structure}
+\label{sec:state-learner-with}
+
+Recall that we let $\Lambda_1$ denote the conditional cumulative hazard function
+for one of the event times of interest and $\Gamma$ the conditional cumulative
+hazard function for censoring, c.f., Section~2 of the main paper.
+
+\begin{proof}[Proof of Proposition~2 of the main paper]
+  For notational convenience we suppress \( X \) in the following. The final
+  result can be obtained by adding the argument \( X \) to all functions and
+  averaging. We use the relations from equation~(8) in the main paper to write
+  \begingroup %
+  \allowdisplaybreaks
+    \begin{align*}
+      & \int_0^{\tau} w(s) 
+        \left\{
+        \Gamma(s) - \hat{\Gamma}_n(s)
+        \right\}
+        [\Lambda_1 - \hat{\Lambda}_{1,n}](\diff s)
+      \\
+      & =
+        \int_0^{\tau} w(s) 
+        \left\{
+        \int_0^s \frac{F(\diff u, -1)}{F(u-, 0)} -
+        \int_0^s \frac{\hat{F}_n(\diff u, -1)}{\hat{F}_n(u-, 0)}  -
+        \right\}
+        \left[
+        \frac{F(\diff s, 1)}{F(s-, 0)}
+        - \frac{\hat{F}_n(\diff s, 1)}{\hat{F}_n(s-, 0)}
+        \right]
+      \\
+      & =
+        \int_0^{\tau} w(s) 
+        \Bigg\{
+        \int_0^s 
+        \left(
+        \frac{1}{F(u-, 0)} -  \frac{1}{\hat{F}_n(u-, 0)}
+        \right) F(\diff u, -1)
+      \\
+      & \qquad\qquad \qquad
+        +
+        \int_0^s \frac{1}{\hat{F}_n(u-, 0)} 
+        \left[
+        F(\diff u, -1) - \hat{F}_n(\diff u, -1)
+        \right]
+        \Bigg\}
+      \\
+      & \qquad\qquad \times
+        \left[
+        \left(
+        \frac{1}{F(s-, 0)} -
+        \frac{1}{\hat{F}_n(s-, 0)}
+        \right)F(\diff s, 1)
+        + \frac{1}{\hat{F}_n(s-, 0)}
+        \left(
+        F(\diff s, 1) -
+        \hat{F}_n(\diff s, 1)
+        \right)
+        \right]
+      \\
+      &
+        = \int_0^{\tau} 
+        \int_0^s
+        w(s) 
+        \left(
+        \frac{1}{F(u-, 0)} -  \frac{1}{\hat{F}_n(u-, 0)}
+        \right) 
+        \left(
+        \frac{1}{F(s-, 0)} -
+        \frac{1}{\hat{F}_n(s-, 0)}
+        \right)F(\diff u, -1)F(\diff s, 1)
+      \\
+      & \quad +
+        \int_0^{\tau}
+        \int_0^s
+        w(s) 
+        \left(
+        \frac{1}{F(u-, 0)} -  \frac{1}{\hat{F}_n(u-, 0)}
+        \right) \frac{F(\diff u, -1) }{\hat{F}_n(u-,0)}
+        \left(
+        F(\diff s, 1) -
+        \hat{F}_n(\diff s, 1)
+        \right)
+      \\
+      & \quad +
+        \int_0^{\tau} 
+        \int_0^s      
+        \frac{w(s) }{\hat{F}_n(u-, 0)} 
+        \left[
+        F(\diff u, -1) - \hat{F}_n(\diff u, -1)
+        \right]
+        \left(
+        \frac{1}{F(s-, 0)} -
+        \frac{1}{\hat{F}_n(s-, 0)}
+        \right)F(\diff s, 1)
+      \\
+      & \quad +
+        \int_0^{\tau} 
+        \int_0^s      
+        \frac{w(s) }{\hat{F}_n(u-, 0)} 
+        \left[
+        F(\diff u, -1) - \hat{F}_n(\diff u, -1)
+        \right]
+        \frac{1}{\hat{F}_n(s-, 0)}
+        \left(
+        F(\diff s, 1) -
+        \hat{F}_n(\diff s, 1)
+        \right).
+    \end{align*}
+    \endgroup %
+    Consider the first term on the right hand side. By the mean value theorem,
+    \begin{equation*}
+      \frac{1}{F(t-, 0)}
+      - \frac{1}{\hat{F}_n(t-, 0)}
+      = \frac{-1}{\tilde{r}_n(t)^2}
+      \left[
+        F(t-, 0)
+        - \hat{F}_n(t-, 0)
+      \right],
+    \end{equation*}
+    where \( \tilde{r}_n(t) \) is some value between \( \hat{F}(t-, 0) \) and
+    \( \hat{F}_n(t-, 0) \). Letting \( w_n^*(t) = -\tilde{r}_n(t)^{-2} \), we
+    may write
+  \begin{align*}
+    & \int_0^{\tau} 
+      \int_0^s
+      w(s) 
+      \left(
+      \frac{1}{F(u-, 0)} -  \frac{1}{\hat{F}_n(u-, 0)}
+      \right)      
+      \left(
+      \frac{1}{F(s-, 0)} -
+      \frac{1}{\hat{F}_n(s-, 0)}
+      \right)F(\diff u, -1)F(\diff s, 1)
+    \\
+    & =
+      \int_0^{\tau} 
+      \int_0^s
+      w(s)
+      w_n^*(u) 
+      \left(
+      F(u-, 0) - \hat{F}_n(u-, 0)
+      \right)
+    \\
+    & \qquad \qquad \quad
+      \times
+      w_n^*(s) 
+      \left(
+      F(s-, 0) - \hat{F}_n(s-, 0)
+      \right)       
+      F(\diff u, -1)F(\diff s, 1)
+    \\
+    & =
+      \int_0^{\tau} 
+      \int_0^s
+      w_n^a(s,u)
+      \left(
+      F(u-, 0) - \hat{F}_n(u-, 0)
+      \right)
+      \left(
+      F(s-, 0) - \hat{F}_n(s-, 0)
+      \right)       
+      F(\diff u, -1)F(\diff s, 1),
+  \end{align*}
+  where we have defined \( w_n^a(s,u) = w(s)w^*_n(s)w^*_n(u) \). By the
+  assumption that \( F(\blank,0) \) and \( F_n(\blank,0) \) are uniformly
+  bounded away from zero on \( [0,\tau] \), it follows that \( w_n^* \) is
+  uniformly bounded, and hence \( w_n^a(s,u) \) is also uniformly bounded,
+  because \( w \) was assumed uniformly bounded. The same approach can be
+  applied to the three remaining terms which gives the result.
+\end{proof}
+
+\bibliography{bib.bib}
+
+\end{document}
