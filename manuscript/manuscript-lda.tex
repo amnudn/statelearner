@@ -103,14 +103,14 @@ grestore
 %\authorrunning{Short form of author list} % if too long for running head
 
 \institute{Anders Munch \at
-              Section of Biostatistics, University of Copenhagen \\
+              Section of Biostatistics, University of Copenhagen, Denmark \\
               % Tel.: +123-45-678910\\
               % Fax: +123-45-678910\\
               \email{a.munch@sund.ku.dk}           %  \\
 %             \emph{Present address:} of F. Author  %  if needed
               \and %
               Thomas~A.~Gerds %
-              \at Section of Biostatistics, University of Copenhagen }
+              \at Section of Biostatistics, University of Copenhagen, Denmark}
 
 \date{Received: date / Accepted: date}
 % The correct dates will be entered by the editor
@@ -267,9 +267,10 @@ state learner in the context of targeted learning. We report results of our
 numerical experiments in Section~\ref{sec:numer-exper} and analyse a prostate
 cancer data set in Section~\ref{sec:real-data-appl}.
 Section~\ref{sec:discussion} contains a discussion of the merits and limitations
-of our proposal. Proofs are given in the Appendix. An implementation of the
-state learner is available at \url{https://github.com/amnudn/statelearner} along
-with codes for reproducing our numerical experiments.
+of our proposal. Proofs are given in Appendix~\ref{sec:proofs}. An
+implementation of the state learner is available at
+\url{https://github.com/amnudn/statelearner} along with code for reproducing our
+numerical experiments.
 
 \section{Notation and framework}
 \label{sec:framework}
@@ -469,11 +470,8 @@ baseline covariates \( X \) is determined by the function
 \begin{equation}
   \label{eq:F-def}
   F(t, k, x) = P(\eta(t) = k \mid X=x),
-  \quad \text{for all} \quad
-  t \in [0,\tau],
-  k \in \{-1,0,1,2\},
-  x \in \mathcal{X}.
 \end{equation}
+for all \( t \in [0,\tau] \), \( k \in \{-1,0,1,2\} \), and \( x \in \mathcal{X} \).
 The function \( F \) describes the conditional state occupation probabilities of
 the multi-state process \(\eta\). We construct a super learner for \( F \). The
 target of this super learner is the function-valued parameter $\Psi(P) = F$
@@ -488,7 +486,8 @@ a learner for \( F \) can be constructed from learners for \( \Lambda_1 \),
     F(t, 0, x)
     &
       = P(\tilde{T} > t \mid X= x)
-      =
+      \\
+      & =
       \exp{{\{-\Lambda_{1}(t \mid x)-\Lambda_{2}(t \mid x) - \Gamma(t \mid x)\}
       }},
     \\
@@ -770,9 +769,12 @@ any combinations of \( \Gamma-\hat{\Gamma}_n\),
       \right]}
     \\
      & =
-      P{\left[
-      \int_0^{\tau} \int_0^{s} w^a_n(s,u,\blank) [F - \hat{F}_n](u-, 0, \blank)[F - \hat{F}_n](s-, 0, \blank) F(\diff u, -1, \blank ) F ( \diff s, 1, \blank)
-      \right]}
+      P{\big[
+      \int_0^{\tau} \int_0^{s} w^a_n(s,u,\blank) [F - \hat{F}_n](u-, 0,
+       \blank)[F - \hat{F}_n](s-, 0, \blank)}
+    \\
+    & \qquad \quad \times F(\diff u, -1, \blank ) F ( \diff s, 1, \blank)
+      \big]
     \\
     & \quad +
       P{\left[
@@ -862,12 +864,15 @@ asymptotically linear estimators \citep{bickel1993efficient}.
 An example of a targeted estimator is the one-step estimator, defined as
 \begin{equation}
     \label{eq:one-step-def}
-    \hat{\Psi}_{\text{OS}}(\data_n)
-    =
-    \tilde{\Psi}^0(\hat{a}_{1,n}(\data_n), \hat{a}_{2,n}(\data_n),
-    H_n(\data_n))
-    + \empmeas{[\psi(\blank; \hat{a}_{1,n}(\data_n), \hat{a}_{2,n}(\data_n),
-      \hat{b}_n(\data_n) )]},
+    \begin{split}
+      \hat{\Psi}_{\text{OS}}(\data_n)
+      = &
+          \tilde{\Psi}^0(\hat{a}_{1,n}(\data_n), \hat{a}_{2,n}(\data_n),
+          H_n(\data_n))
+      \\
+        & + \empmeas{[\psi(\blank; \hat{a}_{1,n}(\data_n), \hat{a}_{2,n}(\data_n),
+          \hat{b}_n(\data_n) )]},
+    \end{split}
 \end{equation}
 where \( \empmeas \) is the empirical measure of a data set
 \(\{O_i\}_{i=1}^n\).
@@ -947,17 +952,19 @@ measure of \( \{W_1, \dots, W_n\} \) to estimate $\mu$, and denote
 this estimator by $\hat{\mu}_n$. As parameter of interest we consider
 the standardised difference in the absolute risk of an event with
 cause 1 at time $\tau$:
-\begin{equation*}
-  \theta_{{\tau}}(Q) = \int_{\mathcal{W}} 
-  \left\{
+\begin{align*}
+  & \theta_{{\tau}}(Q)
+  \\
+  & = \int_{\mathcal{W}} 
+    \left\{
     \int_0^{\tau}
     S(s- \mid w, 1)  \Lambda_1(\diff s \mid w, 1)
     -
     \int_0^{\tau}
     S(s- \mid w, 0)  \Lambda_1(\diff s \mid w, 0)
-  \right\}
-  \mu(\diff w).
-\end{equation*}
+    \right\}
+    \mu(\diff w).
+\end{align*}
 Under the usual assumptions for causal inference (consistency,
 positivity, no unmeasured confounding) \( \theta_{{\tau}} \) can be
 given the causal interpretation
@@ -977,7 +984,8 @@ Using equation~(\ref{eq:surv-def}) we may write
 \begin{equation}
   \label{eq:1}    
   \begin{split}
-    \tilde{\Psi}_{\tau}^0(\Lambda_1, \Lambda_2, \mu)
+    & \tilde{\Psi}_{\tau}^0(\Lambda_1, \Lambda_2, \mu)
+    \\
     & =
       \int_{\mathcal{W}} 
       \int_0^{\tau}
@@ -1394,32 +1402,6 @@ contains proofs of the oracle inequalities from
 Section~\ref{sec:finite-sample-oracle}; and
 Section~\ref{sec:state-learner-with} demonstrates transience of the second
 order remainder structure stated in Section~\ref{sec:trans-second-order}.
-
-% We start by recalling some notation. We use \( F \) to denote a function that
-% describes the conditional state occupation probabilities of the observed data,
-% as defined in equation~(5) of the main paper. We denote the integrated Brier
-% score as \( \bar B_\tau( F,O) = \int_0^{\tau} B_t(F,O) \diff t \), where
-% \( B_t \) is defined
-% \begin{equation*}
-%   B_t(F,O) = \sum_{j=-1}^{2}
-%   \left(
-%       F(t,j,X) - \1{\{\eta(t)=j\}}
-%   \right)^2.
-% \end{equation*}
-% Finally, recall that we let $\mathcal{H}_{\mathcal{P}}$ denote the function
-% space consisting of all conditional state occupation probability functions for
-% some measure \( P \in \mathcal{P} \), and that we equipped this space with the
-% norm
-% \begin{equation}
-%   \label{eq:norm}
-%   \| F \|_{P_0} = 
-%   \left\{
-%     \sum_{j=-1}^{2}\int_{\mathcal{X}} \int_0^{\tau} F(t, j, x)^2 \diff t H_0( \diff x)
-%   \right\}^{1/2},
-% \end{equation}
-% for some fixed measure \( P_0 \in \mathcal{P} \). We use \( F_0 \) to denote the
-% conditional state occupation probability function associated with the measure
-% \( P_0 \).
 
 \subsection{Consistency}
 \label{sec:consistency-proof}
