@@ -127,9 +127,10 @@ Here we use an interval of 36 month and show the 6 highest ranked triples.
 
 
 * Use for targeted estimation
-We estimate effect of hormone therapy on tumor recurrence (cause=1) and death
-(cause=2). To do so, we need an estimate of the treatment mechanism, i.e., the
-probability of the presence of ulcers given other covariates.
+We estimate effect of hormone therapy on tumor recurrence
+(cause=1) and death (cause=2). To do so, we need an estimate
+of the treatment mechanism, i.e., the probability of receiving
+hormone therapy given other covariates.
 
 #+BEGIN_SRC R :exports code
   canc_dt[,A := as.numeric(hormones)-1]
