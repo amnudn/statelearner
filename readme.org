@@ -191,39 +191,3 @@ intervals up to 3 years after baseline.
 11: cause2    30    ATE one-step  0.014983272 0.031678356 -0.047106306 0.07707285
 12: cause2    36    ATE one-step  0.014682592 0.032697166 -0.049403852 0.07876904
 #+end_example
-
-* Testing alternative loss function :noexport:
-
-#+BEGIN_SRC R
-  set.seed(114)
-  sl2 = statelearner2(learners = list(cause1 = learners,
-				    cause2 = learners,
-				    censor = learners),
-		    data = canc_dt,
-		    time = 36)  
-#+END_SRC
-
-#+BEGIN_SRC R
-  grid.arrange(ggplot(sl$cv_fit, aes(x = cause1, y = loss, col = cause2)) +
-               geom_point(position=position_dodge(width=1), size=.8) +
-               theme_bw() + ylab("Integrated Brier score") +
-               theme(legend.position="top",
-                     axis.text.x = element_text(angle = 45, vjust = .8)) +
-               xlab("Tumor learner") +
-               facet_grid( ~ censor) +
-               scale_colour_grey("Mortality learner", start = 0, end = 0.7),
-               ggplot(sl2$cv_fit, aes(x = cause1, y = loss, col = cause2)) +
-               geom_point(position=position_dodge(width=1), size=.8) +
-               theme_bw() + ylab("Integrated Brier score") +
-               theme(legend.position="top",
-                     axis.text.x = element_text(angle = 45, vjust = .8)) +
-               xlab("Tumor learner") +
-               facet_grid( ~ censor) +
-               scale_colour_grey("Mortality learner", start = 0, end = 0.7)
-               )
-#+END_SRC
-
-#+BEGIN_SRC R 
-  sl_test_plot <- merge(sl$cv_fit, sl2$cv_fit, by = c("cause1", "cause2", "censor"))
-  sl_test_plot[, plot(loss.x, loss.y)]
-#+END_SRC
