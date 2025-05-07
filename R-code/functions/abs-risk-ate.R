@@ -3,9 +3,9 @@
 ## Author: Anders Munch
 ## Created: Oct 27 2023 (16:08) 
 ## Version: 
-## Last-Updated: May  5 2025 (10:40) 
+## Last-Updated: May  7 2025 (16:17) 
 ##           By: Anders Munch
-##     Update #: 446
+##     Update #: 453
 #----------------------------------------------------------------------
 ## 
 ### Commentary:
@@ -167,42 +167,62 @@ os_abs_risk_ate <- function(data, eval_times, fit_1, fit_2, fit_cens, fit_treat,
     cause_est = list(cause1 = L1, cause2 = L2)
     out = do.call(rbind, lapply(eval_times, function(tt){
         do.call(rbind, lapply(1:2, function(ii){
-            cause_interest = names(cause_est)[ii]
-            L1_ii = cause_est[[ii]]
-            L2_ii = cause_est[[1+(ii %% 2)]]
-            cause_data = copy(data)
-            if(ii == 2)
-                cause_data[status != 0, status := 1+status %% 2]
-            raw0 = raw_os_abs_risk_ate(data = cause_data,
-                                       t = tt,
-                                       Lambda1 = L1_ii,
-                                       Lambda2 = L2_ii,
-                                       Gamma = G,
-                                       pi = pi,
-                                       jump_points = jump_points,
-                                       chunks = chunks,
-                                       collapse = 0)
-            naiv1 = mean(raw0$naiv1_i)
-            naiv0 = mean(raw0$naiv0_i)
-            debias_term1 = with(raw0, mean(W1_i*(A_i - B_i + C_i)))
-            debias_term0 = with(raw0, mean(W0_i*(A_i - B_i + C_i)))
-            see_1 = with(raw0, sd(naiv1_i + W1_i*(A_i - B_i + C_i))/sqrt(nrow(data)))
-            see_0 = with(raw0, sd(naiv0_i + W0_i*(A_i - B_i + C_i))/sqrt(nrow(data)))
-            see_ate = with(raw0, sd(naiv1_i + W1_i*(A_i - B_i + C_i) - (naiv0_i + W0_i*(A_i - B_i + C_i)))/sqrt(nrow(data)))
             effect_names = c("A=1","A=0","ATE")
-            out0_os = data.table(cause = cause_interest,
-                                 time = tt,
-                                 effect = effect_names,
-                                 est_type = "one-step",
-                                 est = c(naiv1+debias_term1, naiv0+debias_term0, naiv1+debias_term1 - (naiv0+debias_term0)),
-                                 see = c(see_1, see_0, see_ate))
-            out0_naiv = data.table(cause = cause_interest,
-                                   time = tt,
-                                   effect = effect_names,
-                                   est_type = "naiv",
-                                   est = c(naiv1, naiv0, naiv1 - naiv0),
-                                   see = as.numeric(NA))
-            return(rbind(out0_os, out0_naiv))
+            try_message = try(silent=TRUE, expr={
+                ## What we want to happen
+                cause_interest = names(cause_est)[ii]
+                L1_ii = cause_est[[ii]]
+                L2_ii = cause_est[[1+(ii %% 2)]]
+                cause_data = copy(data)
+                if(ii == 2)
+                    cause_data[status != 0, status := 1+status %% 2]
+                    raw0 = raw_os_abs_risk_ate(data = cause_data,
+                                               t = tt,
+                                               Lambda1 = L1_ii,
+                                               Lambda2 = L2_ii,
+                                               Gamma = G,
+                                               pi = pi,
+                                               jump_points = jump_points,
+                                               chunks = chunks,
+                                               collapse = 0)
+                    naiv1 = mean(raw0$naiv1_i)
+                    naiv0 = mean(raw0$naiv0_i)
+                    debias_term1 = with(raw0, mean(W1_i*(A_i - B_i + C_i)))
+                    debias_term0 = with(raw0, mean(W0_i*(A_i - B_i + C_i)))
+                    see_1 = with(raw0, sd(naiv1_i + W1_i*(A_i - B_i + C_i))/sqrt(nrow(data)))
+                    see_0 = with(raw0, sd(naiv0_i + W0_i*(A_i - B_i + C_i))/sqrt(nrow(data)))
+                    see_ate = with(raw0, sd(naiv1_i + W1_i*(A_i - B_i + C_i) - (naiv0_i + W0_i*(A_i - B_i + C_i)))/sqrt(nrow(data)))
+                    out0_os = data.table(cause = cause_interest,
+                                         time = tt,
+                                         effect = effect_names,
+                                         est_type = "one-step",
+                                         est = c(naiv1+debias_term1, naiv0+debias_term0, naiv1+debias_term1 - (naiv0+debias_term0)),
+                                         see = c(see_1, see_0, see_ate))
+                    out0_naiv = data.table(cause = cause_interest,
+                                           time = tt,
+                                           effect = effect_names,
+                                           est_type = "naiv",
+                                           est = c(naiv1, naiv0, naiv1 - naiv0),
+                                           see = as.numeric(NA))
+                    out_ii_tt = rbind(out0_os, out0_naiv)
+            })
+            if("try-error"%in%class(try_message)){
+                ## What to do if error
+                out0_os = data.table(cause = cause_interest,
+                                     time = tt,
+                                     effect = effect_names,
+                                     est_type = "one-step",
+                                     est = as.numeric(NA),
+                                     see = as.numeric(NA))
+                out0_naiv = data.table(cause = cause_interest,
+                                       time = tt,
+                                       effect = effect_names,
+                                       est_type = "naiv",
+                                       est = as.numeric(NA),
+                                       see = as.numeric(NA))
+                out_ii_tt = rbind(out0_os, out0_naiv)
+            }
+            return(out_ii_tt)
         }))
     }))
     out[, ":="(lower = est-1.96*see, upper = est+1.96*see)]
