@@ -3,9 +3,9 @@
 ## Author: Anders Munch
 ## Created: Oct 27 2023 (16:08) 
 ## Version: 
-## Last-Updated: Jan 23 2024 (15:28) 
+## Last-Updated: May  5 2025 (10:40) 
 ##           By: Anders Munch
-##     Update #: 443
+##     Update #: 446
 #----------------------------------------------------------------------
 ## 
 ### Commentary:
@@ -157,7 +157,11 @@ raw_os_abs_risk_ate <- function(data, t, Lambda1, Lambda2, Gamma, pi, jump_point
 os_abs_risk_ate <- function(data, eval_times, fit_1, fit_2, fit_cens, fit_treat, jump_points = data[, sort(unique(time))],chunks = 1){
     ## TREATMENT VARIABLE SHOULD BE NAMED A!!!
     L1 = function(newdata,times) predictCHF(fit_1, newdata, times)
-    L2 = function(newdata,times) predictCHF(fit_2, newdata, times)
+    ## Not sure this is the best hack to get survival function? (should check)
+    if(missing(fit_2))
+        L2 = function(newdata,times) matrix(0, nrow(newdata), ncol = length(times))    
+    else
+        L2 = function(newdata,times) predictCHF(fit_2, newdata, times)
     G = function(newdata,times) predictCHF(fit_cens, newdata, times)
     pi = function(newdata) predictTreat(fit_treat, newdata)
     cause_est = list(cause1 = L1, cause2 = L2)
