@@ -3,9 +3,9 @@
 ## Author: Anders Munch
 ## Created: Aug 18 2023 (10:26) 
 ## Version: 
-## Last-Updated: Jul 16 2024 (16:16) 
+## Last-Updated: May  7 2025 (16:10) 
 ##           By: Anders Munch
-##     Update #: 418
+##     Update #: 422
 #----------------------------------------------------------------------
 ## 
 ### Commentary: 
@@ -37,7 +37,8 @@ fit_cause_model <- function(model, data, cause, x_form = NULL, ...){
     stopifnot(cause %in% cause_names, !("internal_event_var" %in% names(data)))
     wd = copy(data)[, -cause_names[cause_names != cause], with = FALSE]
     setnames(wd, old = cause, new = "internal_event_var")
-    ## not so elegant
+    ## not so elegant -- should to this in a better way and export to separate functions
+    out = NULL
     if(is.null(x_form))
         form = Surv(time, internal_event_var) ~ .
     else
@@ -56,6 +57,8 @@ fit_cause_model <- function(model, data, cause, x_form = NULL, ...){
     if(model == "rfsrc.fast"){
         out = rfsrc.fast(form, data = wd, forest = TRUE, ...)
     }
+    if(is.null(out))
+        stop(paste("The model", model, "is not implemented in statelearner."))
     return(out)
 }
 ## Calculate F from CSCHFs
