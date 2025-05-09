@@ -3,9 +3,9 @@
 ## Author: Anders Munch
 ## Created: Oct 27 2023 (16:08) 
 ## Version: 
-## Last-Updated: May  7 2025 (16:17) 
+## Last-Updated: May  8 2025 (12:39) 
 ##           By: Anders Munch
-##     Update #: 453
+##     Update #: 537
 #----------------------------------------------------------------------
 ## 
 ### Commentary:
@@ -23,6 +23,7 @@
 ### Code:
 library(here)
 library(data.table)
+library(MASS)
 
 ## naiv (data, t, Lambda1, Lambda2, jump_points)
 naiv <- function(data, t, Lambda1, Lambda2, jump_points, chunks = 1){
@@ -228,7 +229,110 @@ os_abs_risk_ate <- function(data, eval_times, fit_1, fit_2, fit_cens, fit_treat,
     out[, ":="(lower = est-1.96*see, upper = est+1.96*see)]
     return(out[])
 }
+os_abs_risk_ate_ic_matrix <- function(data, eval_times, fit_1, fit_2, fit_cens, fit_treat, jump_points = data[, sort(unique(time))],chunks = 1){
+    ## TREATMENT VARIABLE SHOULD BE NAMED A!!!
+    L1 = function(newdata,times) predictCHF(fit_1, newdata, times)
+    ## Not sure this is the best hack to get survival function? (should check)
+    if(missing(fit_2))
+        L2 = function(newdata,times) matrix(0, nrow(newdata), ncol = length(times))    
+    else
+        L2 = function(newdata,times) predictCHF(fit_2, newdata, times)
+    G = function(newdata,times) predictCHF(fit_cens, newdata, times)
+    pi = function(newdata) predictTreat(fit_treat, newdata)
+    cause_est = list(cause1 = L1, cause2 = L2)
+    out_list = lapply(eval_times, function(tt){
+        lapply(list(cause1 = 1, cause2 = 2), function(ii){
+            try_message = try(silent=TRUE, expr={
+                ## What we want to happen
+                cause_interest = names(cause_est)[ii]
+                L1_ii = cause_est[[ii]]
+                L2_ii = cause_est[[1+(ii %% 2)]]
+                cause_data = copy(data)
+                if(ii == 2) cause_data[status != 0, status := 1+status %% 2]
+                raw0 = raw_os_abs_risk_ate(data = cause_data,
+                                           t = tt,
+                                           Lambda1 = L1_ii,
+                                           Lambda2 = L2_ii,
+                                           Gamma = G,
+                                           pi = pi,
+                                           jump_points = jump_points,
+                                           chunks = chunks,
+                                           collapse = 0)                    
+                ate_ic_terms_tt = as.numeric(with(raw0, naiv1_i + W1_i*(A_i - B_i + C_i) - (naiv0_i + W0_i*(A_i - B_i + C_i))))        
+            })
+            if("try-error"%in%class(try_message)){
+                ## What to do if error
+                ate_ic_terms_tt = rep(as.numeric(NA), nrow(data))
+            }
+            return(ate_ic_terms_tt)
+        })
+    })
+    out1 = do.call(cbind, lapply(out_list, function(xx) xx[["cause1"]]))
+    out2 = do.call(cbind, lapply(out_list, function(xx) xx[["cause2"]]))
+    colnames(out1) = eval_times
+    colnames(out2) = eval_times
+    return(list(cause1 = out1, cause2 = out2))
+}
+os_abs_risk_ate_ci_band <- function(data,
+                                    eval_times,
+                                    fit_1,
+                                    fit_2,
+                                    fit_cens,
+                                    fit_treat,                                    
+                                    jump_points = data[, sort(unique(time))],
+                                    chunks = 1,
+                                    sim_gaus = 1e5){
+    ic_matrix = os_abs_risk_ate_ic_matrix(data = data, 
+                                          eval_times = eval_times,
+                                          fit_1 = fit_1,
+                                          fit_2 = fit_2,
+                                          fit_cens = fit_cens,
+                                          fit_treat = fit_treat,
+                                          jump_points = jump_points,
+                                          chunks = chunks)
+    out = do.call(rbind, lapply(1:2, function(ii){
 
+        try_message = try(silent=TRUE, expr={
+            ## What we want to happen
+            mat = ic_matrix[[ii]]
+            time_names = colnames(mat)
+            mu = apply(mat, 2, mean)
+            na_ind = which(is.na(mu))
+            mu_no_na = mu[-na_ind]
+
+            n_obs = nrow(data)
+
+            ## Should check this approach with Hely
+            sigma_no_na = cor(mat[-na_ind, -na_ind])
+            sim_joint = mvrnorm(n = sim_gaus, mu = mu_no_na, Sigma = sigma_no_na)
+            sim_max = apply(sim_joint, 1, max)
+            max_qi = as.numeric(quantile(abs(sim_max), probs = c(0.95)))
+            marg_ses = sqrt(diag(cov(mat[-na_ind, -na_ind])))
+            dt_joint = data.table(time = eval_times[-na_ind],
+                                  estimate = mu_no_na,
+                                  see = marg_ses/sqrt(n_obs))
+            out_ii = merge(data.table(cause = paste0("cause", ii), time = eval_times), dt_joint, by = "time", all = TRUE)
+            out_ii[, ":="(lower = estimate - 1.96*see,
+                          upper = estimate + 1.96*see,
+                          lowerBand = estimate - max_qi*see,
+                          upperBand = estimate + max_qi*see)]
+        })
+        if("try-error"%in%class(try_message)){
+            ## What to do if error
+            out_ii = data.table(cause = paste0("cause", ii),
+                                time = eval_times,
+                                estimate = as.numeric(NA),
+                                see = as.numeric(NA),
+                                lower = as.numeric(NA),
+                                upper = as.numeric(NA),
+                                lowerBand = as.numeric(NA),
+                                upperBand = as.numeric(NA))
+        }        
+        return(out_ii)
+    }))
+
+    return(out[])
+}
 
 ######################################################################
 ### martingale-int.R ends here
