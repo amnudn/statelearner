@@ -1,61 +1,54 @@
-%%%%%%%%%%%%%%%%%%%%%%% file template.tex %%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% This is a general template file for the LaTeX package SVJour3
-% for Springer journals.          Springer Heidelberg 2010/09/16
-%
-% Copy it to a new file with a new name and use it as the basis
-% for your article. Delete % signs as needed.
-%
-% This template includes a few options for different layouts and
-% content for various journals. Please consult a previous issue of
-% your journal as needed.
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% First comes an example EPS file -- just ignore it and
-% proceed on the \documentclass line
-% your LaTeX will extract the file if required
-\begin{filecontents*}{example.eps}
-%!PS-Adobe-3.0 EPSF-3.0
-%%BoundingBox: 19 19 221 221
-%%CreationDate: Mon Sep 29 1997
-%%Creator: programmed by hand (JK)
-%%EndComments
-gsave
-newpath
-  20 20 moveto
-  20 220 lineto
-  220 220 lineto
-  220 20 lineto
-closepath
-2 setlinewidth
-gsave
-  .4 setgray fill
-grestore
-stroke
-grestore
-\end{filecontents*}
-%
-\RequirePackage{fix-cm}
-%
-%\documentclass{svjour3}                     % onecolumn (standard format)
-%\documentclass[smallcondensed]{svjour3}     % onecolumn (ditto)
-\documentclass[smallextended]{svjour3}       % onecolumn (second format)
-%\documentclass[twocolumn]{svjour3}          % twocolumn
-%
-\smartqed  % flush right qed marks, e.g. at end of proof
-%
-\usepackage{graphicx}
-%
-% \usepackage{mathptmx}      % use Times fonts if available on your TeX system
-%
-% insert here the call for the packages your document requires
-\usepackage{dsfont, amssymb,soul,xcolor, enumitem, amsmath,verbatim}
-\usepackage[authoryear]{natbib}
+\documentclass[a4paper,danish]{article}
+\usepackage[margin=3.5cm]{geometry}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{natbib, dsfont, enumitem,
+  amssymb,soul,xcolor,amsmath,amsthm,graphicx,subcaption,verbatim,pgfplots,tikz,prodint}
+\usetikzlibrary{calc,patterns,angles,quotes,automata,
+  positioning,arrows,shapes}
+
 \definecolor{linkcolor}{rgb}{0, 0, 0.54}
 \usepackage[colorlinks,allcolors=linkcolor]{hyperref}
-%
-% please place your own definitions here and don't use \def but
+
+% Ref and bibliography style 
+\bibliographystyle{abbrvnat}
+
+% Handling new lines
+\setlength{\parskip}{1em}
+\setlength{\parindent}{0em}
+
+% Handling space after sections
+\usepackage{titlesec}
+\titlespacing*{\section}{0em}{2em}{0em}
+\titlespacing*{\subsection}{0em}{2em}{0em}
+\titlespacing*{\subsubsection}{0em}{2em}{0em}
+
+% No spacing after in start of list
+\setlist[itemize]{topsep=0pt}
+\setlist[enumerate]{topsep=0pt}
+
+% Theorem environments 
+\theoremstyle{plain} % plain italic style
+\newtheorem{theorem}{Theorem}
+\numberwithin{theorem}{section}
+\newtheorem*{theorem*}{Theorem}
+\newtheorem{conjecture}{Conjecture}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition} % non-italic
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{assumption}[theorem]{Assumption}
+\newtheorem*{assumption*}{Assumption}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{note}[theorem]{Note}
+
+% Notation
 \DeclareMathOperator{\E}{\mathbb{E}} % expectation
 \newcommand{\Z}{\mathbb{Z}}
 \newcommand{\R}{\mathbb{R}}
@@ -81,61 +74,138 @@ grestore
 \DeclareMathOperator*{\argmax}{\arg\!\max}
 \newcommand{\empmeas}{\ensuremath{\mathbb{P}_n}} % empirical measure
 \newcommand{\data}{\ensuremath{\mathcal{D}}}
-%
-% Insert the name of "your journal" with
-\journalname{Lifetime Data Analysis}
-%
+
+
+
+\title{The state learner -- a super learner for right-censored
+  data}
+\author{Anders Munch \& Thomas A. Gerds}
+\date{\today}
+
 \begin{document}
+\maketitle
 
-\title{The state learner -- a super learner for right-censored data
-  % \thanks{Grants or other notes about the article that should go on the front
-  % page should be placed here. General acknowledgments should be placed at the
-  % end of the article.}
-}
-% \subtitle{Do you have a subtitle?\\ If so, write it here}
 
-\titlerunning{The state learner}        % if too long for running head
 
-\author{Blinded author}
 
-%\authorrunning{Short form of author list} % if too long for running head
 
-% \institute{Anders Munch \at
-%               Section of Biostatistics, University of Copenhagen, Denmark \\
-%               % Tel.: +123-45-678910\\
-%               % Fax: +123-45-678910\\
-%               \email{a.munch@sund.ku.dk}           %  \\
-% %             \emph{Present address:} of F. Author  %  if needed
-%               \and %
-%               Thomas~A.~Gerds %
-%               \at Section of Biostatistics, University of Copenhagen, Denmark}
+% %%%%%%%%%%%%%%%%%%%%%%% file template.tex %%%%%%%%%%%%%%%%%%%%%%%%%
+% %
+% % This is a general template file for the LaTeX package SVJour3
+% % for Springer journals.          Springer Heidelberg 2010/09/16
+% %
+% % Copy it to a new file with a new name and use it as the basis
+% % for your article. Delete % signs as needed.
+% %
+% % This template includes a few options for different layouts and
+% % content for various journals. Please consult a previous issue of
+% % your journal as needed.
+% %
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %
+% % First comes an example EPS file -- just ignore it and
+% % proceed on the \documentclass line
+% % your LaTeX will extract the file if required
+% \begin{filecontents*}{example.eps}
+% %!PS-Adobe-3.0 EPSF-3.0
+% %%BoundingBox: 19 19 221 221
+% %%CreationDate: Mon Sep 29 1997
+% %%Creator: programmed by hand (JK)
+% %%EndComments
+% gsave
+% newpath
+%   20 20 moveto
+%   20 220 lineto
+%   220 220 lineto
+%   220 20 lineto
+% closepath
+% 2 setlinewidth
+% gsave
+%   .4 setgray fill
+% grestore
+% stroke
+% grestore
+% \end{filecontents*}
+% %
+% \RequirePackage{fix-cm}
+% %
+% %\documentclass{svjour3}                     % onecolumn (standard format)
+% %\documentclass[smallcondensed]{svjour3}     % onecolumn (ditto)
+% \documentclass[smallextended]{svjour3}       % onecolumn (second format)
+% %\documentclass[twocolumn]{svjour3}          % twocolumn
+% %
+% \smartqed  % flush right qed marks, e.g. at end of proof
+% %
+% \usepackage{graphicx}
+% %
+% % \usepackage{mathptmx}      % use Times fonts if available on your TeX system
+% %
+% % insert here the call for the packages your document requires
+% \usepackage{dsfont, amssymb,soul,xcolor, enumitem, amsmath,verbatim}
+% \usepackage[authoryear]{natbib}
+% \definecolor{linkcolor}{rgb}{0, 0, 0.54}
+% \usepackage[colorlinks,allcolors=linkcolor]{hyperref}
+% %
+% % please place your own definitions here and don't use \def but
+% \DeclareMathOperator{\E}{\mathbb{E}} % expectation
+% \newcommand{\Z}{\mathbb{Z}}
+% \newcommand{\R}{\mathbb{R}}
+% \newcommand{\N}{\mathbb{N}}
+% \newcommand{\C}{\mathbb{C}}
+% \renewcommand{\S}{\mathbb{S}}
+% \newcommand{\blank}{\makebox[1ex]{\textbf{$\cdot$}}}
+% \newcommand\independent{\protect\mathpalette{\protect\independenT}{\perp}}
+% \def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern2mu{#1#2}}}
+% \renewcommand{\phi}{\varphi}
+% \renewcommand{\epsilon}{\varepsilon}
+% \newcommand*\diff{\mathop{}\!\mathrm{d}}
+% \newcommand{\weakly}{\rightsquigarrow}
+% \newcommand\smallO{\textit{o}}
+% \newcommand\bigO{\textit{O}}
+% \newcommand{\midd}{\; \middle|\;}
+% \newcommand{\1}{\mathds{1}}
+% \usepackage{ifthen} %% Empirical process with default argument
+% \newcommand{\G}[2][n]{
+% {\ensuremath{\mathbb{G}_{#1}}{\left[#2\right]}}
+% }
+% \DeclareMathOperator*{\argmin}{\arg\!\min}
+% \DeclareMathOperator*{\argmax}{\arg\!\max}
+% \newcommand{\empmeas}{\ensuremath{\mathbb{P}_n}} % empirical measure
+% \newcommand{\data}{\ensuremath{\mathcal{D}}}
 
-\date{Received: date / Accepted: date}
-% The correct dates will be entered by the editor
+% \begin{document}
+
+% \title{The state learner -- a super learner for right-censored
+%   data}
+
+
+% \author{Anders Munch \& Thomas A. Gerds}
 
 
 \maketitle
 
 \begin{abstract}
-  In survival analysis, prediction models are needed as stand-alone tools and in
-  applications of causal inference to estimate nuisance parameters. The super
-  learner is a machine learning algorithm which combines a library of prediction
-  models into a meta learner based on cross-validated loss. In right-censored
-  data, the choice of the loss function and the estimation of the expected loss
-  need careful consideration. We introduce the state learner, a new super
-  learner for survival analysis, which simultaneously evaluates libraries of
-  prediction models for the event of interest and the censoring distribution.
-  The state learner can be applied to all types of survival models, works in the
-  presence of competing risks, and does not require a single pre-specified
-  estimator of the conditional censoring distribution. We establish an oracle
-  inequality for the state learner and investigate its performance through
-  numerical experiments. We illustrate the application of the state learner with
-  prostate cancer data, as a stand-alone prediction tool, and, for causal
-  inference, as a way to estimate the nuisance parameter models of a smooth
-  statistical functional.
+  In survival analysis, prediction models are needed as
+  stand-alone tools and in applications of causal inference to
+  estimate nuisance parameters. The super learner is a machine
+  learning algorithm which combines a library of prediction
+  models into a meta learner based on cross-validated loss. In
+  right-censored data, the choice of the loss function and the
+  estimation of the expected loss need careful consideration.
+  We introduce the state learner, a new super learner for
+  survival analysis, which simultaneously evaluates libraries
+  of prediction models for the event of interest and the
+  censoring distribution. The state learner places no
+  restrictions on the algorithms that can be included in the
+  library, works in the presence of competing risks, and does
+  not require a single pre-specified estimator of the
+  conditional censoring distribution. We establish an oracle
+  inequality for the state learner and investigate its
+  performance through numerical experiments. We illustrate the
+  application of the state learner with prostate cancer data.
 
-  \keywords{Competing risks, cross-validation, loss based estimation,
-    right-censored data, super learner}
+  % \keywords{Competing risks, cross-validation, loss based estimation,
+  %   right-censored data, super learner}
 % \PACS{PACS code1 \and PACS code2 \and more}
 % \subclass{MSC code1 \and MSC code2 \and more}
 \end{abstract}
@@ -143,132 +213,136 @@ grestore
 \section{Introduction}
 \label{sec:introduction}
 
-% Medical decision making is traditionally based on the discrepancy
-% between intuitive judgment and the law of chance
-% \citep{redelmeier1995probability}.
-% We are concerned with the statistical models that provide
-% probabilistic predictions about the medical future of a patient. We
-% have two different applications of these models in mind. One is as a
-% stand-alone tool which predicts the likelihood of medical outcomes.
-% The other is as nuisance parameter estimate
-% input to an algorithm which estimates a causal target
-% parameter such as an average treatment effect and depends on estimates
-% of nuisance parameters such as the conditional probability of being
-% uncensored.  An example of the latter is the targeted minimum loss
-% based estimator \citep{rytgaard2022targeted}. In both applications,
-% the models have to be learned based on available data from previous
-% patients.
-A super learner is a machine learning algorithm that combines a finite
-set of learners into a meta learner by estimating prediction
-performance in hold-out samples using a pre-specified loss function
-\citep{van2007super}. When the aim is to make a prediction model,
-super learners combine strong learners, such as Cox regression models
-and random survival forests \citep[][Section 8.4]{gerds2021medical}.
-% For targeted learning of a low dimensional
-% target parameter in presence of a high-dimensional nuisance parameter,
-% a super learner will usually also include the highly adaptive lasso
-% \citep{van2011targeted, benkeser2016highly,van2017generally}.
-While the general idea of combining strong learners based on cross-validation
-stems from earlier work \citep{wolpert1992stacked,breiman1996stacked}, the
-name super learner is justified by an oracle inequality
+[More motivation]
+
+
+A super learner is a machine learning algorithm that combines
+a finite set of learners into a meta learner by estimating
+prediction performance in hold-out samples using a
+pre-specified loss function \citep{van2007super}. When the aim
+is to make a prediction model, super learners combine strong
+learners, such as Cox regression models and random survival
+forests \citep[][Section 8.4]{gerds2021medical}. While the
+general idea of combining strong learners based on
+cross-validation stems from earlier work
+\citep{wolpert1992stacked,breiman1996stacked}, the name super
+learner is justified by an oracle inequality
 \citep{van2003unicv,vaart2006oracle}.
-% The super learner is guaranteed to perform
-% almost as well as the model which minimises the expected performance, i.e., the
-% model we would select if we could evaluate the prediction performance in an
-% infinite hold-out sample.
 
-We define the state learner, a new super learner for right-censored data, which
-simultaneously estimates the expected loss of learners of the event time
-distribution and the censoring distribution. Compared to the super learners of
-\cite{polley2011-sl-cens} and \cite{golmakani2020super}, the state learner
-proposed here poses no restrictions on the type of learners that can be included
-in the library. Compared to super learners that rely on inverse probability of
-censoring weighting, censoring unbiased transformations, or pseudo-values, the
-state learner does not require a pre-specified censoring distribution. Compared
-to the super learners by \cite{han2021inverse} and \cite{westling2021inference},
-the state learner has theoretical guarantees which these methods do not have.
-% Moreover, state learner seems to be the first super learner for
-% right censored data which learns the outcome and the censoring
-% distribution simulaneously.
+We define the state learner, a new super learner for
+right-censored data, which simultaneously estimates the
+expected loss of learners of the event time distribution and
+the censoring distribution. Compared to the super learners of
+\cite{polley2011-sl-cens} and \cite{golmakani2020super}, the
+state learner proposed here poses no restrictions on the type
+of learners that can be included in the library. Compared to
+super learners that rely on inverse probability of censoring
+weighting, censoring unbiased transformations, or
+pseudo-values, the state learner does not require a
+pre-specified censoring distribution. Compared to the super
+learners by \cite{han2021inverse} and
+\cite{westling2021inference}, the state learner has
+theoretical guarantees which these methods do not have.
 
-The loss function underlying the state learner operates on coarsened data. In
-the right-censored survival setting the coarsened data consist of the minimum
-and the order of the censoring time and the event time as well as the baseline
-covariates. The state learner works by simultaneously assessing how well
-learners of the event time distribution and the censoring distribution predict
-the states of the coarsened data. To analyse the theoretical properties of the
-state learner we focus on the discrete super learner which combines the library
-of learners by picking the one that minimises the cross-validated loss
-\citep{van2007super}. In the presence of competing risks, our algorithm uses
-separate libraries of learners for the cumulative hazard functions for each of
-the competing risks and for the censoring distribution. We show that the oracle
-selector of the state learner is consistent if all libraries contain a
-consistent learner and prove a finite sample oracle inequality.
+The loss function underlying the state learner operates on
+coarsened data. In the right-censored survival setting the
+coarsened data consist of the minimum and the order of the
+censoring time and the event time as well as the baseline
+covariates. The state learner works by simultaneously
+assessing how well learners of the event time distribution and
+the censoring distribution predict the states of the coarsened
+data. To analyse the theoretical properties of the state
+learner we focus on the discrete super learner which combines
+the library of learners by picking the one that minimises the
+cross-validated loss \citep{van2007super}. In the presence of
+competing risks, our algorithm uses separate libraries of
+learners for the cumulative hazard functions for each of the
+competing risks and for the censoring distribution. We show
+that the oracle selector of the state learner is consistent if
+all libraries contain a consistent learner and prove a finite
+sample oracle inequality.
 
-The state learner algorithm can output a medical risk prediction model
-\citep{gerds2021medical} which predicts the probability of an event based on
-covariates in the presence of competing risks. Another important application,
-which motivated our contribution, is in targeted learning where conditional
-event probabilities occur as high-dimensional nuisance parameters which need to
-be estimated at a certain rate \citep{van2011targeted, rytgaard2021estimation,
-  rytgaard2022targeted}. The state learner is particularly well-suited for this
-application as it simultaneously provides estimates for both the outcome and the
-censoring, both of which are needed for targeted learning. For the asymptotic
-bias term of a targeted estimator, which uses the state learner to estimate
-nuisance parameters, we show that a second order product structure holds. We
-illustrate both applications of the state learner with prostate cancer data
+The state learner algorithm can output a medical risk
+prediction model \citep{gerds2021medical} which predicts the
+probability of an event based on covariates in the presence of
+competing risks. Another important application, which
+motivated our contribution, is in targeted learning where
+conditional event probabilities occur as high-dimensional
+nuisance parameters which need to be estimated at a certain
+rate \citep{van2011targeted, rytgaard2021estimation,
+  rytgaard2022targeted}. The state learner is particularly
+well-suited for this application as it simultaneously provides
+estimates for both the outcome and the censoring, both of
+which are needed for targeted learning. For the asymptotic
+bias term of a targeted estimator, which uses the state
+learner to estimate nuisance parameters, we show that a second
+order product structure holds. We illustrate both applications
+of the state learner with prostate cancer data
 \citep{kattan2000pretreatment}.
 
-There are many existing super learners for right-censored data. We briefly
-review them here. Machine learning based on right-censored data commonly uses
-the partial log-likelihood as a loss function
+There are many existing super learners for right-censored
+data. We briefly review them here. Machine learning based on
+right-censored data commonly uses the partial log-likelihood
+as a loss function
 \citep[e.g.,][]{li2016regularized,yao2017deep,lee2018deephit,katzman2018deepsurv,gensheimer2019scalable,lee2021boosted,kvamme2021continuous}.
-This loss function is also suggested for super learning with right-censored data
-by \cite{polley2011-sl-cens}, where data is assumed to be observed in discrete
-time. However, the partial log-likelihood loss does not work well with data
-splitting (cross-validation) in continuous time. The reason is that the partial
-log-likelihood loss assigns an infinite value for any learner that predicts
-piece-wise constant cumulative hazard functions when there are event times in
-the test set which do not occur in the learning set. This problem occurs with
-prominent survival learners including the Kaplan-Meier estimator, the random
-survival forest, and the semi-parametric Cox regression model and these learners
-cannot be included in the library of the super learner proposed by
-\cite{polley2011-sl-cens}. When a proportional hazards model is assumed, the
-baseline hazard function can be profiled out of the likelihood
-\citep{cox1972regression}. The cross-validated partial log-likelihood loss
-\citep{verweij1993cross} has therefore been suggested as a loss function for
-super learning by \cite{golmakani2020super}. This choice of loss function
-restricts the library of learners to include only Cox proportional hazards
-models, and hence excludes many learners such as, e.g., random survival forests,
-additive hazards models, and accelerated failure time models. Other proposals
-for super learning with right-censored data use an inverse probability of
-censoring weighted (IPCW) loss function
+This loss function is also suggested for super learning with
+right-censored data by \cite{polley2011-sl-cens}, where data
+is assumed to be observed in discrete time. However, the
+partial log-likelihood loss does not work well with data
+splitting (cross-validation) in continuous time. The reason is
+that the partial log-likelihood loss assigns an infinite value
+for any learner that predicts piece-wise constant cumulative
+hazard functions when there are event times in the test set
+which do not occur in the learning set. This problem occurs
+with prominent survival learners including the Kaplan-Meier
+estimator, the random survival forest, and the semi-parametric
+Cox regression model and these learners cannot be included in
+the library of the super learner proposed by
+\cite{polley2011-sl-cens}. When a proportional hazards model
+is assumed, the baseline hazard function can be profiled out
+of the likelihood \citep{cox1972regression}. The
+cross-validated partial log-likelihood loss
+\citep{verweij1993cross} has therefore been suggested as a
+loss function for super learning by \cite{golmakani2020super}.
+This choice of loss function restricts the library of learners
+to include only Cox proportional hazards models, and hence
+excludes many learners such as, e.g., random survival forests,
+additive hazards models, and accelerated failure time models.
+Other proposals for super learning with right-censored data
+use an inverse probability of censoring weighted (IPCW) loss
+function
 \citep{graf1999assessment,van2003unicv,molinaro2004tree,keles2004asymptotically,hothorn2006survival,gerds2006consistent,gonzalez2021stacked},
 censoring unbiased transformations
-\citep{fan1996local,steingrimsson2019censoring}, or pseudo-values
-\citep{andersen2003generalised,mogensen2013random,sachs2019ensemble}. All these
-methods rely on an estimator of the censoring distribution, and their drawback
-is that this estimator has to be pre-specified. An approach which avoids a
-pre-specified censoring model was proposed independently by
-\cite{han2021inverse} and \cite{westling2021inference}. In both articles, the
-authors suggest to iterate between learning of the outcome model and learning of
-the censoring model using IPCW loss functions. However, it seems that this
-procedure is in general not guaranteed to converge to the true data-generating
-mechanism \citep[][Appendix~A.4]{munch2024thesis}.
+\citep{fan1996local,steingrimsson2019censoring}, or
+pseudo-values
+\citep{andersen2003generalised,mogensen2013random,sachs2019ensemble}.
+All these methods rely on an estimator of the censoring
+distribution, and their drawback is that this estimator has to
+be pre-specified. An approach which avoids a pre-specified
+censoring model was proposed independently by
+\cite{han2021inverse} and \cite{westling2021inference}. In
+both articles, the authors suggest to iterate between learning
+of the outcome model and learning of the censoring model using
+IPCW loss functions. However, it seems that this procedure is
+in general not guaranteed to converge to the true
+data-generating mechanism
+\citep[][Appendix~A.4]{munch2024thesis}.
 
-We introduce our notation and framework in Section~\ref{sec:framework}. In
-Section~\ref{sec:super-learning} we define general super learning for
-right-censored data. Section~\ref{sec:super-learner-simple} introduces the state
-learner, and Section~\ref{sec:theor-results-prop} provides theoretical
-guarantees. In Section~\ref{sec:targeted-learning} we discuss the use of the
-state learner in the context of targeted learning. We report results of our
-numerical experiments in Section~\ref{sec:numer-exper} and analyse a prostate
-cancer data set in Section~\ref{sec:real-data-appl}.
-Section~\ref{sec:discussion} contains a discussion of the merits and limitations
-of our proposal. Proofs are given in Appendix~\ref{sec:proofs}. An
-implementation of the state learner is available at
-\url{https://github.com/amnudn/statelearner} along with code for reproducing our
-numerical experiments.
+We introduce our notation and framework in
+Section~\ref{sec:framework}. In
+Section~\ref{sec:super-learning} we define general super
+learning for right-censored data.
+Section~\ref{sec:super-learner-simple} introduces the state
+learner, and Section~\ref{sec:theor-results-prop} provides
+theoretical guarantees. We report results of our numerical
+experiments in Section~\ref{sec:numer-exper} and analyse a
+prostate cancer data set in Section~\ref{sec:real-data-appl}.
+Section~\ref{sec:discussion} contains a discussion of the
+merits and limitations of our proposal. Proofs are given in
+Appendix~\ref{sec:proofs}. An implementation of the state
+learner is available at
+\url{https://github.com/amnudn/statelearner} along with code
+for reproducing our numerical experiments.
 
 \section{Notation and framework}
 \label{sec:framework}
@@ -362,25 +436,31 @@ Thus, we can consider $\Lambda_j$ and \(\Gamma\) as operators which map from
 \section{The concept of super learning}
 \label{sec:super-learning}
 
-In survival analysis, a super learner can be used to estimate a
-parameter $\Psi$ which can be identified from the observed data
-distribution \(P\in\mathcal P\). In this section, to introduce the
-discrete super learner and the oracle learner, we consider estimation of the
-function-valued parameter \(\Psi:\mathcal P\to\mathcal M_{\tau}\), given by
-\(\Psi(P)=\Lambda_j\). This parameter is identified via equation
-\eqref{eq:lambdaj} on \([0,\tau]\).
+In survival analysis, a super learner can be used to estimate
+a parameter $\theta \in \Theta$ which can be identified from
+the observed data distribution \(P\in\mathcal P\). A super
+learner typically estimates a function, and thus the parameter
+space $\Theta$ is most often a class of functions. For
+example, $\theta$ could be a conditional survival function or
+a cumulative hazard function. In
+Section~\ref{sec:super-learner-simple} we consider a specific
+choice of parameter as target for our super learner, but in
+this section we describe super learning for a general
+parameter $\theta$ with values in some parameter space
+$\Theta$.
 
-As input to the super learner we need a data set
-\( \data_n=\{O_i\}_{i=1}^n \) of i.i.d.\ observations from \( P \in \mathcal{P} \) and a collection of candidate
-learners $\mathcal{A}$. Each learner \(a \in \mathcal{A}\) is a map
-\( a \colon \mathcal{O}^n \rightarrow \mathcal{M}_{\tau}\) which takes a data
-set as input and returns an estimate $a(\data_n) \in \mathcal{M}_{\tau}$ of
-$\Lambda_{j}$.
+As input to a super learner we need a data set
+\( \data_n=\{O_i\}_{i=1}^n \) of i.i.d.\ observations from
+\( P \in \mathcal{P} \) and a collection of candidate learners
+$\mathcal{A}$. Each learner \(a \in \mathcal{A}\) is a map
+\( a \colon \mathcal{O}^n \rightarrow \Theta \) which takes a
+data set as input and returns an estimate
+$a(\data_n) \in \Theta$ of $\theta$.
 % Formally, the domain of $a$ depends on \(n\) but we suppress this in the notation.
 In what follows, we use the short-hand notation
 \(P[f] = \int f(o) P(\diff o) \). A super learner evaluates the
 performance of \(a \in \mathcal{A}\) with a loss function
-\(L\colon \mathcal{M}_{\tau} \times \mathcal{O} \rightarrow \R_+\) and
+\(L\colon \Theta \times \mathcal{O} \rightarrow \R_+\) and
 estimates the expected loss \(P[L(a(\data_n), \blank)]\) using
 cross-validation. Specifically, the expected loss of $a\in\mathcal A$
 is estimated by splitting the data set $\data_n$ into $K$ disjoint
@@ -411,8 +491,6 @@ The discrete super learner is defined as
 \begin{equation*}
 \hat{a}_n = \argmin_{a\in\mathcal A}\hat{R}_n(a; L).
 \end{equation*}
-% The final estimator of \(\Psi(P)=\Lambda_j\) is then the selected
-% learner applied to the full data set, i.e., \(\hat{a}_n(\data_n)\).
 The oracle learner is defined as the learner that minimises the
 expected loss under the data-generating distribution \( P \),
 i.e.,
@@ -446,16 +524,15 @@ suppressed in the notation.
 \section{The state learner}
 \label{sec:super-learner-simple}
 
-The main idea of the state learner is to jointly use learners for
-\( \Lambda_1 \), \( \Lambda_2 \), and \( \Gamma \), and the relations in
-equation~(\ref{eq:parametrizeP}), to learn a feature of the observed data
-distribution \( P \). The discrete state learner ranks a tuple of learners for
-the tuple of the cumulative hazard functions
-\( (\Lambda_1, \Lambda_2, \Gamma) \) based on how well they jointly model the
-observed data. Risk predictions can then be obtained by combining
-\( \Lambda_1 \) and $\Lambda_2$ from the highest ranked tuple using a well-known
-formula \citep{benichou1990estimates, ozenne2017riskregression}. To formally
-introduce the state learner, we define the multi-state process
+The main idea of the state learner is to jointly use learners
+for \( \Lambda_1 \), \( \Lambda_2 \), and \( \Gamma \), and
+the relations in equation~(\ref{eq:parametrizeP}), to learn a
+feature of the observed data distribution \( P \). The
+discrete state learner ranks a tuple of learners for the tuple
+of the cumulative hazard functions
+\( (\Lambda_1, \Lambda_2, \Gamma) \) based on how well they
+jointly model the observed data. To formally introduce the
+state learner, we define the multi-state process
 \begin{equation*}
   \eta(t) = \1\{\tilde{T} \leq t, \tilde D=1\} + 2\,\1\{\tilde{T} \leq t, \tilde
   D=2\} - \1\{\tilde{T} \leq t, \tilde D=0\},
@@ -469,16 +546,20 @@ baseline covariates \( X \) is determined by the function
   \label{eq:F-def}
   F(t, k, x) = P(\eta(t) = k \mid X=x),
 \end{equation}
-for all \( t \in [0,\tau] \), \( k \in \{-1,0,1,2\} \), and \( x \in \mathcal{X} \).
-The function \( F \) describes the conditional state occupation probabilities of
-the multi-state process \(\eta\). We construct a super learner for \( F \). The
-target of this super learner is the function-valued parameter $\Psi(P) = F$
-which is identified through equation~(\ref{eq:F-def}). Under conditional
-independent censoring each quadruple $(\Lambda_{1}, \Lambda_{2}, \Gamma, H)$
-characterises a distribution \(P\in\mathcal P\), c.f.\
-equation~\eqref{eq:parametrizeP}, which in turn determines \( (F, H) \). Hence,
-a learner for \( F \) can be constructed from learners for \( \Lambda_1 \),
-\( \Lambda_2 \), and $\Gamma$ as follows:
+for all \( t \in [0,\tau] \), \( k \in \{-1,0,1,2\} \), and
+\( x \in \mathcal{X} \). The function \( F \) describes the
+conditional state occupation probabilities of the multi-state
+process \(\eta\). We construct a super learner for \( F \).
+The target of this super learner is the function-valued
+parameter $\theta(P) = F$ which is identified through
+equation~(\ref{eq:F-def}). Under conditional independent
+censoring each quadruple
+$(\Lambda_{1}, \Lambda_{2}, \Gamma, H)$ characterises a
+distribution \(P\in\mathcal P\), c.f.\
+equation~\eqref{eq:parametrizeP}, which in turn determines
+\( (F, H) \). Hence, a learner for \( F \) can be constructed
+from learners for \( \Lambda_1 \), \( \Lambda_2 \), and
+$\Gamma$ as follows:
 \begin{equation}\label{eq:transition}
   \begin{split}
     F(t, 0, x)
@@ -578,15 +659,41 @@ and the discrete state learner is given by
 \end{align*}
 
 
+\section{Use cases for the state learner}
+\label{sec:use-cases-state}
+
+The parameter \( F \) is not of much interest...
+
+\subsection{Survival and risk predictions}
+\label{sec:surv-risk-pred}
+
+...
+
+Risk predictions can then be obtained by combining
+\( \Lambda_1 \) and $\Lambda_2$ from the highest ranked tuple
+using a well-known formula \citep{benichou1990estimates,
+  ozenne2017riskregression}.
+
+\subsection{Targeted and debiased machine learning}
+\label{sec:targeted-learning}
+
+... TL + SL = strong... The state learner is particularly well
+suited for targeted and debiased machine learning as it
+immediately provides estimates of the nuisance parameters
+pertaining to the outcome and the censoring models. While it
+was our original motivation for developing the state learning,
+we leave the study of the state learner in the context of
+targeted and debiased machine learning for a future paper.
+
+
 \section{Theoretical results for the state learner}
 \label{sec:theor-results-prop}
 
-In this section we establish theoretical guarantees for the state learner. We
-show that the state learner is consistent if its library contains a consistent
-learner, and we establish a finite sample inequality for the excess risk of the
-state learner compared to the oracle. Finally we show that a certain second
-order structure is preserved when the state learner is used for targeted
-learning.
+In this section we establish theoretical guarantees for the
+state learner. We show that the state learner is consistent if
+its library contains a consistent learner, and we establish a
+finite sample inequality for the excess risk of the state
+learner compared to the oracle.
 
 \subsection{Consistency}
 \label{sec:consistency}
@@ -614,7 +721,6 @@ equation~(\ref{eq:F-def}) using the measure \( P \in \mathcal{P} \).
   If \(P_0\in\mathcal{P}\) then
   \begin{equation*}
     F_0 = \argmin_{F \in \mathcal{H}_{\mathcal{P}}} P_0{[\bar{B}_\tau(F, \blank)]},
-  % F^* = \argmin_{(\Lambda_1,\Lambda_2,\Gamma) \in \mathcal{M}_{\tau}\otimes\mathcal{M}_{\tau}\otimes\mathcal{M}_{\tau}} P_0{[\bar B_\tau(\phi_{(\Lambda_1,\Lambda_2,\Gamma)}, \blank)]},
   \end{equation*}
   \( H \)-almost surely for any \( j\in \{-1,0,1,2\} \) and almost any
   \( t \in [0, \tau]\).
@@ -694,399 +800,7 @@ Corollary~\ref{cor:oracle-prop} has the following asymptotic consequences.
 \end{proof}
 
 
-\subsection{Transience of the second order remainder structure}
-\label{sec:trans-second-order}
 
-In this section we demonstrate a theoretical property of the state
-learner which is useful for targeted learning (c.f., Section
-\ref{sec:targeted-learning}). Specifically we consider an estimator of
-a target parameter which is obtained by substituting the state learner
-estimates of the nuisance parameters $\Lambda_1$, $\Lambda_2$, and
-$\Gamma$. An example is an estimator of the cumulative incidence
-curve, which can be obtained from estimators of $\Lambda_1$ and
-$\Lambda_2$. Another example is provided in Section \ref{sec:targeted-learning}.
-By equations~(\ref{eq:lambdaj}) and~(\ref{eq:gamma}) and the definition of
-\( F \), we have
-\begin{equation}
-  \label{eq:7}
-  \Gamma(t , x) 
-  = \int_0^t  \frac{F(\diff s, -1, x )}{F(s-, 0, x )},
-  \quad \text{and} \quad
-  \Lambda_j(t , x) 
-  = \int_0^t  \frac{F(\diff s, j, x )}{F(s-, 0, x )},
-  \quad j \in \{1,2\},
-\end{equation}
-and thus an estimator based on \( \hat{\Lambda}_{1,n} \),
-\( \hat{\Lambda}_{2,n} \), and \( \hat{\Gamma}_{n} \) can also be obtained from
-an estimator of $F$ using equation~(\ref{eq:7}). A so-called targeted estimator
-has the key feature that it is asymptotically equivalent to a sum of i.i.d.\
-random variables plus a second order remainder term
-\citep{van2011targeted,hines2022demystifying}. For the setting with competing
-risks, the remainder term is dominated by terms of the form
-\begin{equation}
-  \label{eq:dr-term}
-  P{\left[
-      \int_0^{\tau} w_n(s, \blank)
-      \hat{M}_{1,n}(s \mid  \blank)
-      \hat{M}_{2,n}(\diff s \mid  \blank)
-    \right]},
-\end{equation}
-where \( (\hat{M}_{1,n}, \hat{M}_{2,n}) \) is any of the nine combinations of
-\( \hat{M}_{1,n} \in \{[\Gamma -\hat{\Gamma}_n], [\Lambda_1
--\hat{\Lambda}_{1,n}], [\Lambda_2 -\hat{\Lambda}_{2,n}]\} \) and
-\( \hat{M}_{2,n} \in \{[\Gamma -\hat{\Gamma}_n], [\Lambda_1
--\hat{\Lambda}_{1,n}], [\Lambda_2 -\hat{\Lambda}_{2,n}]\} \), and \( w_n \) is
-some data-dependent function with domain \([0,\tau]\times\mathcal X \)
-\citep{van2003unified}. In particular, a targeted estimator will be
-asymptotically linear if the `products' of the estimation errors
-\( \hat{M}_{1,n} \) and \( \hat{M}_{2,n} \) in equation~(\ref{eq:dr-term}) are
-\( \smallO_P{(n^{-1/2})}\). Proposition~\ref{prop:dr-structure} states that if
-equation~(\ref{eq:dr-term}) holds for a targeted estimator based on estimators
-$\hat{\Lambda}_{1,n}$, $\hat{\Lambda}_{2,n}$, and $\hat{\Gamma}_{n}$, then a
-similar product structure holds for a targeted estimator based on
-\( \hat{F}_n \). We state the result for the special case that
-\(\hat{M}_{1,n}= \Gamma-\hat{\Gamma}_n \) and
-\(\hat{M}_{2,n} =\Lambda_1-\hat{\Lambda}_{1,n} \), but similar results hold for
-any combinations of \( \Gamma-\hat{\Gamma}_n\),
-\( \Lambda_1-\hat{\Lambda}_{1,n} \), and \( \Lambda_2-\hat{\Lambda}_{2,n} \).
-\begin{proposition}
-  \label{prop:dr-structure}
-  Assume that \( w(s,x)\leq c \), \( F(s, 0, x) \geq 1/c \) and
-  \( \hat{F}_n(s, 0, x) \geq 1/c \) for some \( c>0 \) for all
-  \( s \in [0, \tau] \) and \( x \in \mathcal{X} \). Then there are real-valued
-  uniformly bounded functions \( w^a_n \), \( w^b_n \), \( w^c_n \), and
-  \( w^d_n \) with domain \( [0,\tau]^2 \times \mathcal{X} \) such that
-  \begin{align*}
-    & P{\left[
-      \int_0^{\tau} w(s, \blank)
-      \left\{
-      \Gamma(s,\blank) -\hat{\Gamma}_n(s,\blank)
-      \right\}
-      [\Lambda_1-\hat{\Lambda}_{1,n}]
-      (\diff s, \blank)
-      \right]}
-    \\
-     & =
-      P{\big[
-      \int_0^{\tau} \int_0^{s} w^a_n(s,u,\blank) [F - \hat{F}_n](u-, 0,
-       \blank)[F - \hat{F}_n](s-, 0, \blank)}
-    \\
-    & \qquad \quad \times F(\diff u, -1, \blank ) F ( \diff s, 1, \blank)
-      \big]
-    \\
-    & \quad +
-      P{\left[
-      \int_0^{\tau} \int_0^{s} w^b_n(s,u,\blank) [F - \hat{F}_n](u-, 0, \blank)
-      F(\diff u, -1, \blank ) [F - \hat{F}_n](\diff s, 1, \blank)
-      \right]}
-    \\
-    & \quad +
-      P{\left[
-      \int_0^{\tau} \int_0^{s} w^c_n(s,u,\blank) [F - \hat{F}_n](\diff u, -1, \blank)
-      [F - \hat{F}_n](s-, 0, \blank)
-      F(\diff s, 1, \blank ) 
-      \right]}
-    \\
-    & \quad +
-      P{\left[
-      \int_0^{\tau} \int_0^{s} w^d_n(s,u,\blank) [F - \hat{F}_n](\diff u, -1, \blank)
-      [F - \hat{F}_n](\diff s, 1, \blank)
-      \right]}.
-  \end{align*}
-\end{proposition}
-\begin{proof}
-  See Appendix~\ref{sec:state-learner-with}.
-\end{proof}
-
-\section{Targeted learning}
-\label{sec:targeted-learning}
-
-In this section, we consider a suitably smooth operator
-\( \theta \colon \mathcal{Q} \rightarrow \Theta \) which represents a
-target parameter of interest. The parameter space $\Theta$ can be a
-subset of \(\R^d\) or a subset of a function space, for example a
-subset of \(\mathcal{M}_{\tau}\) as in Section
-\ref{sec:super-learning}. In subsection~\ref{sec:cause-spec-aver} we
-discuss an example from causal inference where $\theta$ is the average
-treatment effect and \( \Theta = [-1,1] \).  To discuss the role of
-the state learner for targeted learning we briefly review some results
-from semiparametric efficiency theory. Extensive reviews and
-introductions are available elsewhere
-\cite[e.g.,][]{pfanzagl1985contributions,bickel1993efficient,van2003unified,tsiatis2007semiparametric,kennedy2016semiparametric}.
-Under the assumption of conditional independent censoring and
-positivity, $\theta$ is identifiable from \( \mathcal{P} \) which
-means that there exists an operator
-\( \Psi \colon \mathcal{P} \rightarrow \Theta \) such that
-\( \theta(Q) = \Psi(P_{Q, \Gamma}) \) for all
-$\Gamma \in \mathcal{M}_{\tau}$.  By equation~(\ref{eq:parametrizeP})
-this implies that we may write
-\begin{equation*}
-  \theta(Q) = \Psi(P) = \tilde{\Psi}^0(\Lambda_1, \Lambda_2, H),
-\end{equation*}
-for some operator \( \tilde{\Psi}^0 \). The state learner provides a ranking of
-all tuples
-\( (a_1, a_2, b) \in \mathcal{A}_1 \times \mathcal{A}_2 \times \mathcal{B} \).
-We use \( \hat{a}_{1,n} \), \( \hat{a}_{2,n} \), and \( \hat{b}_n \) to denote
-the learners corresponding to the discrete state learner \( \hat{\phi}_n \),
-i.e., the tuple with the highest rank. Letting \( H_n(\data_n) \) denote the
-empirical measure of \( \{X_1, \dots, X_n\} \), we obtain a plug-in estimator of
-$\theta$:
-\begin{equation}
-  \label{eq:2}
-  \hat{\Psi}^0(\data_n) =
-  \tilde{\Psi}^0(\hat{a}_{1,n}(\data_n), \hat{a}_{2,n}(\data_n), H_n(\data_n)). 
-\end{equation}
-
-The asymptotic distribution of \( \hat{\Psi}^0 \) is
-difficult to analyse due to the cross-validated model selection step
-involved in the estimation of the nuisance parameters $\Lambda_1$ and
-$\Lambda_2$.
-% In addition, the estimator will typically have an
-% asymptotic bias that vanishes at a too slow 
-% rate.
-Using tools from semi-parametric efficiency theory, it is possible to
-construct a so-called targeted or debiased estimator with an
-asymptotic distribution which we know how to estimate
-\citep{bickel1993efficient,van2011targeted,chernozhukov2018double}. A
-targeted estimator is based on the efficient influence function for
-the parameter $\tilde{\Psi}^0$ and relies on estimators of the
-nuisance parameters $\Gamma$, \( \Lambda_1 \) and $\Lambda_2$. The
-efficient influence function is a \( P \)-zero mean and square
-integrable function which we denote by
-\( \psi(\blank ; \Lambda_1, \Lambda_2, \Gamma) \). The name is
-justified because any regular asymptotically linear estimator that has
-\( \psi \) as its influence function is asymptotically efficient,
-meaning that it has smallest asymptotic variance among all regular
-asymptotically linear estimators \citep{bickel1993efficient}.
-
-An example of a targeted estimator is the one-step estimator, defined as
-\begin{equation}
-    \label{eq:one-step-def}
-    \begin{split}
-      \hat{\Psi}_{\text{OS}}(\data_n)
-      = &
-          \tilde{\Psi}^0(\hat{a}_{1,n}(\data_n), \hat{a}_{2,n}(\data_n),
-          H_n(\data_n))
-      \\
-        & + \empmeas{[\psi(\blank; \hat{a}_{1,n}(\data_n), \hat{a}_{2,n}(\data_n),
-          \hat{b}_n(\data_n) )]},
-    \end{split}
-\end{equation}
-where \( \empmeas \) is the empirical measure of a data set
-\(\{O_i\}_{i=1}^n\).
-Under suitable regularity conditions
-we have the
-following asymptotic expansion of the one-step estimator
-\citep{pfanzagl1985contributions,van2003unified,fisher2021visually,kennedy2022semiparametric},
-\begin{equation*}
-  \hat{\Psi}_{\text{OS}}(\data_n)- \Psi(P)
-  =  \empmeas{[\psi(\blank ; \Lambda_1, \Lambda_2, \Gamma)]}
-  +\mathrm{Rem}{(\hat{\Lambda}_{1,n},\hat{\Lambda}_{2,n},  \hat{\Gamma}_n, P)} + \smallO_{P}(n^{-1/2}),
-\end{equation*}
-where the remainder term has the form
-\begin{equation}
-  \label{eq:4}
-  \mathrm{Rem}{(\hat{\Lambda}_{1,n},\hat{\Lambda}_{2,n},  \hat{\Gamma}_n, P)}
-  = \bigO_P{
-    \left\{
-      \|\Lambda_1-\hat{\Lambda}_{1,n}\|^2
-      +
-      \|\Lambda_2-\hat{\Lambda}_{2,n}\|^2
-      +
-      \|\Gamma-\hat{\Gamma}_{n}\|^2
-    \right\}
-  },
-\end{equation}
-for some suitable norm \( \|\blank \| \), for instance the
-\( \mathcal{L}_{P}^2 \)-norm. When equation~(\ref{eq:4}) holds and the
-nuisance parameters $\Lambda_1$, $\Lambda_2$, and $\Gamma$ are
-consistently estimated at rate \( \smallO_P{(n^{-1/4})} \), then
-\begin{equation}
-  \label{eq:3}
-  \sqrt{n}(\hat{\Psi}_{\text{OS}}(\data_n)- \Psi(P)) \weakly \mathcal{N}(0,
-  P{[\psi(\blank; \Lambda_1, \Lambda_2, \Gamma)^2]}),
-\end{equation}
-where we use \( \weakly \) to denote weak convergence \citep{van2000asymptotic}.
-In particular, equation~(\ref{eq:3}) and Slutsky's lemma imply that we can
-obtain asymptotically valid \((1-\alpha)\cdot100\%\) confidence intervals by
-calculating
-\begin{equation*}
-  \left[
-    \hat{\Psi}_{\text{OS}}(\data_n) - q_{\alpha/2} \hat{\sigma}(\data_n) ,
-    \;
-    \hat{\Psi}_{\text{OS}}(\data_n) + q_{\alpha/2} \hat{\sigma}(\data_n)
-  \right],
-\end{equation*}
-where \( q_{\alpha} \) is the \( (1-\alpha) \)-quantile of the standard normal
-distribution and
-\begin{equation*}
-  \hat{\sigma}(\data_n)^2 = \empmeas{ \left[ \psi(\blank;
-      \hat{a}_{1,n}(\data_n), \hat{a}_{2,n}(\data_n), \hat{b}_n(\data_n))^2
-    \right]}.
-\end{equation*}
-
-
-
-\subsection{Average treatment effect on the absolute risk of an event}
-\label{sec:cause-spec-aver}
-
-In the following we detail how the state learner can be used to
-construct a targeted estimator of the cause-specific average treatment
-effect \citep{rytgaard2022targeted}. We assume that the covariate
-vector \( X \in \R^p \) contains a binary treatment indicator \( A \)
-and a vector of potential confounders,
-\( W \in \mathcal{W}\subset \R^{p-1} \).  We use $\mu$ to denote the
-marginal distribution of \( W \) and $\pi$ to denote the conditional
-probability of treatment,
-\begin{equation*}
-  \pi(w) = P(A=1 \mid W=w).
-\end{equation*}
-We assume throughout that $\pi$ is uniformly bounded away from \( 0 \)
-and \( 1 \) on \( \mathcal{W} \) and that both \( A \) and \( W \) are
-fully observed for all individuals. We use a super learner to
-estimate $\pi$ \citep{Polley_Ledell_Kennedy_Laan_2023_Superlearn}, and
-we denote this estimator by $\hat{\pi}_n$. We use the empirical
-measure of \( \{W_1, \dots, W_n\} \) to estimate $\mu$, and denote
-this estimator by $\hat{\mu}_n$. As parameter of interest we consider
-the standardised difference in the absolute risk of an event with
-cause 1 at time $\tau$:
-\begin{align*}
-  & \theta_{{\tau}}(Q)
-  \\
-  & = \int_{\mathcal{W}} 
-    \left\{
-    \int_0^{\tau}
-    S(s- \mid w, 1)  \Lambda_1(\diff s \mid w, 1)
-    -
-    \int_0^{\tau}
-    S(s- \mid w, 0)  \Lambda_1(\diff s \mid w, 0)
-    \right\}
-    \mu(\diff w).
-\end{align*}
-Under the usual assumptions for causal inference (consistency,
-positivity, no unmeasured confounding) \( \theta_{{\tau}} \) can be
-given the causal interpretation
-\begin{equation*}
-  \theta_{{\tau}}(Q) =
-  P{(T^{1} \leq \tau, D^{1}=1)}-
-  P{(T^{0} \leq \tau, D^{0}=1)},
-\end{equation*}
-where \( (T^a, D^a) \), \( a \in \{0,1\} \), denote potential outcomes
-\citep{hernanRobinsWhatIf}. In this case, the interpretation of $\theta_{\tau}$
-is the difference in the average risk of cause \( 1 \) occurring before time
-\( \tau \) in the population if everyone had been given treatment (\( A=1 \))
-compared to if no one had been given treatment \( (A=0) \).
-
-Using equation~(\ref{eq:surv-def}) we may write
-\( \theta_{{\tau}}(Q) = \tilde{\Psi}_{\tau}^0(\Lambda_1, \Lambda_2, \mu) \), where
-\begin{equation}
-  \label{eq:1}    
-  \begin{split}
-    & \tilde{\Psi}_{\tau}^0(\Lambda_1, \Lambda_2, \mu)
-    \\
-    & =
-      \int_{\mathcal{W}} 
-      \int_0^{\tau}
-      \exp{\{{-\Lambda_1(s- \mid w, 1)-\Lambda_2(s- \mid w, 1)}\}}  \Lambda_1(\diff s \mid
-      w, 1)
-      \mu(\diff w)
-    \\
-    &  \quad
-      -\int_{\mathcal{W}} 
-      \int_0^{\tau}
-      \exp{\{{-\Lambda_1(s- \mid w, 0)-\Lambda_2(s- \mid w, 0)}\}}  \Lambda_1(\diff s \mid w, 0)
-      \mu(\diff w).
-  \end{split}
-\end{equation}
-The efficient influence function for the parameter $\tilde{\Psi}_{\tau}$ depends
-on the set \( (\Lambda_1, \Lambda_2, \Gamma, \pi) \) of nuisance parameters.
-We define
-\begin{align*}
-  \omega_a(A,W; \pi)
-  &=  \frac{% (-1)^{a+1}
-    \1{\{A=a\}}}{\pi(W)^{a}(1-\pi(W))^{1-a}},
-  \\
-  g(t, A, W; \Lambda_1, \Lambda_2)
-  & = \int_0^{t}
-    \exp{\{ {-\Lambda_1(s- \mid W, A)-\Lambda_2(s- \mid W, A)} \}}  \Lambda_1(\diff s \mid
-    W, A),
-  \\  
-  M_j(\diff t \mid A, W;  \Lambda_j  )
-  & = N_j(\diff t) -
-    \1{\{\tilde{T} \geq t\}} \Lambda_j(\diff t \mid W, A),
-    \quad j \in \{1,2\},
-    \intertext{and}
-    M(\diff t \mid A, W;  \Lambda_1, \Lambda_2  )
-  & = M_1(\diff t \mid A, W;  \Lambda_1  ) +
-    M_2(\diff t \mid A, W;  \Lambda_2  ).
-\end{align*}
-The efficient influence function can now be written as
-\citep{van2003unified,jewell2007non,rytgaard2022targeted},
-\begin{equation*}
-  \psi_{\tau}(O; \Lambda_1, \Lambda_2, \Gamma, \pi)
-  = \psi_{\tau}^1(O; \Lambda_1, \Lambda_2, \Gamma, \pi)
-  - \psi_{\tau}^0(O; \Lambda_1, \Lambda_2, \Gamma, \pi)
-  -\tilde{\Psi}_{\tau}^0(\Lambda_1, \Lambda_2, \mu),
-\end{equation*}
-where
-\begin{equation}
-  \label{eq:5}
-  \begin{split}
-    & \psi_{\tau}^a(O; \Lambda_1, \Lambda_2, \Gamma, \pi)
-    \\
-    & =
-      \omega_a(A,W; \pi)
-      \int_0^{\tau} \exp{\{{\Gamma(t- \mid A, W)}\}}   
-      M_1(\diff t \mid A, W; \Lambda_1)
-    \\
-    & \quad
-      -
-      \omega_a(A,W; \pi)
-      g(\tau, A, W; \Lambda_1, \Lambda_2)
-    \\
-    & \quad \quad \times
-      \int_0^{\tau}
-      \exp{\{{[\Gamma+\Lambda_1 + \Lambda_2](t- \mid A, W)}\}}
-      M(\diff t \mid A, W; \Lambda_1, \Lambda_2)
-    \\
-    & \quad
-      +
-      \omega_a(A,W; \pi)      
-      \int_0^{\tau}
-      g(t, A, W; \Lambda_1, \Lambda_2)
-    \\
-    & \quad \quad \times
-      \exp{\{{[\Gamma+\Lambda_1 + \Lambda_2](t- \mid A, W)}\}}
-      M(\diff t \mid A, W; \Lambda_1, \Lambda_2)
-    \\
-    & \quad + g(\tau, a, W; \Lambda_1, \Lambda_2).
-  \end{split}
-\end{equation}
-Equations~(\ref{eq:1}) and~(\ref{eq:5}) allow us to construct a one-step
-estimator by using the definition given in equation~(\ref{eq:one-step-def}),
-which gives the estimator
-\begin{equation}
-  \label{eq:one-step-comp-ate}
-  \begin{split}
-    \hat{\Psi}_{\tau,\text{OS}}(\data_n)
-    = &
-        \tilde{\Psi}_{\tau}^0(\hat{a}_1(\data_n), \hat{a}_2(\data_n),
-        \hat{\mu}_n(\data_n))
-    \\
-      &
-        +
-        \empmeas{[\psi_{\tau}(\blank; \hat{a}_{1,n}(\data_n), \hat{a}_{2,n}(\data_n),
-        \hat{b}_n(\data_n), \hat{\pi}_n(\data_n))]}
-    \\
-    = &
-        \empmeas{[\psi_{\tau}^1(\blank; \hat{a}_{1,n}(\data_n), \hat{a}_{2,n}(\data_n),
-        \hat{b}_n(\data_n), \hat{\pi}_n(\data_n))]}
-    \\
-      &
-        - \empmeas{[\psi_{\tau}^0(\blank; \hat{a}_{1,n}(\data_n), \hat{a}_{2,n}(\data_n),
-        \hat{b}_n(\data_n), \hat{\pi}_n(\data_n))]}.
-  \end{split}
-\end{equation}
 
 \section{Numerical experiments}
 \label{sec:numer-exper}
@@ -1244,10 +958,7 @@ learner in the presence of competing risks. We have introduced the
 data in Section~\ref{sec:numer-exper}. The data consists of 1,042
 patients who are followed from start of followup until tumor
 recurrence, death without tumor recurrence or end of followup
-(censored) whatever came first. For the sole purpose of illustration,
-we estimate the average treatment effect of hormone therapy on death
-and tumor recurrence. To do this we adapt the estimation strategy of
-Section~\ref{sec:targeted-learning} as follows. We use the state
+(censored) whatever came first. ... We use the state
 learner to rank libraries of learners for the cause-specific
 cumulative hazard functions of tumor recurrence, death without tumor
 recurrence, and censoring.  The libraries of learners each include
@@ -1258,9 +969,7 @@ survival forest. We use the same set of learners to learn the
 cumulative hazard function of tumor recurrence \( \Lambda_1 \), the
 cumulative hazard function of death without tumor recurrence
 \( \Lambda_2 \), and the cumulative hazard function of the conditional
-censoring distribution $\Gamma$.  We then use the highest ranked
-combination of learners and apply
-formula~\eqref{eq:one-step-comp-ate}.
+censoring distribution $\Gamma$.  
 
 This gives a library consisting of \( 5^3 = 125 \) learners for the
 conditional state occupation probability function \( F \) defined in
@@ -1284,34 +993,6 @@ random forest is used to model the censoring distribution.
     learner', respectively.}
   \label{fig:zelefski-real}
 \end{figure}
-
-
-We use the learners of the three cumulative hazard functions selected
-by the state learner and the estimator defined in
-Section~\ref{sec:cause-spec-aver},
-equation~(\ref{eq:one-step-comp-ate}), to estimate the average
-treatment effect of hormone therapy on risk of tumor recurrence and
-death. The propensity score is estimated with a lasso model that
-includes all levels of interaction.
-The results are shown in Figure~\ref{fig:zelefski-real-target} for 6
-month intervals after baseline with pointwise 95\% confidence
-intervals. We see that hormone therapy decreases the risk of tumor
-recurrence and increases the risk of death without tumor recurrence,
-but that none of the estimated effects are statistically significant.
-
-\begin{figure}
-  \centering%
-  \includegraphics[width=1\linewidth]{real-data-target.pdf}
-  \caption[]{Estimates of the average treatment effect of hormone therapy on the
-    risk of tumor recurrence and death obtained from the prostate cancer study
-    analysed by \cite{kattan2000pretreatment}. The estimates are based on the
-    estimator defined in equation~(\ref{eq:one-step-comp-ate}) with pointwise
-    95\% confidence intervals calculated as described in
-    Section~\ref{sec:targeted-learning}. The estimates of the nuisance
-    parameters are provided by the state learner.}
-  \label{fig:zelefski-real-target}
-\end{figure}
-
 
 
 \section{Discussion}
@@ -1393,13 +1074,12 @@ The authors declare that they have no conflict of interest.
 \section{Proofs}
 \label{sec:proofs}
 
-This section contains proofs of the results stated in the paper.
-Section~\ref{sec:consistency-proof} contains a proof of the consistency result
-from Section~\ref{sec:consistency}; Section~\ref{sec:oracle-inequalities}
-contains proofs of the oracle inequalities from
-Section~\ref{sec:finite-sample-oracle}; and
-Section~\ref{sec:state-learner-with} demonstrates transience of the second
-order remainder structure stated in Section~\ref{sec:trans-second-order}.
+This section contains proofs of the results stated in the
+paper. Section~\ref{sec:consistency-proof} contains a proof of
+the consistency result from Section~\ref{sec:consistency}, and
+Section~\ref{sec:oracle-inequalities} contains proofs of the
+oracle inequalities from
+Section~\ref{sec:finite-sample-oracle}.
 
 \subsection{Consistency}
 \label{sec:consistency-proof}
@@ -1587,179 +1267,6 @@ and then the final result follows from Lemma~\ref{lemma:norm}.
   \end{equation*}
   for all \( n \in \N \). The results then follows from
   Corollary~\ref{cor:oracle-prop}.
-\end{proof}
-
-
-\subsection{Transience of the second order remainder structure}
-\label{sec:state-learner-with}
-
-Recall that we let $\Lambda_1$ denote the conditional cumulative hazard function
-for one of the event times of interest and $\Gamma$ the conditional cumulative
-hazard function for censoring, c.f., Section~\ref{sec:framework}.
-
-\begin{proof}[Proof of Proposition~\ref{prop:dr-structure}]
-  For notational convenience we suppress \( X \) in the following. The final
-  result can be obtained by adding the argument \( X \) to all functions and
-  averaging. We use the relations from equation~\eqref{eq:7} to write
-  \begingroup %
-  \allowdisplaybreaks
-    \begin{align*}
-      & \int_0^{\tau} w(s) 
-        \left\{
-        \Gamma(s) - \hat{\Gamma}_n(s)
-        \right\}
-        [\Lambda_1 - \hat{\Lambda}_{1,n}](\diff s)
-      \\
-      & =
-        \int_0^{\tau} w(s) 
-        \left\{
-        \int_0^s \frac{F(\diff u, -1)}{F(u-, 0)} -
-        \int_0^s \frac{\hat{F}_n(\diff u, -1)}{\hat{F}_n(u-, 0)}  -
-        \right\}
-        \left[
-        \frac{F(\diff s, 1)}{F(s-, 0)}
-        - \frac{\hat{F}_n(\diff s, 1)}{\hat{F}_n(s-, 0)}
-        \right]
-      \\
-      & =
-        \int_0^{\tau} w(s) 
-        \Bigg\{
-        \int_0^s 
-        \left(
-        \frac{1}{F(u-, 0)} -  \frac{1}{\hat{F}_n(u-, 0)}
-        \right) F(\diff u, -1)
-      \\
-      & \qquad\qquad \qquad
-        +
-        \int_0^s \frac{1}{\hat{F}_n(u-, 0)} 
-        \left[
-        F(\diff u, -1) - \hat{F}_n(\diff u, -1)
-        \right]
-        \Bigg\}
-      \\
-      & \qquad\qquad \times
-        \left[
-        \left(
-        \frac{1}{F(s-, 0)} -
-        \frac{1}{\hat{F}_n(s-, 0)}
-        \right)F(\diff s, 1)
-        + \frac{1}{\hat{F}_n(s-, 0)}
-        \left(
-        F(\diff s, 1) -
-        \hat{F}_n(\diff s, 1)
-        \right)
-        \right]
-      \\
-      &
-        = \int_0^{\tau} 
-        \int_0^s
-        w(s) 
-        \left(
-        \frac{1}{F(u-, 0)} -  \frac{1}{\hat{F}_n(u-, 0)}
-        \right) 
-        \left(
-        \frac{1}{F(s-, 0)} -
-        \frac{1}{\hat{F}_n(s-, 0)}
-        \right)F(\diff u, -1)F(\diff s, 1)
-      \\
-      & \quad +
-        \int_0^{\tau}
-        \int_0^s
-        w(s) 
-        \left(
-        \frac{1}{F(u-, 0)} -  \frac{1}{\hat{F}_n(u-, 0)}
-        \right) \frac{F(\diff u, -1) }{\hat{F}_n(u-,0)}
-        \left(
-        F(\diff s, 1) -
-        \hat{F}_n(\diff s, 1)
-        \right)
-      \\
-      & \quad +
-        \int_0^{\tau} 
-        \int_0^s      
-        \frac{w(s) }{\hat{F}_n(u-, 0)} 
-        \left[
-        F(\diff u, -1) - \hat{F}_n(\diff u, -1)
-        \right]
-        \left(
-        \frac{1}{F(s-, 0)} -
-        \frac{1}{\hat{F}_n(s-, 0)}
-        \right)F(\diff s, 1)
-      \\
-      & \quad +
-        \int_0^{\tau} 
-        \int_0^s      
-        \frac{w(s) }{\hat{F}_n(u-, 0)} 
-        \left[
-        F(\diff u, -1) - \hat{F}_n(\diff u, -1)
-        \right]
-        \frac{1}{\hat{F}_n(s-, 0)}
-        \left(
-        F(\diff s, 1) -
-        \hat{F}_n(\diff s, 1)
-        \right).
-    \end{align*}
-    \endgroup %
-    Consider the first term on the right hand side. By the mean value theorem,
-    \begin{equation*}
-      \frac{1}{F(t-, 0)}
-      - \frac{1}{\hat{F}_n(t-, 0)}
-      = \frac{-1}{\tilde{r}_n(t)^2}
-      \left[
-        F(t-, 0)
-        - \hat{F}_n(t-, 0)
-      \right],
-    \end{equation*}
-    where \( \tilde{r}_n(t) \) is some value between \( \hat{F}(t-, 0) \) and
-    \( \hat{F}_n(t-, 0) \). Letting \( w_n^*(t) = -\tilde{r}_n(t)^{-2} \), we
-    may write
-  \begin{align*}
-    & \int_0^{\tau} 
-      \int_0^s
-      w(s) 
-      \left(
-      \frac{1}{F(u-, 0)} -  \frac{1}{\hat{F}_n(u-, 0)}
-      \right)      
-      \left(
-      \frac{1}{F(s-, 0)} -
-      \frac{1}{\hat{F}_n(s-, 0)}
-      \right)F(\diff u, -1)F(\diff s, 1)
-    \\
-    & =
-      \int_0^{\tau} 
-      \int_0^s
-      w(s)
-      w_n^*(u) 
-      \left(
-      F(u-, 0) - \hat{F}_n(u-, 0)
-      \right)
-    \\
-    & \qquad \qquad \quad
-      \times
-      w_n^*(s) 
-      \left(
-      F(s-, 0) - \hat{F}_n(s-, 0)
-      \right)       
-      F(\diff u, -1)F(\diff s, 1)
-    \\
-    & =
-      \int_0^{\tau} 
-      \int_0^s
-      w_n^a(s,u)
-      \left(
-      F(u-, 0) - \hat{F}_n(u-, 0)
-      \right)
-      \left(
-      F(s-, 0) - \hat{F}_n(s-, 0)
-      \right)       
-      F(\diff u, -1)F(\diff s, 1),
-  \end{align*}
-  where we have defined \( w_n^a(s,u) = w(s)w^*_n(s)w^*_n(u) \). By the
-  assumption that \( F(\blank,0) \) and \( F_n(\blank,0) \) are uniformly
-  bounded away from zero on \( [0,\tau] \), it follows that \( w_n^* \) is
-  uniformly bounded, and hence \( w_n^a(s,u) \) is also uniformly bounded,
-  because \( w \) was assumed uniformly bounded. The same approach can be
-  applied to the three remaining terms which gives the result.
 \end{proof}
 
 
