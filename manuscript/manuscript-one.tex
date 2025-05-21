@@ -86,104 +86,6 @@
 \maketitle
 
 
-
-
-
-% %%%%%%%%%%%%%%%%%%%%%%% file template.tex %%%%%%%%%%%%%%%%%%%%%%%%%
-% %
-% % This is a general template file for the LaTeX package SVJour3
-% % for Springer journals.          Springer Heidelberg 2010/09/16
-% %
-% % Copy it to a new file with a new name and use it as the basis
-% % for your article. Delete % signs as needed.
-% %
-% % This template includes a few options for different layouts and
-% % content for various journals. Please consult a previous issue of
-% % your journal as needed.
-% %
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %
-% % First comes an example EPS file -- just ignore it and
-% % proceed on the \documentclass line
-% % your LaTeX will extract the file if required
-% \begin{filecontents*}{example.eps}
-% %!PS-Adobe-3.0 EPSF-3.0
-% %%BoundingBox: 19 19 221 221
-% %%CreationDate: Mon Sep 29 1997
-% %%Creator: programmed by hand (JK)
-% %%EndComments
-% gsave
-% newpath
-%   20 20 moveto
-%   20 220 lineto
-%   220 220 lineto
-%   220 20 lineto
-% closepath
-% 2 setlinewidth
-% gsave
-%   .4 setgray fill
-% grestore
-% stroke
-% grestore
-% \end{filecontents*}
-% %
-% \RequirePackage{fix-cm}
-% %
-% %\documentclass{svjour3}                     % onecolumn (standard format)
-% %\documentclass[smallcondensed]{svjour3}     % onecolumn (ditto)
-% \documentclass[smallextended]{svjour3}       % onecolumn (second format)
-% %\documentclass[twocolumn]{svjour3}          % twocolumn
-% %
-% \smartqed  % flush right qed marks, e.g. at end of proof
-% %
-% \usepackage{graphicx}
-% %
-% % \usepackage{mathptmx}      % use Times fonts if available on your TeX system
-% %
-% % insert here the call for the packages your document requires
-% \usepackage{dsfont, amssymb,soul,xcolor, enumitem, amsmath,verbatim}
-% \usepackage[authoryear]{natbib}
-% \definecolor{linkcolor}{rgb}{0, 0, 0.54}
-% \usepackage[colorlinks,allcolors=linkcolor]{hyperref}
-% %
-% % please place your own definitions here and don't use \def but
-% \DeclareMathOperator{\E}{\mathbb{E}} % expectation
-% \newcommand{\Z}{\mathbb{Z}}
-% \newcommand{\R}{\mathbb{R}}
-% \newcommand{\N}{\mathbb{N}}
-% \newcommand{\C}{\mathbb{C}}
-% \renewcommand{\S}{\mathbb{S}}
-% \newcommand{\blank}{\makebox[1ex]{\textbf{$\cdot$}}}
-% \newcommand\independent{\protect\mathpalette{\protect\independenT}{\perp}}
-% \def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern2mu{#1#2}}}
-% \renewcommand{\phi}{\varphi}
-% \renewcommand{\epsilon}{\varepsilon}
-% \newcommand*\diff{\mathop{}\!\mathrm{d}}
-% \newcommand{\weakly}{\rightsquigarrow}
-% \newcommand\smallO{\textit{o}}
-% \newcommand\bigO{\textit{O}}
-% \newcommand{\midd}{\; \middle|\;}
-% \newcommand{\1}{\mathds{1}}
-% \usepackage{ifthen} %% Empirical process with default argument
-% \newcommand{\G}[2][n]{
-% {\ensuremath{\mathbb{G}_{#1}}{\left[#2\right]}}
-% }
-% \DeclareMathOperator*{\argmin}{\arg\!\min}
-% \DeclareMathOperator*{\argmax}{\arg\!\max}
-% \newcommand{\empmeas}{\ensuremath{\mathbb{P}_n}} % empirical measure
-% \newcommand{\data}{\ensuremath{\mathcal{D}}}
-
-% \begin{document}
-
-% \title{The state learner -- a super learner for right-censored
-%   data}
-
-
-% \author{Anders Munch \& Thomas A. Gerds}
-
-
-\maketitle
-
 \begin{abstract}
   In survival analysis, prediction models are needed as
   stand-alone tools and in applications of causal inference to
@@ -203,12 +105,10 @@
   inequality for the state learner and investigate its
   performance through numerical experiments. We illustrate the
   application of the state learner with prostate cancer data.
-
-  % \keywords{Competing risks, cross-validation, loss based estimation,
-  %   right-censored data, super learner}
-% \PACS{PACS code1 \and PACS code2 \and more}
-% \subclass{MSC code1 \and MSC code2 \and more}
 \end{abstract}
+
+\textit{\textbf{Keywords:} Competing risks, cross-validation,
+  loss based estimation, right-censored data, super learner}
 
 \section{Introduction}
 \label{sec:introduction}
@@ -433,7 +333,7 @@ Under these assumptions, the conditional cumulative hazard functions
 Thus, we can consider $\Lambda_j$ and \(\Gamma\) as operators which map from
 \( \mathcal{P} \) to \(\mathcal M_{\tau}\).
 
-\section{The concept of super learning}
+\section{Super learning}
 \label{sec:super-learning}
 
 In survival analysis, a super learner can be used to estimate
@@ -553,9 +453,8 @@ process \(\eta\). We construct a super learner for \( F \).
 The target of this super learner is the function-valued
 parameter $\theta(P) = F$ which is identified through
 equation~(\ref{eq:F-def}). Under conditional independent
-censoring each quadruple
-$(\Lambda_{1}, \Lambda_{2}, \Gamma, H)$ characterises a
-distribution \(P\in\mathcal P\), c.f.\
+censoring each tuple $(\Lambda_{1}, \Lambda_{2}, \Gamma, H)$
+characterises a distribution \(P\in\mathcal P\), c.f.\
 equation~\eqref{eq:parametrizeP}, which in turn determines
 \( (F, H) \). Hence, a learner for \( F \) can be constructed
 from learners for \( \Lambda_1 \), \( \Lambda_2 \), and
@@ -565,8 +464,7 @@ $\Gamma$ as follows:
     F(t, 0, x)
     &
       = P(\tilde{T} > t \mid X= x)
-      \\
-      & =
+      =
       \exp{{\{-\Lambda_{1}(t \mid x)-\Lambda_{2}(t \mid x) - \Gamma(t \mid x)\}
       }},
     \\
@@ -586,13 +484,14 @@ $\Gamma$ as follows:
       = \int_0^t F(s-, 0, x)  \Gamma(\diff s \mid x).
   \end{split}
 \end{equation}
-The state learner requires three libraries of learners (c.f., Section \ref{sec:super-learning}),
-\(\mathcal{A}_1\), \( \mathcal{A}_2 \), and \( \mathcal{B} \), where
-\(\mathcal{A}_1\) and \( \mathcal{A}_2\) contain learners for the
-conditional cause-specific cumulative hazard functions \(\Lambda_1\)
-and \( \Lambda_2\), respectively, and \(\mathcal{B}\) contains
-learners for the conditional cumulative hazard function of the
-censoring distribution. % We further
+The state learner requires three libraries of learners:
+\(\mathcal{A}_1\), \( \mathcal{A}_2 \), and \( \mathcal{B} \),
+where \(\mathcal{A}_1\) and \( \mathcal{A}_2\) contain
+learners for the conditional cause-specific cumulative hazard
+functions \(\Lambda_1\) and \( \Lambda_2\), respectively, and
+\(\mathcal{B}\) contains learners for the conditional
+cumulative hazard function of the censoring
+distribution. % We further
 % define \(\mathcal{H}\) as the set of all probability distributions on
 % \( \mathcal{X} \) and
 % \begin{equation*}
@@ -635,10 +534,11 @@ Brier score \citep{brier1950verification} at time \( t \in [0, \tau] \),
   \right)^2.
 \end{equation*}
 Based on a split of a data set \(\data_n\) into $K$ disjoint
-approximately equally sized subsets (see Section \ref{sec:super-learning}), each learner
+approximately equally sized subsets (c.f., Section
+\ref{sec:super-learning}), each learner
 \( \phi_{a_1, a_2, b} \) in the library
-\( \mathcal{F}(\mathcal{A}_1, \mathcal{A}_2, \mathcal{B}) \) is
-evaluated using the cross-validated loss,
+\( \mathcal{F}(\mathcal{A}_1, \mathcal{A}_2, \mathcal{B}) \)
+is evaluated using the cross-validated loss,
 \begin{equation*}
   \hat{R}_{n}(\phi_{a_1,a_2,b} ; \bar{B}_{\tau}) =
   \frac{1}{K}\sum_{k=1}^{K}
@@ -662,17 +562,65 @@ and the discrete state learner is given by
 \section{Use cases for the state learner}
 \label{sec:use-cases-state}
 
-The parameter \( F \) is not of much interest...
+The state learner estimates the parameter \( F \) which is a
+feature of the observed right-censored data distribution
+\( P \). In particular, \( F \) depends on the censoring
+distribution and is typically not of direct interest in
+itself. In the following, we describe how an estimate of
+\( F \), as provided by the state learner, can be used to
+estimate more relevant parameters of interest, such as
+survival probabilities.
 
 \subsection{Survival and risk predictions}
 \label{sec:surv-risk-pred}
 
-...
+We here provide explicit formulas for obtaining event-free
+survival probabilities and risk predictions given the
+state-occupation function \( F \) defined in
+equation~\eqref{eq:F-def}. These formula holds under the
+assumption of conditional independent censoring and
+positivity, as introduced in Section~\ref{sec:framework}.
 
-Risk predictions can then be obtained by combining
-\( \Lambda_1 \) and $\Lambda_2$ from the highest ranked tuple
-using a well-known formula \citep{benichou1990estimates,
-  ozenne2017riskregression}.
+By equations~(\ref{eq:lambdaj}) and~(\ref{eq:gamma}) and the
+definition of \( F \), we have
+\begin{equation}
+  \label{eq:7}
+  % \Gamma(t , x) = \int_0^t \frac{F(\diff s, -1, x )}{F(s-,
+  % 0, x )}, \quad \text{and} \quad
+  \Lambda_j(t , x) 
+  = \int_0^t  \frac{F(\diff s, j, x )}{F(s-, 0, x )},
+  \quad j \in \{1,2\}.
+\end{equation}
+Equation~\eqref{eq:surv-def} provides a formula for obtaining
+the event-free survival probabilities from the cause-specific
+cumulative hazard functions. Similarly, cause-specific risk
+predictions can be obtained from \( \Lambda_1 \) and
+$\Lambda_2$ using the formula
+\citep[e.g.,][]{benichou1990estimates,
+  ozenne2017riskregression},
+\begin{equation}
+  \label{eq:cs-risk-def}
+  Q(T \leq t, D = j \mid X=x) =
+  \int_0^t \exp\left\{-\Lambda_{1}(u \mid x)-\Lambda_{2}(u
+    \mid x)\right\}  \Lambda_j(\diff u \mid x),
+  \quad j \in \{1,2\}.
+\end{equation}
+Hence, given the state learner's estimate of \( F \) we can
+use equation~\eqref{eq:7} to obtain estimates of the
+cause-specific cumulative hazard functions $\Lambda_j$, which
+can in turn be used to obtain estimates of the event-free
+survival probabilites and cause-specific risks through
+equations~\eqref{eq:surv-def} and~\eqref{eq:cs-risk-def}.
+
+In Section~\ref{sec:super-learner-simple} we suggested to
+implement the state learner by building a library using
+learners of the cause-specific cumulative hazard functions,
+$\Lambda_j$, and the cumulative hazard function for censoring,
+$\Gamma$. With this implementation we can directly input the
+highest ranked tuple of cause-specific hazard functions
+$(\Lambda_1, \Lambda_2)$ provided by the state learner as
+input to equations~\eqref{eq:surv-def}
+and~\eqref{eq:cs-risk-def}.
 
 \subsection{Targeted and debiased machine learning}
 \label{sec:targeted-learning}
@@ -1061,13 +1009,7 @@ discretisation.
 The authors declare that they have no conflict of interest.
 
 
-% BibTeX users please use one of
-% \bibliographystyle{spbasic}      % basic style, author-year citations
-%\bibliographystyle{spmpsci}      % mathematics and physical sciences
-%\bibliographystyle{spphys}       % APS-like style for physics
-
-\bibliographystyle{abbrvnat}
-\bibliography{bib.bib}   % name your BibTeX data base
+\bibliography{bib.bib}
 
 \appendix
 
