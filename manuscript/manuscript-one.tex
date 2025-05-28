@@ -11,6 +11,13 @@
 \definecolor{linkcolor}{rgb}{0, 0, 0.54}
 \usepackage[colorlinks,allcolors=linkcolor]{hyperref}
 
+\usepackage[author=]{fixme}
+\fxusetheme{color}
+\definecolor{fxtarget}{rgb}{.5,.5,.5}
+\definecolor{fxnote}{rgb}{.5,.5,.5}
+
+\fxsetup{status=draft}
+
 % Ref and bibliography style 
 \bibliographystyle{abbrvnat}
 
@@ -113,77 +120,53 @@
 \section{Introduction}
 \label{sec:introduction}
 
-[More motivation]
+Accurate risk prediction from time-to-event data is a central
+topic in many areas of medical research and public health.
+Super learning \citep{van2007super}, also known as ensemble
+learning or stacked regression
+\citep{wolpert1992stacked,breiman1996stacked}, provides a
+powerful approach by combining multiple candidate prediction
+models. In the context of survival analysis, a super learner
+can for instance combine Cox regression models and random
+survival forests \citep[][Section 8.4]{gerds2021medical}.
 
+In this paper we propose the state learner, a new super
+learner designed to handle the specific challenges of ensemble
+learning with right-censored data. The state learner estimates
+the performance of a library of candidate models for both the
+event-time and censoring distributions simultaneously. This
+joint estimation framework avoids the need for pre-specifying
+a censoring model, which is a limitation of many existing
+methods. Our approach also allows for full flexibility in the
+choice of models in the library, contrasting with earlier
+proposals that restrict the library to specific model classes
+\citep{polley2011-sl-cens,golmakani2020super}. Furthermore,
+unlike iterative approaches such as those in
+\cite{han2021inverse} and \cite{westling2021inference}, we can
+provide theoretical guarantees for the performance of the
+state learner.
 
-A super learner is a machine learning algorithm that combines
-a finite set of learners into a meta learner by estimating
-prediction performance in hold-out samples using a
-pre-specified loss function \citep{van2007super}. When the aim
-is to make a prediction model, super learners combine strong
-learners, such as Cox regression models and random survival
-forests \citep[][Section 8.4]{gerds2021medical}. While the
-general idea of combining strong learners based on
-cross-validation stems from earlier work
-\citep{wolpert1992stacked,breiman1996stacked}, the name super
-learner is justified by an oracle inequality
-\citep{van2003unicv,vaart2006oracle}.
+The state learner is based on the simple idea of considering
+right-censored competing risks data as an artificial
+multi-state system where censoring is included as a state of
+its own. Candidate models are then assessed based on how well
+they predict the state occupations of this system across time,
+based on baseline covariates. We demonstrate how to construct
+a library for the state learner using existing survival
+models, and how to obtain risk predictions from the resulting
+ensemble. To analyse the theoretical properties of the state
+learner we focus on the discrete super learner which pick the
+model in the library with best estimated performance
+\citep{van2007super}. We show that the discrete state learner
+is consistent under mild conditions and prove a finite-sample
+oracle inequality.
 
-We define the state learner, a new super learner for
-right-censored data, which simultaneously estimates the
-expected loss of learners of the event time distribution and
-the censoring distribution. Compared to the super learners of
-\cite{polley2011-sl-cens} and \cite{golmakani2020super}, the
-state learner proposed here poses no restrictions on the type
-of learners that can be included in the library. Compared to
-super learners that rely on inverse probability of censoring
-weighting, censoring unbiased transformations, or
-pseudo-values, the state learner does not require a
-pre-specified censoring distribution. Compared to the super
-learners by \cite{han2021inverse} and
-\cite{westling2021inference}, the state learner has
-theoretical guarantees which these methods do not have.
-
-The loss function underlying the state learner operates on
-coarsened data. In the right-censored survival setting the
-coarsened data consist of the minimum and the order of the
-censoring time and the event time as well as the baseline
-covariates. The state learner works by simultaneously
-assessing how well learners of the event time distribution and
-the censoring distribution predict the states of the coarsened
-data. To analyse the theoretical properties of the state
-learner we focus on the discrete super learner which combines
-the library of learners by picking the one that minimises the
-cross-validated loss \citep{van2007super}. In the presence of
-competing risks, our algorithm uses separate libraries of
-learners for the cumulative hazard functions for each of the
-competing risks and for the censoring distribution. We show
-that the oracle selector of the state learner is consistent if
-all libraries contain a consistent learner and prove a finite
-sample oracle inequality.
-
-The state learner algorithm can output a medical risk
-prediction model \citep{gerds2021medical} which predicts the
-probability of an event based on covariates in the presence of
-competing risks. Another important application, which
-motivated our contribution, is in targeted learning where
-conditional event probabilities occur as high-dimensional
-nuisance parameters which need to be estimated at a certain
-rate \citep{van2011targeted, rytgaard2021estimation,
-  rytgaard2022targeted}. The state learner is particularly
-well-suited for this application as it simultaneously provides
-estimates for both the outcome and the censoring, both of
-which are needed for targeted learning. For the asymptotic
-bias term of a targeted estimator, which uses the state
-learner to estimate nuisance parameters, we show that a second
-order product structure holds. We illustrate both applications
-of the state learner with prostate cancer data
-\citep{kattan2000pretreatment}.
+\subsection{Related work}
+\label{sec:related-work}
 
 There are many existing super learners for right-censored
-data. We briefly review them here. Machine learning based on
-right-censored data commonly uses the partial log-likelihood
-as a loss function
+data. Machine learning based on right-censored data commonly
+uses the partial log-likelihood as a loss function
 \citep[e.g.,][]{li2016regularized,yao2017deep,lee2018deephit,katzman2018deepsurv,gensheimer2019scalable,lee2021boosted,kvamme2021continuous}.
 This loss function is also suggested for super learning with
 right-censored data by \cite{polley2011-sl-cens}, where data
@@ -208,9 +191,10 @@ This choice of loss function restricts the library of learners
 to include only Cox proportional hazards models, and hence
 excludes many learners such as, e.g., random survival forests,
 additive hazards models, and accelerated failure time models.
-Other proposals for super learning with right-censored data
-use an inverse probability of censoring weighted (IPCW) loss
-function
+
+Alternative approaches for super learning with right-censored
+data use an inverse probability of censoring weighted (IPCW)
+loss function
 \citep{graf1999assessment,van2003unicv,molinaro2004tree,keles2004asymptotically,hothorn2006survival,gerds2006consistent,gonzalez2021stacked},
 censoring unbiased transformations
 \citep{fan1996local,steingrimsson2019censoring}, or
@@ -218,31 +202,99 @@ pseudo-values
 \citep{andersen2003generalised,mogensen2013random,sachs2019ensemble}.
 All these methods rely on an estimator of the censoring
 distribution, and their drawback is that this estimator has to
-be pre-specified. An approach which avoids a pre-specified
-censoring model was proposed independently by
-\cite{han2021inverse} and \cite{westling2021inference}. In
-both articles, the authors suggest to iterate between learning
-of the outcome model and learning of the censoring model using
-IPCW loss functions. However, it seems that this procedure is
-in general not guaranteed to converge to the true
-data-generating mechanism
+be pre-specified.
+
+More recent work by \cite{han2021inverse} and
+\cite{westling2021inference} circumvents the need to
+pre-specify a censoring model by iterating
+between estimation of the outcome and censoring models. However, it seems that this procedure is in general not
+guaranteed to converge to the true data-generating mechanism
 \citep[][Appendix~A.4]{munch2024thesis}.
 
+\subsection{Outline of the paper}
+\label{sec:outline-paper}
+
 We introduce our notation and framework in
-Section~\ref{sec:framework}. In
-Section~\ref{sec:super-learning} we define general super
-learning for right-censored data.
-Section~\ref{sec:super-learner-simple} introduces the state
-learner, and Section~\ref{sec:theor-results-prop} provides
-theoretical guarantees. We report results of our numerical
-experiments in Section~\ref{sec:numer-exper} and analyse a
-prostate cancer data set in Section~\ref{sec:real-data-appl}.
-Section~\ref{sec:discussion} contains a discussion of the
-merits and limitations of our proposal. Proofs are given in
-Appendix~\ref{sec:proofs}. An implementation of the state
-learner is available at
-\url{https://github.com/amnudn/statelearner} along with code
-for reproducing our numerical experiments.
+Section~\ref{sec:framework}. Section~\ref{sec:super-learning}
+defines general super learning for right-censored data.
+Section~\ref{sec:super-learner-simple} presents the state
+learner. In Section~\ref{sec:use-cases-state}, we demonstrate
+how the state learner can be used to obtain risk predictions
+and how it can be applied in the context of causal inference.
+Section~\ref{sec:theor-results-prop} provides theoretical
+guarantees. Section~\ref{sec:numer-exper} reports the results
+of numerical experiments, and Section~\ref{sec:real-data-appl}
+illustrates the method on prostate cancer data. We conclude
+with a discussion in Section~\ref{sec:discussion}. Proofs are
+included in Appendix~\ref{sec:proofs}. Code and an
+implementation of the state learner are available at
+\url{https://github.com/amnudn/statelearner}.
+
+
+% A super learner is a machine learning algorithm that combines
+% a finite set of learners into a meta learner by estimating
+% prediction performance in hold-out samples using a
+% pre-specified loss function \citep{van2007super}. When the aim
+% is to make a prediction model, super learners combine strong
+% learners, such as Cox regression models and random survival
+% forests \citep[][Section 8.4]{gerds2021medical}. While the
+% general idea of combining strong learners based on
+% cross-validation stems from earlier work
+% \citep{wolpert1992stacked,breiman1996stacked}, the name super
+% learner is justified by an oracle inequality
+% \citep{van2003unicv,vaart2006oracle}.
+
+% We define the state learner, a new super learner for
+% right-censored data, which simultaneously estimates the
+% expected loss of learners of the event time distribution and
+% the censoring distribution. Compared to the super learners of
+% \cite{polley2011-sl-cens} and \cite{golmakani2020super}, the
+% state learner proposed here poses no restrictions on the type
+% of learners that can be included in the library. Compared to
+% super learners that rely on inverse probability of censoring
+% weighting, censoring unbiased transformations, or
+% pseudo-values, the state learner does not require a
+% pre-specified censoring distribution. Compared to the super
+% learners by \cite{han2021inverse} and
+% \cite{westling2021inference}, the state learner has
+% theoretical guarantees which these methods do not have.
+
+% The loss function underlying the state learner operates on
+% coarsened data. In the right-censored survival setting the
+% coarsened data consist of the minimum and the order of the
+% censoring time and the event time as well as the baseline
+% covariates. The state learner works by simultaneously
+% assessing how well learners of the event time distribution and
+% the censoring distribution predict the states of the coarsened
+% data. To analyse the theoretical properties of the state
+% learner we focus on the discrete super learner which combines
+% the library of learners by picking the one that minimises the
+% cross-validated loss \citep{van2007super}. In the presence of
+% competing risks, our algorithm uses separate libraries of
+% learners for the cumulative hazard functions for each of the
+% competing risks and for the censoring distribution. We show
+% that the oracle selector of the state learner is consistent if
+% all libraries contain a consistent learner and prove a finite
+% sample oracle inequality.
+
+% The state learner algorithm can output a medical risk
+% prediction model \citep{gerds2021medical} which predicts the
+% probability of an event based on covariates in the presence of
+% competing risks. Another important application, which
+% motivated our contribution, is in targeted learning where
+% conditional event probabilities occur as high-dimensional
+% nuisance parameters which need to be estimated at a certain
+% rate \citep{van2011targeted, rytgaard2021estimation,
+%   rytgaard2022targeted}. The state learner is particularly
+% well-suited for this application as it simultaneously provides
+% estimates for both the outcome and the censoring, both of
+% which are needed for targeted learning. For the asymptotic
+% bias term of a targeted estimator, which uses the state
+% learner to estimate nuisance parameters, we show that a second
+% order product structure holds. We illustrate both applications
+% of the state learner with prostate cancer data
+% \citep{kattan2000pretreatment}.
+
 
 \section{Notation and framework}
 \label{sec:framework}
@@ -351,10 +403,10 @@ $\Theta$.
 
 As input to a super learner we need a data set
 \( \data_n=\{O_i\}_{i=1}^n \) of i.i.d.\ observations from
-\( P \in \mathcal{P} \) and a collection of candidate learners
-$\mathcal{A}$. Each learner \(a \in \mathcal{A}\) is a map
-\( a \colon \mathcal{O}^n \rightarrow \Theta \) which takes a
-data set as input and returns an estimate
+\( P \in \mathcal{P} \) and a collection of candidate models
+or learners $\mathcal{A}$. Each learner \(a \in \mathcal{A}\)
+is a map \( a \colon \mathcal{O}^n \rightarrow \Theta \) which
+takes a data set as input and returns an estimate
 $a(\data_n) \in \Theta$ of $\theta$.
 % Formally, the domain of $a$ depends on \(n\) but we suppress this in the notation.
 In what follows, we use the short-hand notation
@@ -568,20 +620,17 @@ feature of the observed right-censored data distribution
 distribution and is typically not of direct interest in
 itself. In the following, we describe how an estimate of
 \( F \), as provided by the state learner, can be used to
-estimate more relevant parameters of interest, such as
+estimate more relevant parameters of interest, such as, e.g.,
 survival probabilities.
 
 \subsection{Survival and risk predictions}
 \label{sec:surv-risk-pred}
 
-We here provide explicit formulas for obtaining event-free
-survival probabilities and risk predictions given the
-state-occupation function \( F \) defined in
-equation~\eqref{eq:F-def}. These formula holds under the
+Event-free survival probabilities and risk predictions can be
+obtained from the state-occupation function \( F \) under the
 assumption of conditional independent censoring and
-positivity, as introduced in Section~\ref{sec:framework}.
-
-By equations~(\ref{eq:lambdaj}) and~(\ref{eq:gamma}) and the
+positivity, as introduced in Section~\ref{sec:framework}. By
+equations~(\ref{eq:lambdaj}) and~(\ref{eq:gamma}) and the
 definition of \( F \), we have
 \begin{equation}
   \label{eq:7}
@@ -592,7 +641,7 @@ definition of \( F \), we have
   \quad j \in \{1,2\}.
 \end{equation}
 Equation~\eqref{eq:surv-def} provides a formula for obtaining
-the event-free survival probabilities from the cause-specific
+event-free survival probabilities from the cause-specific
 cumulative hazard functions. Similarly, cause-specific risk
 predictions can be obtained from \( \Lambda_1 \) and
 $\Lambda_2$ using the formula
@@ -625,12 +674,30 @@ and~\eqref{eq:cs-risk-def}.
 \subsection{Targeted and debiased machine learning}
 \label{sec:targeted-learning}
 
-... TL + SL = strong... The state learner is particularly well
-suited for targeted and debiased machine learning as it
-immediately provides estimates of the nuisance parameters
-pertaining to the outcome and the censoring models. While it
-was our original motivation for developing the state learning,
-we leave the study of the state learner in the context of
+The framework of \textit{targeted} or \textit{debiased}
+machine learning is a general methodology for combining
+data-adaptive modeling, such as machine and super learning,
+with asymptotically valid statistical inference for
+interpretable target parameters \citep{van2006targeted,
+  chernozhukov2018double}. \fxnote*{add more references?}{This
+  framework has been applied extensively for causal inference
+  based on observational data
+  \citep[e.g.,][]{van2011targeted,kennedy2016semiparametric,rytgaard2022targeted}.}
+A targeted or debiased estimator is constructed by first
+estimation high-dimensional nuisance parameter using machine
+learning, and then employing a debiasing or targeting step
+using tools from semi-parametric efficiency theory
+\citep{pfanzagl1985contributions,bickel1993efficient,van2003unified,tsiatis2007semiparametric,kennedy2022semiparametric}.
+In the context of right-censored competing risk data, the
+high-dimensional nuisance parameters needed to be estimated
+will typically include the cause-specific cumulative hazard
+functions and the cumulative hazard function for censoring
+\citep[e.g.,][]{van2003unified,rytgaard2021estimation,rytgaard2022targeted}.
+The state learner is hence particularly well suited for
+targeted and debiased machine learning as it immediately
+provides estimates of these nuisance parameters. While it was
+our original motivation for developing the state learning, we
+leave the study of the state learner in the context of
 targeted and debiased machine learning for a future paper.
 
 
@@ -783,21 +850,23 @@ data were generated in the same way, except that censoring was generated
 completely independently. We refer to this simulation setting as `independent
 censoring'.
 
-For all super learners we use a library consisting of three learners:
-The Kaplan-Meier estimator
-\citep{kaplan1958nonparametric,Gerds_2019prodlim}, a Cox model with
-main effects \citep{cox1972regression, survival-package}, and a random
-survival forest \citep{ishwaran2008random,rfsrc-paclage}. We use the
-same library to learn the outcome distribution and the censoring
-distribution. Note that the three learners in our library of learners
-can be used to learn the cumulative hazard functions of the 
-outcome and the censoring distribution. The latter works by
-training the learner on the data set \( \data_n^c \), where
-\( \data_n^c = \{O_i^c\}_{i=1}^n \) with
-\( O_i^c = (\tilde{T}_i, 1-\Delta, X_i) \). When we say that we use a
-learner for the cumulative hazard function of the outcome to learn the
-cumulative hazard function of the censoring time, we mean that the
-learner is trained on \( \data_n^c \).
+For all super learners we use a library consisting of three
+learners: The Kaplan-Meier estimator
+\citep{kaplan1958nonparametric,Gerds_2019prodlim}, a Cox model
+with main effects \citep{cox1972regression, survival-package},
+and a random survival forest
+\citep{ishwaran2008random,rfsrc-paclage}. We use the same
+library to learn the outcome distribution and the censoring
+distribution. Note that the three learners in our library of
+learners can be used to learn the cumulative hazard functions
+of the outcome and the censoring distribution. The latter
+works by training the learner on the data set \( \data_n^c \),
+where \( \data_n^c = \{O_i^c\}_{i=1}^n \) with
+\( O_i^c = (\tilde{T}_i, 1-\Delta_i, X_i) \). When we say that
+we use a learner for the cumulative hazard function of the
+outcome to learn the cumulative hazard function of the
+censoring time, we mean that the learner is trained on
+\( \data_n^c \).
 
 We compare the state learner to two IPCW based super learners: The
 first super learner, called IPCW(Cox), uses a Cox model with main
