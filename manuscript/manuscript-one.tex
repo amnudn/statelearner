@@ -132,8 +132,8 @@ can help tailor care to individual patients, avoid overtreatment, and
 allocate healthcare resources more effectively. Super learning
 \citep{van2007super}, also known as ensemble learning or stacked
 regression \citep{wolpert1992stacked,breiman1996stacked}, provides a
-powerful approach to this problem which by combining multiple
-candidate prediction models reduces the risk of bias incurred by a
+powerful approach to this problem by combining multiple
+candidate prediction models to reduce the risk of bias incurred by a
 single potentially mispecified model. In survival analysis, a super
 learner may combine a stack of Cox regression models with a stack of
 random survival forests \citep[][Section 8.4]{gerds2021medical}. Such
@@ -164,27 +164,27 @@ censoring distribution, and is also fully flexible with respect to the
 choice of learners. The latter is in contrast to other proposals which
 restrict the library of learners to specific model classes
 \citep{polley2011-sl-cens,golmakani2020super}, see Section
-\ref{sec:choice-of-loss-function}. Recent work by
+\ref{sec:choice-of-loss-function}. Like our proposal, recent work by
 \cite{han2021inverse} and \cite{westling2021inference} also
 circumvents the need to pre-specify a censoring model by iterating
-between estimation of the outcome and censoring models. However, this
+between estimation of the outcome and censoring models.
+However, this iterative
 procedure is in general not guaranteed to converge to the true
-data-generating mechanism \citep[][Appendix~A.4]{munch2024thesis}. To
-analyse the theoretical properties of the state learner we focus on
-the discrete super learner which picks the model in the library with
-best estimated performance \citep{van2007super}. Here we provide
-theoretical guarantees for the performance of the state learner and in
-particular show that the discrete state learner is consistent under
-natural conditions and prove a finite-sample oracle inequality. We
-demonstrate how to construct a library for the state learner using
-common survival models, and how to obtain risk predictions from the
-resulting ensemble.\marginnote{is the term cross-fitting correct?}
-The state learner can be applied to produce a risk
-prediction model and can also be used for cross-fitting in semiparametric inference.
+data-generating mechanism
+\citep[][Appendix~A.4]{munch2024thesis}.
 
-\subsection{Outline of the paper}
-\label{sec:outline-paper}
+To analyse the theoretical properties of the state learner we
+focus on the discrete super learner which picks the model in
+the library with best estimated performance
+\citep{van2007super}. We provide theoretical guarantees
+for the performance of the state learner and in particular
+show that the discrete state learner is consistent under
+natural conditions and prove a finite-sample oracle
+inequality. We demonstrate how to construct a library for the
+state learner using common survival models, and how to obtain
+risk predictions from the resulting ensemble.
 
+The rest of the paper is organized as follows.
 We introduce our notation and framework in
 Section~\ref{sec:framework}. Section~\ref{sec:super-learning}
 introduces loss-based super learning. In
@@ -383,21 +383,22 @@ the process
 \begin{equation*}
   \eta(t) = \1\{\tilde{T} \leq t, \tilde D=1\} + 2\,\1\{\tilde{T} \leq t, \tilde
   D=2\} - \1\{\tilde{T} \leq t, \tilde D=0\},
-  \quad \text{for} \quad t \in [0, \tau]
-\end{equation*} which takes values in \( \{-1,0,1,2\}\) which
-represent four mutually exclusive states. Specifically value \( 0 \)
-represents the state where the individual is still event-free and
-uncensored, value \( 1\) the state where the event of interest has
-occured, value \( 2\) the state where a competing risk has occured and
-value \( -1\) the state where the observation is right censored.  The
-state occupation probabilities given baseline covariates \( X \) are
-given by the function\marginnote{cannot use k because k is used in
-previous section}
+  \quad \text{for} \quad t \in [0, \tau],
+\end{equation*}
+which takes values in \( \{-1,0,1,2\}\). The four values
+represent four mutually exclusive states. Specifically, value
+\( 0 \) represents the state where the individual is still
+event-free and uncensored, value \( 1\) the state where the
+event of interest has occurred, value \( 2\) the state where a
+competing risk has occurred, and value \( -1\) the state where
+the observation is right-censored. The state occupation
+probabilities given baseline covariates \( X \) are given by
+the function
 \begin{equation}
   \label{eq:F-def}
-  F(t, k, x) = P(\eta(t) = k \mid X=x),
+  F(t, l, x) = P(\eta(t) = l \mid X=x),
 \end{equation}
-for all \( t \in [0,\tau] \), \( k \in \{-1,0,1,2\} \), and
+for all \( t \in [0,\tau] \), \( l \in \{-1,0,1,2\} \), and
 \( x \in \mathcal{X} \).
 
 The state learner is a super learner for the function-valued parameter
@@ -464,7 +465,11 @@ $\mathcal{F}$ of learners for \( F \):
   &= \int_0^t \phi_{a_1,a_2, b}(\data_n)(s-,0,x)  b(\data_n)(\diff s \mid x).
 \end{align*} Notably, the libraries \( \mathcal{A}_1 \), \(
 \mathcal{A}_2 \), and \( \mathcal{B} \) can be constructed using
-common methods for survival analysis.\marginnote{Elaborate on this last statement with a concrete example?}
+standard software for survival analysis. In
+\texttt{R}, for instance, we can construct Cox models as
+learners using the \texttt{survival}-package
+\citep{survival-package}, and we can construct random survival
+forests as learners using the \texttt{randomForestSRC}-package \citep{randomForestSRC}.
 
 To evaluate how well a function \( F \) predicts the
 process $\eta$ we use the integrated Brier score \citep{graf1999assessment}
@@ -472,9 +477,9 @@ process $\eta$ we use the integrated Brier score \citep{graf1999assessment}
 where \( B_t \) is the Brier score
 \citep{brier1950verification} at time \( t \in [0, \tau] \),
 \begin{equation*}
-  B_t(F,O) = \sum_{j=-1}^{2}
+  B_t(F,O) = \sum_{l=-1}^{2}
   \left(
-      F(t,j,X) - \1{\{\eta(t)=j\}}
+      F(t,l,X) - \1{\{\eta(t)=l\}}
   \right)^2.
 \end{equation*}
 \marginnote{Say that Brier score is across all 4 states because this is not commonly done}
@@ -544,7 +549,7 @@ equation~(\ref{eq:F-def}). In the following we let
   \begin{equation*}
     F_P = \argmin_{F \in \mathcal{H}_{\mathcal{P}}} P{[\bar{B}_\tau(F, \blank)]},
   \end{equation*}
-  for all \( j \in \{-1, 0, 1, 2 \} \), almost all
+  for all \( l \in \{-1, 0, 1, 2 \} \), almost all
   \( t \in [0,\tau] \), and \( P \)-almost all
   \( x \in \mathcal{X} \).
 \end{proposition}
@@ -569,7 +574,7 @@ dependence on the sample size. In the following we let the space \(
   \label{eq:norm}
   \| F \|_{P} = 
   \left\{
-    \sum_{j=-1}^{2}\int_{\mathcal{X}} \int_0^{\tau} F(t, j, x)^2 \diff t P( \diff x)
+    \sum_{l=-1}^{2}\int_{\mathcal{X}} \int_0^{\tau} F(t, l, x)^2 \diff t P( \diff x)
   \right\}^{1/2}.
 \end{equation}
 
@@ -593,10 +598,9 @@ dependence on the sample size. In the following we let the space \(
 \begin{proof}
   See Appendix~\ref{sec:oracle-inequalities}.
 \end{proof}
-\marginnote{if it is a special case, why is a proof needed?}
-Proposition~\ref{prop:oracle-prop} is in essence a
-special case of Theorem 2.3 in \citep{vaart2006oracle}. It 
-has the following asymptotic consequences.
+
+Proposition~\ref{prop:oracle-prop} has the following
+asymptotic consequences.
 
 \begin{corollary}
   \label{cor:asymp-cons}
@@ -751,7 +755,7 @@ learners: The Kaplan-Meier estimator
 \citep{kaplan1958nonparametric,Gerds_2019prodlim}, a Cox model
 with main effects \citep{cox1972regression, survival-package},
 and a random survival forest
-\citep{ishwaran2008random,rfsrc-paclage}. We use the same
+\citep{ishwaran2008random,randomForestSRC}. We use the same
 library to learn the outcome distribution and the censoring
 distribution. Note that the three learners in our library of
 learners can be used to learn the cumulative hazard functions
@@ -1050,22 +1054,22 @@ equation~(\ref{eq:norm}).
   \( R_{P}(F) = \Vert F - F_P \Vert_{P}^2 \).
 \end{lemma}
 \begin{proof}[Proof]
-  For any \( t \in [0, \tau] \) and \( j\in \{-1,0,1,2\} \) we have
+  For any \( t \in [0, \tau] \) and \( l\in \{-1,0,1,2\} \) we have
   \begin{align*}
-    & \E_{P}{\left[ (F(t, j, X) - \1{\{\eta(t) = j \}})^2 \right]}
+    & \E_{P}{\left[ (F(t, l, X) - \1{\{\eta(t) = l \}})^2 \right]}
     \\
-    & =    \E_{P}{\left[ (F(t, j, X) - F_P(t, j, X) + F_P(t, j, X) - \1{\{\eta(t) = j
+    & =    \E_{P}{\left[ (F(t, l, X) - F_P(t, l, X) + F_P(t, l, X) - \1{\{\eta(t) = l
       \}})^2 \right]}
     \\
-    & =    \E_{P}{\left[ (F(t, j, X) - F_P(t, j, X))^2\right]}
-      + \E_{P}{\left[ (F_P(t, j, X) - \1{\{\eta(t) = j \}})^2\right]}
+    & =    \E_{P}{\left[ (F(t, l, X) - F_P(t, l, X))^2\right]}
+      + \E_{P}{\left[ (F_P(t, l, X) - \1{\{\eta(t) = l \}})^2\right]}
     \\
     & \quad
-      + 2\E_{P}{\left[ (F(t, j, X) - F_P(t, j, X))(F_P(t, j, X) - \1{\{\eta(t) = j
+      + 2\E_{P}{\left[ (F(t, l, X) - F_P(t, l, X))(F_P(t, l, X) - \1{\{\eta(t) = l
       \}})\right]}
     \\
-    & =    \E_{P}{\left[ (F(t, j, X) - F_P(t, j, X))^2\right]}
-      + \E_{P}{\left[ (F_P(t, j, X) - \1{\{\eta(t) = j \}})^2\right]},
+    & =    \E_{P}{\left[ (F(t, l, X) - F_P(t, l, X))^2\right]}
+      + \E_{P}{\left[ (F_P(t, l, X) - \1{\{\eta(t) = l \}})^2\right]},
   \end{align*}
   where the last equality follows from the tower property. Hence, using Fubini,
   we have
@@ -1131,21 +1135,21 @@ the function \(o \mapsto \bar{B}_{\tau,P}(F, o) \). As
      a + b -2c
     \right\},
 \end{align*}
-so using this with \( a=F(t, j, x) \), \( b=F_P(t, j, x) \), and
-\( c = \1{\{\eta(t) = j\}} \), we have by Jensen's inequality
+so using this with \( a=F(t, l, x) \), \( b=F_P(t, l, x) \), and
+\( c = \1{\{\eta(t) = l\}} \), we have by Jensen's inequality
 \begin{align*}
   & P{[\bar{B}_{\tau,P}(F, \blank)^2]}
   \\
   & \leq
     2\tau\E_{P}{\left[
-    \sum_{j=-1}^{2} \int_0^{\tau}
+    \sum_{l=-1}^{2} \int_0^{\tau}
     \left\{
     \left(
-    F(t, j, X) - \1{\{\eta(t) = j\}}
+    F(t, l, X) - \1{\{\eta(t) = l\}}
     \right)^2
     -
     \left(
-    F_P(t, j, X) - \1{\{\eta(t) = j\}}
+    F_P(t, l, X) - \1{\{\eta(t) = l\}}
     \right)^2
     \right\}^2
     \diff t 
@@ -1153,23 +1157,23 @@ so using this with \( a=F(t, j, x) \), \( b=F_P(t, j, x) \), and
   \\
   & =2\tau
     \E_{P}\Bigg[
-    \sum_{j=-1}^{2} \int_0^{\tau}
+    \sum_{l=-1}^{2} \int_0^{\tau}
     \left(
-    F(t, j, X) - F_P(t, j, X)
+    F(t, l, X) - F_P(t, l, X)
     \right)^2
   \\
   & \quad \quad \quad\quad \quad \quad \times
     \left\{
-    F(t, j, X) +  F_P(t, j, X)-2 \1{\{\eta(t) = j\}}
+    F(t, l, X) +  F_P(t, l, X)-2 \1{\{\eta(t) = l\}}
     \right\}^2
     \diff t 
     \Bigg]
   \\
   & \leq
     8\tau \E_{P}{\left[
-    \sum_{j=-1}^{2} \int_0^{\tau}
+    \sum_{l=-1}^{2} \int_0^{\tau}
     \left(
-    F(t, j, X) - F_P(t, j, X)
+    F(t, l, X) - F_P(t, l, X)
     \right)^2
     \diff t 
     \right]}.
